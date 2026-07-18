@@ -873,6 +873,24 @@
 
 
   <!-- All JavaScript — see js/main.js for function documentation -->
+  <!--
+    Temporal polyfill: loaded only when the engine lacks native Temporal support.
+    The polyfill script sets window.Temporal so main.js can use it unconditionally.
+  -->
+  <script>
+    if (typeof Temporal === 'undefined') {
+      var s = document.createElement('script');
+      s.src = 'https://cdn.jsdelivr.net/npm/@js-temporal/polyfill@0.5.1/dist/index.umd.js';
+      s.onload = function () {
+        // @js-temporal/polyfill UMD exposes window.temporal (lowercase namespace).
+        // Hoist Temporal to the expected global so main.js can reference it directly.
+        if (typeof Temporal === 'undefined' && window.temporal && window.temporal.Temporal) {
+          window.Temporal = window.temporal.Temporal;
+        }
+      };
+      document.head.appendChild(s);
+    }
+  </script>
   <script src="js/main.js"></script>
 
 </body>

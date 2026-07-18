@@ -250,6 +250,33 @@
       },
     ];
 
+    // Convert a JS Date → Temporal.PlainDate (YYYY-MM-DD, local calendar).
+    function toPlainDate(jsDate) {
+      return Temporal.PlainDate.from({
+        year:  jsDate.getFullYear(),
+        month: jsDate.getMonth() + 1,
+        day:   jsDate.getDate(),
+      });
+    }
+
+    // Return calendar-accurate { years, months, days } between two JS Dates using Temporal.
+    // Falls back to the ms-division approach if Temporal is somehow still absent.
+    function calendarDiff(startJsDate, endJsDate) {
+      if (typeof Temporal !== 'undefined') {
+        const start = toPlainDate(startJsDate);
+        const end   = toPlainDate(endJsDate);
+        const dur   = start.until(end, { largestUnit: 'years', smallestUnit: 'days' });
+        return { years: dur.years, months: dur.months, days: dur.days };
+      }
+      // Fallback (should never reach here after polyfill loads, kept as safety net).
+      const ms         = Math.max(0, endJsDate - startJsDate);
+      const totalDays  = Math.floor(ms / 86400000);
+      const years      = Math.floor(totalDays / 365);
+      const months     = Math.floor((totalDays % 365) / 30);
+      const days       = totalDays % 30;
+      return { years, months, days };
+    }
+
     function careerTimer() {
       const periodsContainer = document.getElementById('timer-periods-container');
       const totalContainer   = document.getElementById('timer-total-display');
@@ -279,43 +306,73 @@
       });
 
       function render() {
-        const now   = new Date();
-        let totalMs = 0;
+        const now = new Date();
 
+        // Compute calendar-accurate years+months+days per period.
         periodsLatestFirst.forEach((period, i) => {
           const endDate = period.end === null ? now : period.end;
-          const ms      = Math.max(0, endDate - period.start);
-          totalMs      += ms;
-          renderUnits(periodRows[i], ms);
+          const cal     = calendarDiff(period.start, endDate);
+          // Sub-day precision (hours/min/sec) still needs elapsed ms for the live tick.
+          const elapsedMs = Math.max(0, endDate - period.start);
+          renderUnits(periodRows[i], cal, elapsedMs);
         });
 
-        renderUnits(totalContainer, totalMs);
+        // Total: sum all period ms, then use Temporal for calendar units on the
+        // cumulative span (anchored from the earliest start to now).
+        let totalMs = 0;
+        periodsLatestFirst.forEach(period => {
+          const endDate = period.end === null ? now : period.end;
+          totalMs += Math.max(0, endDate - period.start);
+        });
+        // For the cumulative total we don't have a single contiguous span, so
+        // derive calendar units from total ms via a synthetic duration.
+        const totalDur = Temporal
+          ? Temporal.Duration.from({ milliseconds: totalMs }).round({
+              largestUnit: 'years',
+              smallestUnit: 'seconds',
+              relativeTo: Temporal.Now.plainDateISO(),
+            })
+          : null;
+        const totalCal = totalDur
+          ? { years: totalDur.years, months: totalDur.months, days: totalDur.days }
+          : calendarDiff(new Date(Date.now() - totalMs), new Date());
+        renderUnits(totalContainer, totalCal, totalMs);
       }
 
-      render();
-      setInterval(render, 1000);
+      // Lazy-start: only tick while the widget is visible in the viewport.
+      // IntersectionObserver is universally supported; no polyfill needed.
+      let ticker = null;
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            render();                             // immediate first paint
+            ticker = setInterval(render, 1000);
+          } else {
+            clearInterval(ticker);
+            ticker = null;
+          }
+        });
+      }, { threshold: 0.1 });
+
+      observer.observe(periodsContainer.closest('.career-timer-card') || periodsContainer);
     }
 
-    function renderUnits(container, ms) {
+    // Render calendar units + sub-day live tick into a timer-display element.
+    // cal  = { years, months, days }  — calendar-accurate from Temporal
+    // ms   = raw elapsed milliseconds — for hours/minutes/seconds
+    function renderUnits(container, cal, ms) {
       const totalSeconds = Math.floor(ms / 1000);
-      const totalMinutes = Math.floor(totalSeconds / 60);
-      const totalHours   = Math.floor(totalMinutes / 60);
-      const totalDays    = Math.floor(totalHours   / 24);
-      const totalMonths  = Math.floor(totalDays    / 30.4375);
-      const years        = Math.floor(totalMonths  / 12);
-      const months       = totalMonths % 12;
-      const days         = totalDays   % Math.round(30.4375);
-      const hours        = totalHours  % 24;
-      const minutes      = totalMinutes % 60;
+      const hours        = Math.floor(totalSeconds / 3600) % 24;
+      const minutes      = Math.floor(totalSeconds / 60)   % 60;
       const seconds      = totalSeconds % 60;
 
       const units = [
-        { v: years,   l: 'Yrs'  },
-        { v: months,  l: 'Mos'  },
-        { v: days,    l: 'Days' },
-        { v: hours,   l: 'Hrs'  },
-        { v: minutes, l: 'Min'  },
-        { v: seconds, l: 'Sec'  },
+        { v: cal.years,  l: 'Yrs'  },
+        { v: cal.months, l: 'Mos'  },
+        { v: cal.days,   l: 'Days' },
+        { v: hours,      l: 'Hrs'  },
+        { v: minutes,    l: 'Min'  },
+        { v: seconds,    l: 'Sec'  },
       ];
 
       container.innerHTML = units.map(u => `
@@ -1165,7 +1222,16 @@
     typedTitleEffect();
     navBehaviours();
     scrollReveal();
-    careerTimer();
+    // careerTimer relies on Temporal, which may be loaded async via polyfill.
+    // Wait until Temporal is available before initialising the widget.
+    (function waitForTemporal() {
+      if (typeof Temporal !== 'undefined') {
+        careerTimer();
+      } else {
+        // Poll at 50 ms; native engines resolve in <1 tick, polyfill in ~100-300 ms.
+        setTimeout(waitForTemporal, 50);
+      }
+    })();
     initKnob();
     initSourceTooltip();
     scrollProgressBar();
