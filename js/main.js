@@ -1075,6 +1075,70 @@
     }
 
 
+    function initRecommendationsCarousel() {
+      const carousel  = document.getElementById('rec-carousel');
+      const viewport  = carousel && carousel.parentElement;
+      const dotsWrap  = document.getElementById('rec-dots');
+      const prevBtn   = document.getElementById('rec-prev');
+      const nextBtn   = document.getElementById('rec-next');
+      if (!carousel || !viewport) return;
+
+      const cards   = Array.from(carousel.querySelectorAll('.rec-card'));
+      const total   = cards.length;
+      let current   = 0;
+      let autoTimer = null;
+
+      // Size all cards to match viewport width explicitly
+      function sizeCards() {
+        const w = viewport.offsetWidth;
+        carousel.style.width = (w * total) + 'px';
+        cards.forEach(c => { c.style.width = w + 'px'; });
+      }
+      sizeCards();
+      window.addEventListener('resize', () => { sizeCards(); goTo(current, false); });
+
+      // Build dots
+      cards.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'rec-dot' + (i === 0 ? ' active' : '');
+        dot.setAttribute('aria-label', `Slide ${i + 1}`);
+        dot.addEventListener('click', () => goTo(i));
+        dotsWrap.appendChild(dot);
+      });
+
+      function goTo(index, animate = true) {
+        current = (index + total) % total;
+        const offset = current * viewport.offsetWidth;
+        carousel.style.transition = animate ? 'transform 0.45s cubic-bezier(0.4,0,0.2,1)' : 'none';
+        carousel.style.transform  = `translateX(-${offset}px)`;
+        dotsWrap.querySelectorAll('.rec-dot').forEach((d, i) => {
+          d.classList.toggle('active', i === current);
+        });
+        resetAuto();
+      }
+
+      function resetAuto() {
+        clearInterval(autoTimer);
+        autoTimer = setInterval(() => goTo(current + 1), 5000);
+      }
+
+      prevBtn.addEventListener('click', () => goTo(current - 1));
+      nextBtn.addEventListener('click', () => goTo(current + 1));
+
+      let touchStartX = 0;
+      carousel.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+      carousel.addEventListener('touchend',   e => {
+        const diff = touchStartX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 50) goTo(current + (diff > 0 ? 1 : -1));
+      });
+
+      carousel.addEventListener('mouseenter', () => clearInterval(autoTimer));
+      carousel.addEventListener('mouseleave', resetAuto);
+
+      resetAuto();
+    }
+
+
     function navFullNameReveal() {
       const heroName = document.querySelector('.hero-name');
       const navLabel = document.getElementById('nav-fullname');
@@ -1097,6 +1161,7 @@
     cardTilt();
     activeNavHighlight();
     skillTagTooltips();
+    initRecommendationsCarousel();
     navFullNameReveal();
 
     // Opens PDF in new tab. Shows toast on click + once more when user returns.
