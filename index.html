@@ -11,9 +11,7 @@
   <!-- Stylesheet — all visual design tokens, layout, and animations -->
   <link rel="stylesheet" href="css/style.css">
 
-  <!-- Preload main.js so browser fetches it immediately during parse,
-       regardless of whether the polyfill conditional fires later. -->
-  <link rel="preload" href="js/main.js" as="script">
+
 </head>
 <body>
 
@@ -878,26 +876,13 @@
 
   <!-- All JavaScript — see js/main.js for function documentation -->
   <!--
-    Load main.js only after Temporal is guaranteed available:
-    - Native Temporal (Chrome 94+, Safari 17+, Firefox 108+): skip polyfill download entirely,
-      load main.js directly — zero extra network request.
-    - Older browsers: fetch polyfill first, load main.js in onload callback — no race condition.
+    defer scripts execute in document order after parse completes.
+    Preload scanner discovers both immediately — parallel fetch.
+    global.js self-checks: does nothing on engines with native Temporal.
+    main.js always runs after global.js regardless — no race.
   -->
-  <script>
-    function loadMain() {
-      var s = document.createElement('script');
-      s.src = 'js/main.js';
-      document.body.appendChild(s);
-    }
-    if (typeof Temporal !== 'undefined') {
-      loadMain();
-    } else {
-      var p = document.createElement('script');
-      p.src = 'https://cdn.jsdelivr.net/npm/temporal-polyfill@1.0.1/global.js';
-      p.onload = loadMain;
-      document.head.appendChild(p);
-    }
-  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/temporal-polyfill@1.0.1/global.js"></script>
+  <script defer src="js/main.js"></script>
 
 </body>
 </html>
