@@ -130,6 +130,20 @@
         'I care about the why, not just the what.',
         'Coffee-driven development. Deadline-aware.',
         'Building things that scale.',
+        'The boring parts matter most.',
+        'Readable code is a feature.',
+        'Good APIs are invisible. Bad ones haunt you.',
+        'I write the ticket, build the thing, and close the loop.',
+        'Complexity is easy. Simplicity takes work.',
+        'The best fix is the one nobody notices.',
+        'I ask why before I ask how.',
+        'Legacy code is just future code with more stories.',
+        'Soft skills ship features. Hard skills fix them.',
+        'Code reviews are love letters to your future self.',
+        'Learning every day. Shipping every day.',
+        'Always learning. Always building.',
+        'New problem every day. New solution every day.',
+        'Still curious. Still building.',
       ]);
 
       const el = document.getElementById('typed-text');
