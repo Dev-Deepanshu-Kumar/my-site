@@ -10,6 +10,10 @@
 
   <!-- Stylesheet — all visual design tokens, layout, and animations -->
   <link rel="stylesheet" href="css/style.css">
+
+  <!-- Preload main.js so browser fetches it immediately during parse,
+       regardless of whether the polyfill conditional fires later. -->
+  <link rel="preload" href="js/main.js" as="script">
 </head>
 <body>
 
