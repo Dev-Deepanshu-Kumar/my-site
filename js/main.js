@@ -112,6 +112,11 @@
         'Enterprise SaaS · 5+ Years',
         'Clean Architecture · DDD',
         'REST APIs · Microservices',
+        'I read the error logs, not just the tickets.',
+        'Async by default. Thoughtful by choice.',
+        'From monolith to microservices — one PR at a time.',
+        'I care about the why, not just the what.',
+        'Coffee-driven development. Deadline-aware.',
         'Building things that scale.',
       ];
 
@@ -965,11 +970,15 @@
       document.body.appendChild(tip);
 
       function positionTip(e) {
-        const pad  = 12, tipW = 280;
-        let left   = e.clientX + pad;
-        let top    = e.clientY + pad;
+        const pad  = 12;
+        const tipW = Math.min(280, window.innerWidth - 16);
+        tip.style.maxWidth = tipW + 'px';
+        let left = e.clientX + pad;
+        let top  = e.clientY + pad;
         if (left + tipW > window.innerWidth  - 8) left = e.clientX - tipW - pad;
+        if (left < 8) left = 8;
         if (top  + 80   > window.innerHeight - 8) top  = e.clientY - 80  - pad;
+        if (top < 8) top = 8;
         tip.style.left = left + 'px';
         tip.style.top  = top  + 'px';
       }

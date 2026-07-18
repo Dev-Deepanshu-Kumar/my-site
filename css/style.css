@@ -1739,7 +1739,10 @@
       .validator-inputs   { grid-template-columns: 1fr; gap: 12px; }
       .validator-vs       { display: none; }
       .algo-grid          { grid-template-columns: 1fr 1fr; }
-      .score-gauge-label  { width: 80px; font-size: 10px; }
+      .score-gauge-row    { flex-wrap: wrap; gap: 8px; }
+      .score-gauge-label  { width: 100%; font-size: 10px; }
+      .score-gauge-track  { flex: 1; min-width: 0; }
+      .verdict-subtitle   { word-break: break-word; }
     }
 
 
