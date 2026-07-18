@@ -1,4 +1,10 @@
 
+    // ── Toggle: set to false to hide the "Open to new opportunities" badge ──
+    const SHOW_OPEN_TO_WORK = true;
+    const badge = document.getElementById('open-to-work-badge');
+    if (badge) badge.style.display = SHOW_OPEN_TO_WORK ? '' : 'none';
+
+
     function particleSystem() {
       const canvas = document.getElementById('particle-canvas');
       const ctx    = canvas.getContext('2d');
@@ -943,7 +949,12 @@
         'Unit Testing'       : 'Wrote tests for business logic, custom auth handlers, query and command handlers',
         'Integration Testing': 'Real-DB integration tests covering repository and service layers end-to-end',
         'Git'                : 'Daily — feature branches, PRs, rebasing across all roles',
-        'Azure Repos'        : 'Git hosting at IndiaLends for main projects; also used TFS for a CDN-related project there',
+        'Azure Repos'        : 'Git hosting at IndiaLends for main application repos',
+        'TFS'                : 'Team Foundation Server — used at IndiaLends for version control on a CDN-related project',
+        'REST'               : 'Primary API style across all three companies — designed and consumed RESTful contracts',
+        'JSON'               : 'Standard data format for all API integrations; also used for config, request/response payloads',
+        'XML'                : 'Used extensively for banking and NBFC partner API integrations at IndiaLends — many financial APIs still require XML',
+        'Webhooks'           : 'Built HTTP-triggered Azure Functions to handle inbound webhook events from third-party banking partners',
         'Bitbucket'          : 'Code hosting at Siemens — Bitbucket with PR pipelines and branch policies',
         'Swagger / OpenAPI'  : 'Auto-generated API docs on all ASP.NET Core services',
         'Postman'            : 'API testing + environment collections for all services',

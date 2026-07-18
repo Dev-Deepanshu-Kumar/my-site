@@ -104,6 +104,19 @@
         </span>
       </div>
 
+      <!-- OPEN-TO-WORK BADGE — set SHOW_OPEN_TO_WORK = true to display, false to hide -->
+      <div id="open-to-work-badge" style="margin-top: 20px; opacity: 0; animation: fadeUp 0.6s 1s forwards;">
+        <span style="
+          display: inline-flex; align-items: center; gap: 8px;
+          background: rgba(91,212,160,0.08); border: 1px solid rgba(91,212,160,0.25);
+          color: #5bd4a0; border-radius: 20px; padding: 6px 14px;
+          font-size: 12px; font-weight: 600; letter-spacing: 0.3px;">
+          <span style="width:7px;height:7px;border-radius:50%;background:#5bd4a0;
+            box-shadow:0 0 6px #5bd4a0; animation: pulse 2s infinite;"></span>
+          Open to new opportunities
+        </span>
+      </div>
+
       <!-- Career Timer — JS reads CAREER_PERIODS array in main.js -->
       <div class="career-timer-card" style="margin-top: 40px; opacity: 0; animation: fadeUp 0.6s 1.2s forwards;">
         <div class="career-timer-heading">
@@ -353,13 +366,13 @@
         </div>
         <div class="highlight-card reveal reveal-d3">
           <span class="highlight-icon">⚙️</span>
-          <div class="highlight-title">Reusable P&amp;S Microservice</div>
-          <p class="highlight-body">Engineered a Planning &amp; Scheduling microservice covering technician assignment, scheduling, and labour-entry as an independently deployable capability using DDD aggregate patterns, designed for adoption across multiple products.</p>
+          <div class="highlight-title">P&amp;S Microservice Contributor</div>
+          <p class="highlight-body">Contributed to building a Planning &amp; Scheduling microservice covering technician assignment, scheduling, and labour-entry as an independently deployable capability applying DDD aggregate patterns, intended for adoption across multiple products.</p>
         </div>
         <div class="highlight-card reveal reveal-d4">
           <span class="highlight-icon">🚀</span>
-          <div class="highlight-title">Release &amp; Reliability Owner</div>
-          <p class="highlight-body">Served as Release Representative across multiple production releases and led a Maintenance &amp; Reliability initiative resolving customer-reported defects across Work Orders, Dashboard, Inventory, and Purchasing.</p>
+          <div class="highlight-title">Release &amp; Reliability Contributor</div>
+          <p class="highlight-body">Served as Release Representative across multiple production releases and contributed to a dedicated Maintenance &amp; Reliability team resolving customer-reported defects across Work Orders, Dashboard, Inventory, and Purchasing.</p>
         </div>
       </div>
 
@@ -431,6 +444,16 @@
         </div>
       </div>
 
+      <div class="skill-category reveal reveal-d1">
+        <div class="skill-category-title">Integrations</div>
+        <div class="skill-tags">
+          <span class="tag tag-gold">REST</span>
+          <span class="tag tag-gold">JSON</span>
+          <span class="tag tag-gold">XML</span>
+          <span class="tag tag-gold">Webhooks</span>
+        </div>
+      </div>
+
       <div class="skill-category reveal reveal-d2">
         <div class="skill-category-title">Auth &amp; Security</div>
         <div class="skill-tags">
@@ -473,6 +496,7 @@
         <div class="skill-tags">
           <span class="tag tag-blue">Git</span>
           <span class="tag tag-blue">Azure Repos</span>
+          <span class="tag tag-blue">TFS</span>
           <span class="tag tag-blue">Bitbucket</span>
           <span class="tag tag-blue">Swagger / OpenAPI</span>
           <span class="tag tag-blue">Postman</span>
@@ -526,14 +550,14 @@
             <div class="exp-bullets-wrapper">
               <ul class="exp-bullets">
                 <li>Contributed to modernising a 170-project, multi-tenant ASP.NET MVC enterprise SaaS platform serving 2,500+ organisations, developing modular .NET/.NET Core services and RESTful APIs applying DDD and Clean Architecture principles.</li>
-                <li>Designed and implemented backend APIs for an enterprise dashboard as an independently deployable satellite service (Strangler Fig pattern), enabling independent feature releases from the monolithic application and supporting gradual microservices-oriented modernisation.</li>
-                <li>Optimised dashboard performance by replacing Entity Framework-based data access with Dapper + SQL stored procedures, introducing lazy loading, paginated APIs, and independently loaded widgets.</li>
-                <li>Engineered a Planning &amp; Scheduling microservice covering technician assignment, scheduling, and labour-entry as an independently deployable service applying DDD aggregate patterns, designed as a reusable capability across multiple enterprise products.</li>
+                <li>Contributed to building backend APIs for an enterprise dashboard as an independently deployable satellite service (Strangler Fig pattern), enabling independent feature releases from the monolithic application and supporting gradual microservices-oriented modernisation.</li>
+                <li>Contributed to dashboard performance improvements including replacing Entity Framework-based data access with Dapper + SQL stored procedures, lazy loading, paginated APIs, and independently loaded widgets.</li>
+                <li>Contributed to building a Planning &amp; Scheduling microservice covering technician assignment, scheduling, and labour-entry as an independently deployable service applying DDD aggregate patterns, intended as a reusable capability across multiple enterprise products.</li>
                 <li>Built a reusable .NET Standard shared library (internal NuGet via MyGet) integrating AWS Secrets Manager, Redis caching, and resiliency patterns (retry, circuit-breaker) for secure region-aware database credential resolution as part of the Windows/IIS-to-Linux-container migration.</li>
                 <li>Implemented secure .NET 8 Minimal APIs protected through a custom cookie authentication scheme that delegates session validation to a centralised auth service, integrating with an enterprise ecosystem based on OIDC, Auth0, and JWT.</li>
                 <li>Developed BDD-driven unit and integration tests using NUnit, SpecFlow/ReqnRoll, and Moq, improving regression coverage and confidence in production releases.</li>
                 <li>Served as Release Representative across multiple production releases, supporting release planning, API reviews, rollback validation, package versioning, and production monitoring via Jenkins, TeamCity, Datadog, Grafana, SonarQube, and Snyk.</li>
-                <li>Contributed to a dedicated Maintenance &amp; Reliability initiative resolving customer-reported defects across Work Orders, Dashboard, Inventory, Purchasing, and related modules.</li>
+                <li>Contributed to a dedicated Maintenance &amp; Reliability team resolving customer-reported defects across Work Orders, Dashboard, Inventory, Purchasing, and related modules.</li>
               </ul>
             </div>
           </div>
