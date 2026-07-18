@@ -113,7 +113,13 @@
 
 
     function typedTitleEffect() {
-      const phrases = [
+      const phrases = (function shuffle(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      })([
         'C# · .NET · ASP.NET Core',
         'Enterprise SaaS · 5+ Years',
         'Clean Architecture · DDD',
@@ -124,7 +130,7 @@
         'I care about the why, not just the what.',
         'Coffee-driven development. Deadline-aware.',
         'Building things that scale.',
-      ];
+      ]);
 
       const el = document.getElementById('typed-text');
       let phraseIndex = 0;
@@ -1222,16 +1228,8 @@
     typedTitleEffect();
     navBehaviours();
     scrollReveal();
-    // careerTimer relies on Temporal, which may be loaded async via polyfill.
-    // Wait until Temporal is available before initialising the widget.
-    (function waitForTemporal() {
-      if (typeof Temporal !== 'undefined') {
-        careerTimer();
-      } else {
-        // Poll at 50 ms; native engines resolve in <1 tick, polyfill in ~100-300 ms.
-        setTimeout(waitForTemporal, 50);
-      }
-    })();
+    // Polyfill loaded via defer before this script (see index.html) — Temporal guaranteed available.
+    careerTimer();
     initKnob();
     initSourceTooltip();
     scrollProgressBar();
