@@ -97,13 +97,17 @@
       margin-left: 12px;
     }
 
-    /* Gradient lives on the inner span — pill background on parent doesn't conflict */
+    /* Gradient lives on the inner span — pill background on parent doesn't conflict.
+       translate3d forces a GPU compositing layer, fixing Safari's known bug where
+       background-clip:text fails to repaint inside an opacity-transitioning parent. */
     .nav-fullname-text {
       display: inline-block;
       background: linear-gradient(135deg, var(--color-accent-light), var(--color-gold));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      -webkit-transform: translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0);
     }
 
     .nav-fullname.visible {
