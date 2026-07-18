@@ -81,26 +81,29 @@
     }
 
     .nav-fullname {
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
+      /* Pill chrome lives here — background + border only, no text styling */
       display: inline-block;
-      background: linear-gradient(135deg, var(--color-accent-light), var(--color-gold));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      opacity: 0;
-      pointer-events: none;
-      white-space: nowrap;
-      padding: 4px 12px;
+      background: rgba(43,156,186,0.06);
       border: 1px solid rgba(43,156,186,0.35);
       border-radius: 20px;
-      background: rgba(43,156,186,0.06);
+      padding: 4px 12px;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
       transform: translateX(12px);
       transition: opacity 0.4s ease, transform 0.4s ease;
       /* Desktop: in flex flow, pushed right by nav-links */
       margin-right: auto;
       margin-left: 12px;
+    }
+
+    /* Gradient lives on the inner span — pill background on parent doesn't conflict */
+    .nav-fullname-text {
+      display: inline-block;
+      background: linear-gradient(135deg, var(--color-accent-light), var(--color-gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .nav-fullname.visible {
