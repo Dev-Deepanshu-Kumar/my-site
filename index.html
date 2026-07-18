@@ -800,8 +800,155 @@
 
     .exp-title    { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 4px; }
     .exp-title--dim { color: var(--color-muted); }
-    .exp-company  { font-size: 13.5px; color: var(--color-accent-light); font-weight: 500; }
     .exp-location { color: var(--color-muted); font-size: 12.5px; margin-top: 3px; }
+
+    /* Company name — acts as a link if href provided */
+    .exp-company {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13.5px;
+      color: var(--color-accent-light);
+      font-weight: 500;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .exp-company:hover { color: #fff; }
+    .exp-company-icon {
+      display: inline-flex;
+      opacity: 0;
+      transform: translate(-2px, 2px);
+      transition: opacity 0.2s, transform 0.2s;
+      flex-shrink: 0;
+    }
+    .exp-company:hover .exp-company-icon {
+      opacity: 1;
+      transform: translate(0, 0);
+    }
+
+    /* ── Resume download section ── */
+    #section-resume {
+      padding: 60px 0 20px;
+    }
+
+    .resume-card {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .resume-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(43,156,186,0.06) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 50%, rgba(232,170,74,0.05) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .resume-card:hover {
+      border-color: rgba(43,156,186,0.35);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.3);
+    }
+
+    .resume-icon-wrap {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .resume-icon-bg {
+      width: 72px; height: 72px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(43,156,186,0.15), rgba(232,170,74,0.1));
+      border: 1px solid rgba(43,156,186,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    .resume-text { flex: 1; min-width: 220px; }
+
+    .resume-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .resume-subtitle {
+      font-size: 13.5px;
+      color: var(--color-muted);
+      line-height: 1.65;
+      margin-bottom: 16px;
+    }
+
+    .resume-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .resume-tag {
+      background: rgba(43,156,186,0.08);
+      border: 1px solid rgba(43,156,186,0.2);
+      color: var(--color-muted);
+      padding: 3px 10px;
+      border-radius: 10px;
+      font-size: 11.5px;
+    }
+
+    .resume-download-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--color-accent), #1a7a96);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      font-family: inherit;
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .resume-download-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .resume-download-btn:hover::after { opacity: 1; }
+    .resume-download-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 32px rgba(43,156,186,0.45);
+    }
+
+    .resume-download-btn svg { flex-shrink: 0; }
+
+    @media (max-width: 600px) {
+      .resume-card { padding: 24px 20px; gap: 20px; }
+      .resume-download-btn { width: 100%; justify-content: center; }
+    }
 
     .exp-date-badge {
       background: rgba(232, 170, 74, 0.1);
@@ -1710,6 +1857,7 @@
       <li><a href="#section-skills">Skills</a></li>
       <li><a href="#section-experience">Experience</a></li>
       <li><a href="#section-education">Education</a></li>
+      <li><a href="Deepanshu_Kumar_Resume.pdf" download style="color:var(--color-muted)">↓ Resume</a></li>
     </ul>
 
     <!-- Mobile hamburger button -->
@@ -2185,7 +2333,10 @@
             <div class="exp-header">
               <div>
                 <div class="exp-title">Software Engineer</div>
-                <div class="exp-company">Siemens — Asset Management Software</div>
+                <a class="exp-company" href="https://www.assetmanagement.siemens.com/" target="_blank" rel="noopener">
+                  Siemens — Asset Management Software
+                  <svg class="exp-company-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
                 <div class="exp-location">📍 Noida, India &nbsp;·&nbsp; Formerly Brightly Software &nbsp;·&nbsp; Enterprise CMMS Platform</div>
               </div>
               <div class="exp-date-badge exp-date-badge--current">Jan 2024 — Present</div>
@@ -2220,7 +2371,10 @@
             <div class="exp-header">
               <div>
                 <div class="exp-title">Software Engineer</div>
-                <div class="exp-company">IndiaLends — GC Web Ventures Pvt Ltd</div>
+                <a class="exp-company" href="https://indialends.com/" target="_blank" rel="noopener">
+                  IndiaLends — GC Web Ventures Pvt Ltd
+                  <svg class="exp-company-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
                 <div class="exp-location">📍 Gurugram, India &nbsp;·&nbsp; FinTech Digital Lending</div>
               </div>
               <div class="exp-date-badge">Apr 2022 — Dec 2023</div>
@@ -2251,8 +2405,8 @@
           <div class="exp-card exp-card--dim">
             <div class="exp-header">
               <div>
-                <div class="exp-title exp-title--dim">Career Sabbatical — Independent Study &amp; Upskilling</div>
-                <div class="exp-location">Planned break during the COVID-19 pandemic for personal priorities and reassessing long-term career direction before returning to full-time engineering.</div>
+                <div class="exp-title exp-title--dim">Independent Study &amp; Upskilling</div>
+                <div class="exp-location">Took a planned career break during the COVID-19 pandemic, amid industry-wide uncertainty, to focus on personal priorities and reassess long-term career direction before returning to full-time software engineering.</div>
               </div>
               <div class="exp-date-badge exp-date-badge--dim">Jan 2021 — Mar 2022</div>
             </div>
@@ -2267,7 +2421,10 @@
             <div class="exp-header">
               <div>
                 <div class="exp-title">Software Development Engineer I</div>
-                <div class="exp-company">Telebu Communications LLP</div>
+                <a class="exp-company" href="https://www.telebu.com/" target="_blank" rel="noopener">
+                  Telebu Communications LLP
+                  <svg class="exp-company-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
                 <div class="exp-location">📍 Hyderabad, India &nbsp;·&nbsp; Healthcare Platform — Tabiib</div>
               </div>
               <div class="exp-date-badge">Dec 2019 — Dec 2020</div>
@@ -2391,6 +2548,50 @@
       </div>
 
     </section><!-- /education -->
+
+
+    <!-- ── RESUME DOWNLOAD ───────────────────────────────────── -->
+    <section id="section-resume" class="page-section">
+
+      <div class="section-eyebrow reveal">
+        <span class="section-eyebrow-tag">Want the full picture?</span>
+        <div class="section-eyebrow-line"></div>
+      </div>
+
+      <div class="resume-card reveal">
+
+        <div class="resume-icon-wrap">
+          <div class="resume-icon-bg">📄</div>
+        </div>
+
+        <div class="resume-text">
+          <div class="resume-title">Download My Resume</div>
+          <div class="resume-subtitle">
+            Prefer a traditional format? The full resume covers everything on this page
+            — and fits neatly on two pages of A4.
+          </div>
+          <div class="resume-tags">
+            <span class="resume-tag">PDF · A4</span>
+            <span class="resume-tag">5+ Years Experience</span>
+            <span class="resume-tag">.NET · C# · Backend</span>
+            <span class="resume-tag" id="resume-updated">Updated Jul 2026</span>
+          </div>
+        </div>
+
+        <a href="Deepanshu_Kumar_Resume.pdf"
+           download="Deepanshu_Kumar_Resume.pdf"
+           class="resume-download-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Download Resume
+        </a>
+
+      </div>
+
+    </section><!-- /resume -->
 
   </div><!-- /page-content -->
 
@@ -3256,6 +3457,16 @@
         if (pinned && e.target !== btn) { pinned = false; hideTip(); }
       });
     }
+
+
+    // ── Resume "always current" date tag ──────────────────────
+    (function(){
+      const el = document.getElementById('resume-updated');
+      if (!el) return;
+      const now = new Date();
+      const label = now.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+      el.textContent = 'Updated ' + label;
+    })();
 
 
     // ── Bootstrap all behaviours ───────────────────────────────
