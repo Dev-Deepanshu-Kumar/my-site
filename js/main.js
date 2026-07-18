@@ -274,13 +274,32 @@
         const dur   = start.until(end, { largestUnit: 'years', smallestUnit: 'days' });
         return { years: dur.years, months: dur.months, days: dur.days };
       }
-      // Fallback (should never reach here after polyfill loads, kept as safety net).
-      const ms         = Math.max(0, endJsDate - startJsDate);
-      const totalDays  = Math.floor(ms / 86400000);
-      const years      = Math.floor(totalDays / 365);
-      const months     = Math.floor((totalDays % 365) / 30);
-      const days       = totalDays % 30;
-      return { years, months, days };
+      // Fallback: calendar-accurate diff using Date arithmetic — no magic constants.
+      // Walks year-by-year and month-by-month using actual month lengths.
+      let y  = startJsDate.getFullYear();
+      let m  = startJsDate.getMonth();   // 0-indexed
+      let d  = startJsDate.getDate();
+      const ey = endJsDate.getFullYear();
+      const em = endJsDate.getMonth();
+      const ed = endJsDate.getDate();
+
+      let years  = ey - y;
+      let months = em - m;
+      let days   = ed - d;
+
+      // Borrow from months if days went negative.
+      if (days < 0) {
+        months--;
+        // Days remaining = days in the previous month minus shortfall.
+        const prevMonth = new Date(ey, em, 0);  // day 0 = last day of prior month
+        days += prevMonth.getDate();
+      }
+      // Borrow from years if months went negative.
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+      return { years: Math.max(0, years), months: Math.max(0, months), days: Math.max(0, days) };
     }
 
     function careerTimer() {
