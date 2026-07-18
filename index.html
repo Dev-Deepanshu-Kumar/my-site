@@ -874,12 +874,26 @@
 
   <!-- All JavaScript — see js/main.js for function documentation -->
   <!--
-    temporal-polyfill global.js: self-installs window.Temporal only when the engine
-    lacks native support. defer guarantees it runs before main.js (document order).
-    No dynamic injection, no polling race — execution order is deterministic.
+    Load main.js only after Temporal is guaranteed available:
+    - Native Temporal (Chrome 94+, Safari 17+, Firefox 108+): skip polyfill download entirely,
+      load main.js directly — zero extra network request.
+    - Older browsers: fetch polyfill first, load main.js in onload callback — no race condition.
   -->
-  <script defer src="https://cdn.jsdelivr.net/npm/temporal-polyfill@1.0.1/global.js"></script>
-  <script defer src="js/main.js"></script>
+  <script>
+    function loadMain() {
+      var s = document.createElement('script');
+      s.src = 'js/main.js';
+      document.body.appendChild(s);
+    }
+    if (typeof Temporal !== 'undefined') {
+      loadMain();
+    } else {
+      var p = document.createElement('script');
+      p.src = 'https://cdn.jsdelivr.net/npm/temporal-polyfill@1.0.1/global.js';
+      p.onload = loadMain;
+      document.head.appendChild(p);
+    }
+  </script>
 
 </body>
 </html>
