@@ -1844,45 +1844,16 @@
               View Source
             </a>
 
-            <!-- ℹ️ info tooltip -->
-            <div style="position:relative; display:inline-flex;">
-              <span id="src-info-btn"
-                    style="display:inline-flex; align-items:center; justify-content:center;
-                           width:22px; height:22px; border-radius:50%;
-                           border:1px solid rgba(122,143,166,0.35);
-                           color:var(--color-muted); font-size:12px; font-weight:700;
-                           cursor:pointer; user-select:none; flex-shrink:0;
-                           transition:border-color 0.2s, color 0.2s;"
-                    onmouseover="document.getElementById('src-tooltip').style.opacity='1';document.getElementById('src-tooltip').style.pointerEvents='auto';this.style.borderColor='var(--color-accent)';this.style.color='var(--color-accent-light)'"
-                    onmouseout="document.getElementById('src-tooltip').style.opacity='0';document.getElementById('src-tooltip').style.pointerEvents='none';this.style.borderColor='rgba(122,143,166,0.35)';this.style.color='var(--color-muted)'"
-                    onclick="var t=document.getElementById('src-tooltip');t.style.opacity=t.style.opacity==='1'?'0':'1';t.style.pointerEvents=t.style.opacity==='1'?'auto':'none'">
-                i
-              </span>
-
-              <div id="src-tooltip"
-                   style="position:absolute; bottom:calc(100% + 10px); right:0;
-                          width:260px; background:rgba(15,22,38,0.98);
-                          border:1px solid rgba(43,90,102,0.5); border-radius:12px;
-                          padding:14px 16px; font-size:12px; line-height:1.6;
-                          color:var(--color-muted); opacity:0; pointer-events:none;
-                          transition:opacity 0.2s; z-index:50;
-                          box-shadow:0 8px 32px rgba(0,0,0,0.4);">
-                <div style="font-size:11px; font-weight:700; letter-spacing:1px;
-                            text-transform:uppercase; color:var(--color-accent); margin-bottom:8px;">
-                  About this code
-                </div>
-                The GitHub repo is a <strong style="color:#d0dce8;">portfolio-adapted version</strong>
-                of the original production system. Core matching algorithms are unchanged.
-                The interactive console, config system, and file structure were added
-                specifically for this public showcase.
-                <!-- Tooltip arrow -->
-                <div style="position:absolute; bottom:-6px; right:10px;
-                            width:10px; height:10px; background:rgba(15,22,38,0.98);
-                            border-right:1px solid rgba(43,90,102,0.5);
-                            border-bottom:1px solid rgba(43,90,102,0.5);
-                            transform:rotate(45deg);"></div>
-              </div>
-            </div>
+            <!-- ℹ️ info button — tooltip rendered in <body> via JS to escape overflow:hidden -->
+            <span id="src-info-btn"
+                  style="display:inline-flex; align-items:center; justify-content:center;
+                         width:22px; height:22px; border-radius:50%;
+                         border:1px solid rgba(122,143,166,0.35);
+                         color:var(--color-muted); font-size:12px; font-weight:700;
+                         cursor:pointer; user-select:none; flex-shrink:0;
+                         transition:border-color 0.2s, color 0.2s;">
+              i
+            </span>
 
           </div>
         </div>
@@ -3206,6 +3177,84 @@
     });
 
 
+    // ── Source info tooltip ───────────────────────────────────
+    // Appended to <body> so it escapes any overflow:hidden ancestor.
+    function initSourceTooltip() {
+      const btn = document.getElementById('src-info-btn');
+      if (!btn) return;
+
+      // Create tooltip once, attach to body
+      const tip = document.createElement('div');
+      tip.id = 'src-tooltip';
+      tip.innerHTML = `
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;
+                    text-transform:uppercase;color:var(--color-accent);margin-bottom:8px;">
+          About this code
+        </div>
+        The GitHub repo is a <strong style="color:#d0dce8;">portfolio-adapted version</strong>
+        of the original production system. Core matching algorithms are unchanged.
+        The interactive console, config system, and file structure were added
+        specifically for this public showcase.
+        <div class="tip-arrow"></div>`;
+
+      tip.style.cssText = `
+        position:fixed; width:260px; background:rgba(10,14,26,0.98);
+        border:1px solid rgba(43,90,102,0.6); border-radius:12px;
+        padding:14px 16px; font-size:12.5px; line-height:1.65;
+        color:var(--color-muted); opacity:0; pointer-events:none;
+        transition:opacity 0.2s; z-index:9999;
+        box-shadow:0 12px 40px rgba(0,0,0,0.6);`;
+
+      // Arrow style
+      const style = document.createElement('style');
+      style.textContent = `.tip-arrow {
+        position:absolute; bottom:-6px; right:14px;
+        width:10px; height:10px; background:rgba(10,14,26,0.98);
+        border-right:1px solid rgba(43,90,102,0.6);
+        border-bottom:1px solid rgba(43,90,102,0.6);
+        transform:rotate(45deg); }`;
+      document.head.appendChild(style);
+      document.body.appendChild(tip);
+
+      function showTip() {
+        const r = btn.getBoundingClientRect();
+        tip.style.opacity = '1';
+        tip.style.pointerEvents = 'auto';
+        btn.style.borderColor = 'var(--color-accent)';
+        btn.style.color = 'var(--color-accent-light)';
+        // Position above the button, right-aligned
+        const tipW = 260;
+        let left = r.right - tipW;
+        if (left < 8) left = 8;
+        tip.style.left = left + 'px';
+        tip.style.top  = (r.top - tip.offsetHeight - 10) + 'px';
+        // Recalc after render (height known now)
+        requestAnimationFrame(() => {
+          tip.style.top = (r.top - tip.offsetHeight - 10) + 'px';
+        });
+      }
+
+      function hideTip() {
+        tip.style.opacity = '0';
+        tip.style.pointerEvents = 'none';
+        btn.style.borderColor = 'rgba(122,143,166,0.35)';
+        btn.style.color = 'var(--color-muted)';
+      }
+
+      let pinned = false;
+      btn.addEventListener('mouseenter', showTip);
+      btn.addEventListener('mouseleave', () => { if (!pinned) hideTip(); });
+      btn.addEventListener('click', () => {
+        pinned = !pinned;
+        pinned ? showTip() : hideTip();
+      });
+      // Click outside unpins
+      document.addEventListener('click', e => {
+        if (pinned && e.target !== btn) { pinned = false; hideTip(); }
+      });
+    }
+
+
     // ── Bootstrap all behaviours ───────────────────────────────
     particleSystem();
     typedTitleEffect();
@@ -3213,6 +3262,7 @@
     scrollReveal();
     careerTimer();
     initKnob();
+    initSourceTooltip();
 
   </script>
 
