@@ -872,7 +872,7 @@
     // Picks the last section whose top has crossed 40% of viewport height.
     // Clears all highlights at true page bottom.
     function activeNavHighlight() {
-      const sectionIds = ['section-validator', 'section-about', 'section-skills', 'section-experience', 'section-education'];
+      const sectionIds = ['section-validator', 'section-about', 'section-skills', 'section-experience', 'section-recommendations', 'section-education'];
       const navLinks   = document.querySelectorAll('.nav-links a');
 
       function update() {
