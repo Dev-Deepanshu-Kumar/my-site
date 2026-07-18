@@ -1164,28 +1164,29 @@
     skillTagTooltips();
 
     // Intercept resume download from any download button.
-    // Show toast on click + re-show fresh when user returns from PDF tab.
+    // Show toast on click. Register ONE-SHOT return listener per click —
+    // fires only on next tab return, then removes itself. Never fires without download.
     (function() {
       const btns = [
         document.getElementById('resume-dl-btn'),
         document.getElementById('nav-resume-dl-btn'),
       ].filter(Boolean);
 
-      let downloaded = false;
-
       btns.forEach(btn => {
         btn.addEventListener('click', function(e) {
           e.preventDefault();
-          downloaded = true;
           window.open(btn.getAttribute('href'), '_blank');
           showDownloadToast();
-        });
-      });
 
-      document.addEventListener('visibilitychange', function() {
-        if (!document.hidden && downloaded) {
-          showDownloadToast();
-        }
+          // One-shot: fires only on next return to this tab, then self-removes
+          function onReturn() {
+            if (!document.hidden) {
+              document.removeEventListener('visibilitychange', onReturn);
+              showDownloadToast();
+            }
+          }
+          document.addEventListener('visibilitychange', onReturn);
+        });
       });
     })();
 
