@@ -8,1840 +8,12 @@
   <!-- Favicon — DK monogram, SVG data URI, no external file needed -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a0e1a'/%3E%3Crect width='32' height='32' rx='8' fill='none' stroke='%232b9cba' stroke-width='1.5' opacity='0.6'/%3E%3Ctext x='4' y='23' font-family='Segoe UI%2C Arial%2C sans-serif' font-size='16' font-weight='800' fill='%231ecbe1'%3ED%3C/text%3E%3Ctext x='16' y='23' font-family='Segoe UI%2C Arial%2C sans-serif' font-size='16' font-weight='800' fill='%23e8aa4a'%3EK%3C/text%3E%3C/svg%3E">
 
-  <!-- ============================================================
-       HOW TO EDIT THIS FILE
-       ============================================================
-       CSS is split into clearly named blocks below — find the block
-       matching what you want to change (e.g. "STATS CARDS", "HERO").
-
-       HTML sections all have descriptive id="..." attributes.
-       JavaScript is split into named functions at the bottom.
-
-       COLOUR TOKENS live in :root — change them once, updates everywhere.
-       FONT SIZES use clamp(min, preferred, max) — mobile-safe by default.
-       ============================================================ -->
-
-  <style>
-
-    /* ============================================================
-       COLOUR & SPACING TOKENS  (edit these to retheme everything)
-       ============================================================ */
-    :root {
-      --color-bg:           #0a0e1a;
-      --color-bg-card:      rgba(20, 29, 48, 0.85);
-      --color-border:       rgba(43, 90, 102, 0.4);
-      --color-accent:       #2b9cba;
-      --color-accent-light: #1ecbe1;
-      --color-gold:         #e8aa4a;
-      --color-gold-light:   #f5c76a;
-      --color-text:         #e2e8f0;
-      --color-muted:        #7a8fa6;
-      --color-dim:          #4a5a6a;
-
-      --radius-card:  16px;
-      --radius-badge: 20px;
-      --gap-section:  80px;
-    }
-
-
-    /* ============================================================
-       RESET & BASE
-       ============================================================ */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-
-    body {
-      background: var(--color-bg);
-      color: var(--color-text);
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      font-size: 15px;
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-
-    /* ============================================================
-       PARTICLE CANVAS BACKGROUND
-       ============================================================ */
-    #particle-canvas {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      pointer-events: none;
-    }
-
-
-    /* ============================================================
-       NAVIGATION BAR
-       ============================================================ */
-    #navbar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 40px;
-      background: rgba(10, 14, 26, 0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--color-border);
-      transition: box-shadow 0.3s;
-    }
-
-    #navbar.scrolled {
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
-    }
-
-    .nav-logo {
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      background: linear-gradient(135deg, var(--color-accent-light), var(--color-gold));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 28px;
-      list-style: none;
-    }
-
-    .nav-links a {
-      text-decoration: none;
-      color: var(--color-muted);
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      transition: color 0.2s;
-      position: relative;
-    }
-
-    .nav-links a::after {
-      content: '';
-      position: absolute;
-      bottom: -4px; left: 0; right: 0;
-      height: 2px;
-      background: var(--color-accent);
-      transform: scaleX(0);
-      transition: transform 0.2s;
-    }
-
-    .nav-links a:hover            { color: var(--color-accent-light); }
-    .nav-links a:hover::after     { transform: scaleX(1); }
-
-    /* Mobile hamburger button — hidden on desktop */
-    #nav-hamburger {
-      display: none;
-      flex-direction: column;
-      gap: 5px;
-      cursor: pointer;
-      padding: 4px;
-      background: none;
-      border: none;
-    }
-
-    #nav-hamburger span {
-      display: block;
-      width: 22px;
-      height: 2px;
-      background: var(--color-muted);
-      border-radius: 2px;
-      transition: all 0.3s;
-    }
-
-    /* Mobile nav drawer — hidden by default */
-    #nav-drawer {
-      display: none;
-      position: fixed;
-      top: 56px; left: 0; right: 0;
-      background: rgba(10, 14, 26, 0.98);
-      border-bottom: 1px solid var(--color-border);
-      padding: 16px 0;
-      z-index: 99;
-    }
-
-    #nav-drawer.open { display: block; }
-
-    #nav-drawer a {
-      display: block;
-      padding: 12px 24px;
-      color: var(--color-muted);
-      text-decoration: none;
-      font-size: 15px;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      transition: color 0.2s;
-    }
-
-    #nav-drawer a:hover { color: var(--color-accent-light); }
-
-
-    /* ============================================================
-       PAGE WRAPPER
-       ============================================================ */
-    #page-content {
-      position: relative;
-      z-index: 1;
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 24px 80px;
-    }
-
-
-    /* ============================================================
-       SCROLL-REVEAL ANIMATION  (applied by JS via IntersectionObserver)
-       ============================================================ */
-    .reveal {
-      opacity: 0;
-      transform: translateY(28px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
-    }
-
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    /* Staggered delays for sibling cards in the same row */
-    .reveal-d1 { transition-delay: 0.1s; }
-    .reveal-d2 { transition-delay: 0.2s; }
-    .reveal-d3 { transition-delay: 0.3s; }
-    .reveal-d4 { transition-delay: 0.4s; }
-
-
-    /* ============================================================
-       SECTION SHARED STYLES
-       ============================================================ */
-    .page-section {
-      padding: var(--gap-section) 0 20px;
-    }
-
-    .section-eyebrow {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-
-    .section-eyebrow-tag {
-      font-size: 11px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--color-accent);
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .section-eyebrow-line {
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(to right, var(--color-border), transparent);
-    }
-
-    .section-heading {
-      font-size: clamp(24px, 4vw, 34px);
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 8px;
-      line-height: 1.2;
-    }
-
-    .section-heading span { color: var(--color-accent-light); }
-
-    .section-subtext {
-      color: var(--color-muted);
-      font-size: 15px;
-      margin-bottom: 32px;
-    }
-
-
-    /* ============================================================
-       HERO SECTION
-       ============================================================ */
-    #hero {
-      position: relative;        /* needed for scroll indicator absolute positioning */
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 80px 0 80px;      /* bottom pad leaves room for the absolute scroll hint */
-    }
-
-    .hero-eyebrow {
-      font-size: 12px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--color-accent);
-      margin-bottom: 16px;
-      opacity: 0;
-      animation: fadeUp 0.6s 0.2s forwards;
-    }
-
-    .hero-name {
-      font-size: clamp(38px, 7vw, 80px);
-      font-weight: 800;
-      line-height: 1.05;
-      letter-spacing: -1px;
-      background: linear-gradient(135deg, #ffffff 0%, var(--color-accent-light) 50%, var(--color-gold) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      opacity: 0;
-      animation: fadeUp 0.6s 0.4s forwards;
-    }
-
-    .hero-typed-title {
-      font-size: clamp(14px, 2.5vw, 21px);
-      color: var(--color-gold);
-      font-weight: 600;
-      margin-top: 12px;
-      min-height: 28px;
-      opacity: 0;
-      animation: fadeUp 0.6s 0.6s forwards;
-    }
-
-    .typed-cursor {
-      display: inline-block;
-      width: 2px;
-      height: 1em;
-      background: var(--color-gold);
-      vertical-align: text-bottom;
-      animation: blink 0.7s step-end infinite;
-    }
-
-    .hero-summary {
-      max-width: 620px;
-      margin-top: 20px;
-      color: var(--color-muted);
-      font-size: 16px;
-      line-height: 1.8;
-      opacity: 0;
-      animation: fadeUp 0.6s 0.8s forwards;
-    }
-
-    .hero-contact-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 28px;
-      opacity: 0;
-      animation: fadeUp 0.6s 1.0s forwards;
-    }
-
-    .contact-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: rgba(43, 156, 186, 0.1);
-      border: 1px solid rgba(43, 156, 186, 0.3);
-      color: var(--color-accent-light);
-      padding: 7px 14px;
-      border-radius: 30px;
-      font-size: 13px;
-      text-decoration: none;
-      transition: background 0.25s, border-color 0.25s, transform 0.25s, box-shadow 0.25s;
-      cursor: pointer;
-    }
-
-    .contact-pill svg { width: 14px; height: 14px; flex-shrink: 0; }
-
-    .contact-pill:hover {
-      background: rgba(43, 156, 186, 0.2);
-      border-color: var(--color-accent-light);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 16px rgba(43, 156, 186, 0.25);
-    }
-
-    /* scroll indicator removed */
-
-
-    /* ============================================================
-       STATS CARDS  (the 4 numbers at the top of the about section)
-       ============================================================ */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-      margin-bottom: 56px;
-    }
-
-    .stat-card {
-      background: var(--color-bg-card);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-card);
-      padding: 24px 16px;
-      text-align: center;
-      backdrop-filter: blur(8px);
-      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Top-edge gradient bar that sweeps in on hover */
-    .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--color-accent), var(--color-gold));
-      transform: scaleX(0);
-      transition: transform 0.4s;
-    }
-
-    .stat-card:hover::before    { transform: scaleX(1); }
-    .stat-card:hover {
-      border-color: rgba(43, 156, 186, 0.5);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(43, 156, 186, 0.15);
-    }
-
-    /* The big animated number */
-    .stat-number {
-      font-size: clamp(28px, 4vw, 38px);
-      font-weight: 800;
-      display: block;
-      background: linear-gradient(135deg, var(--color-accent-light), var(--color-gold));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      line-height: 1.1;
-      margin-bottom: 6px;
-    }
-
-    .stat-label {
-      font-size: 11px;
-      color: var(--color-muted);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      line-height: 1.4;
-    }
-
-
-    /* ============================================================
-       HIGHLIGHT CARDS  (the 4 impact cards below stats)
-       ============================================================ */
-    .highlights-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .highlight-card {
-      background: var(--color-bg-card);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-card);
-      padding: 24px;
-      backdrop-filter: blur(8px);
-      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
-    }
-
-    .highlight-card:hover {
-      border-color: rgba(43, 156, 186, 0.5);
-      transform: translateY(-3px);
-      box-shadow: 0 16px 48px rgba(43, 156, 186, 0.12);
-    }
-
-    .highlight-icon   { font-size: 26px; margin-bottom: 12px; display: block; }
-    .highlight-title  { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 8px; }
-    .highlight-body   { font-size: 13.5px; color: var(--color-muted); line-height: 1.65; }
-
-
-    /* ============================================================
-       SKILLS SECTION  (categorised tag clouds)
-       ============================================================ */
-    .skill-category {
-      margin-bottom: 32px;
-    }
-
-    .skill-category-title {
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--color-gold);
-      font-weight: 600;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .skill-category-title::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: linear-gradient(to right, rgba(232, 170, 74, 0.3), transparent);
-    }
-
-    .skill-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 9px;
-    }
-
-    /* Base tag style */
-    .tag {
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: default;
-      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .tag::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .tag:hover::before { opacity: 1; }
-    .tag:hover         { transform: translateY(-2px) scale(1.03); }
-
-    /* Blue variant — languages, backend, auth, tools */
-    .tag-blue {
-      background: rgba(43, 156, 186, 0.08);
-      border: 1px solid rgba(43, 156, 186, 0.25);
-      color: var(--color-accent-light);
-    }
-    .tag-blue::before  { background: linear-gradient(135deg, rgba(43,156,186,0.2), rgba(30,203,225,0.1)); }
-    .tag-blue:hover    { border-color: var(--color-accent-light); box-shadow: 0 4px 16px rgba(43,156,186,0.2); }
-
-    /* Gold variant — data access, DevOps */
-    .tag-gold {
-      background: rgba(232, 170, 74, 0.08);
-      border: 1px solid rgba(232, 170, 74, 0.25);
-      color: var(--color-gold-light);
-    }
-    .tag-gold::before { background: linear-gradient(135deg, rgba(232,170,74,0.2), rgba(245,199,106,0.1)); }
-    .tag-gold:hover   { border-color: var(--color-gold-light); box-shadow: 0 4px 16px rgba(232,170,74,0.2); }
-
-    /* Green variant — cloud, testing */
-    .tag-green {
-      background: rgba(52, 199, 128, 0.08);
-      border: 1px solid rgba(52, 199, 128, 0.25);
-      color: #5bd4a0;
-    }
-    .tag-green::before { background: linear-gradient(135deg, rgba(52,199,128,0.2), rgba(91,212,160,0.1)); }
-    .tag-green:hover   { border-color: #5bd4a0; box-shadow: 0 4px 16px rgba(52,199,128,0.2); }
-
-
-    /* ============================================================
-       CAREER TIMER  (live elapsed time ticker above the timeline)
-       ============================================================ */
-
-    /* Outer wrapper — full-width card above the timeline */
-    .career-timer-card {
-      background: var(--color-bg-card);
-      border: 1px solid var(--color-border);
-      border-radius: 20px;
-      padding: 28px 32px;
-      backdrop-filter: blur(8px);
-      margin-bottom: 40px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Animated top gradient border */
-    .career-timer-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--color-accent), var(--color-gold), var(--color-accent-light));
-      background-size: 200% 100%;
-      animation: timerBorderScroll 3s linear infinite;
-    }
-
-    @keyframes timerBorderScroll {
-      0%   { background-position: 0% 0%; }
-      100% { background-position: 200% 0%; }
-    }
-
-    .career-timer-heading {
-      font-size: 11px;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--color-accent);
-      font-weight: 600;
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* The live dot indicator */
-    .live-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--color-gold);
-      box-shadow: 0 0 0 2px rgba(232,170,74,0.3);
-      animation: pulseDot 1.5s ease-in-out infinite;
-      flex-shrink: 0;
-    }
-
-    /* Row of period segments */
-    .timer-periods {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-
-    .timer-period {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: start;
-      gap: 16px;
-    }
-
-    .timer-period-label {
-      font-size: 13.5px;
-      font-weight: 600;
-      color: #fff;
-      margin-bottom: 4px;
-    }
-
-    .timer-period-dates {
-      font-size: 11.5px;
-      color: var(--color-muted);
-    }
-
-    /* The ticking time display */
-    .timer-display {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .timer-unit {
-      text-align: center;
-      min-width: 52px;
-    }
-
-    .timer-value {
-      font-size: 22px;
-      font-weight: 800;
-      line-height: 1;
-      background: linear-gradient(135deg, var(--color-accent-light), var(--color-gold));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-variant-numeric: tabular-nums;  /* prevents layout shift as digits change */
-      display: block;
-    }
-
-    .timer-unit-label {
-      font-size: 9px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--color-dim);
-      margin-top: 3px;
-      display: block;
-    }
-
-    /* Divider between periods */
-    .timer-divider {
-      height: 1px;
-      background: linear-gradient(to right, var(--color-border), transparent);
-      margin: 2px 0;
-    }
-
-    /* Total bar at the bottom */
-    .timer-total-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      align-items: center;
-      gap: 16px;
-      margin-top: 20px;
-      padding-top: 16px;
-      border-top: 1px solid var(--color-border);
-    }
-
-    .timer-total-label {
-      font-size: 12px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--color-gold);
-      font-weight: 700;
-    }
-
-    .timer-total-display {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    /* Mobile: stack label + timer vertically */
-    @media (max-width: 600px) {
-      .career-timer-card { padding: 20px 16px; }
-
-      .timer-period {
-        grid-template-columns: 1fr;
-        gap: 10px;
-      }
-
-      .timer-display,
-      .timer-total-display { justify-content: flex-start; }
-
-      .timer-total-row {
-        grid-template-columns: 1fr;
-        gap: 10px;
-      }
-    }
-
-
-    /* ============================================================
-       EXPERIENCE TIMELINE
-       ============================================================ */
-    .timeline {
-      position: relative;
-      padding-left: 32px;
-    }
-
-    /* Vertical gradient line running down the left */
-    .timeline::before {
-      content: '';
-      position: absolute;
-      left: 7px; top: 10px; bottom: 10px;
-      width: 2px;
-      background: linear-gradient(to bottom, var(--color-accent), var(--color-gold), transparent);
-    }
-
-    .timeline-item {
-      position: relative;
-      margin-bottom: 40px;
-    }
-
-    /* Dot on the timeline line */
-    .timeline-dot {
-      position: absolute;
-      left: -30px;
-      top: 18px;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: var(--color-accent);
-      border: 2px solid var(--color-bg);
-      box-shadow: 0 0 0 3px rgba(43, 156, 186, 0.3);
-      transition: background 0.3s, box-shadow 0.3s, transform 0.3s;
-    }
-
-    .timeline-item:hover .timeline-dot {
-      background: var(--color-gold);
-      box-shadow: 0 0 0 5px rgba(232, 170, 74, 0.25);
-      transform: scale(1.3);
-    }
-
-    /* Gold pulsing dot for the current/active role */
-    .timeline-dot--current {
-      background: var(--color-gold);
-      box-shadow: 0 0 0 4px rgba(232, 170, 74, 0.3);
-      animation: pulseDot 2s ease-in-out infinite;
-    }
-
-    /* Dim dot for non-engineering entries (sabbatical) */
-    .timeline-dot--dim {
-      background: var(--color-dim);
-      box-shadow: none;
-    }
-
-    /* ── Job card ── */
-    .exp-card {
-      background: var(--color-bg-card);
-      border: 1px solid var(--color-border);
-      border-radius: 20px;
-      padding: 24px 28px;
-      backdrop-filter: blur(8px);
-      transition: border-color 0.35s, transform 0.35s, box-shadow 0.35s;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Left accent bar that grows on hover / expand */
-    .exp-card::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
-      background: linear-gradient(to bottom, var(--color-accent), var(--color-gold));
-      transform: scaleY(0);
-      transition: transform 0.35s;
-      transform-origin: top;
-    }
-
-    .exp-card:hover::before,
-    .exp-card--expanded::before { transform: scaleY(1); }
-
-    .exp-card:hover {
-      border-color: rgba(43, 156, 186, 0.45);
-      transform: translateX(4px);
-      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
-    }
-
-    .exp-card--dim { opacity: 0.7; cursor: default; }
-    .exp-card--dim:hover { transform: none; box-shadow: none; border-color: var(--color-border); }
-
-    .exp-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-
-    .exp-title    { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-    .exp-title--dim { color: var(--color-muted); }
-    .exp-location { color: var(--color-muted); font-size: 12.5px; margin-top: 3px; }
-
-    /* Company name — acts as a link if href provided */
-    .exp-company {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 13.5px;
-      color: var(--color-accent-light);
-      font-weight: 500;
-      text-decoration: none;
-      transition: color 0.2s;
-    }
-    .exp-company:hover { color: #fff; }
-    .exp-company-icon {
-      display: inline-flex;
-      opacity: 0;
-      transform: translate(-2px, 2px);
-      transition: opacity 0.2s, transform 0.2s;
-      flex-shrink: 0;
-    }
-    .exp-company:hover .exp-company-icon {
-      opacity: 1;
-      transform: translate(0, 0);
-    }
-
-    /* ── Resume download section ── */
-    #section-resume {
-      padding: 60px 0 20px;
-    }
-
-    .resume-card {
-      background: var(--color-bg-card);
-      border: 1px solid var(--color-border);
-      border-radius: 24px;
-      padding: 40px;
-      backdrop-filter: blur(12px);
-      display: flex;
-      align-items: center;
-      gap: 32px;
-      flex-wrap: wrap;
-      position: relative;
-      overflow: hidden;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-
-    .resume-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 20% 50%, rgba(43,156,186,0.06) 0%, transparent 60%),
-                  radial-gradient(ellipse at 80% 50%, rgba(232,170,74,0.05) 0%, transparent 60%);
-      pointer-events: none;
-    }
-
-    .resume-card:hover {
-      border-color: rgba(43,156,186,0.35);
-      box-shadow: 0 16px 48px rgba(0,0,0,0.3);
-    }
-
-    .resume-icon-wrap {
-      position: relative;
-      flex-shrink: 0;
-    }
-
-    .resume-icon-bg {
-      width: 72px; height: 72px;
-      border-radius: 18px;
-      background: linear-gradient(135deg, rgba(43,156,186,0.15), rgba(232,170,74,0.1));
-      border: 1px solid rgba(43,156,186,0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 32px;
-      animation: float 4s ease-in-out infinite;
-    }
-
-    .resume-text { flex: 1; min-width: 220px; }
-
-    .resume-title {
-      font-size: 20px;
-      font-weight: 700;
-      color: #fff;
-      margin-bottom: 6px;
-    }
-
-    .resume-subtitle {
-      font-size: 13.5px;
-      color: var(--color-muted);
-      line-height: 1.65;
-      margin-bottom: 16px;
-    }
-
-    .resume-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .resume-tag {
-      background: rgba(43,156,186,0.08);
-      border: 1px solid rgba(43,156,186,0.2);
-      color: var(--color-muted);
-      padding: 3px 10px;
-      border-radius: 10px;
-      font-size: 11.5px;
-    }
-
-    .resume-download-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 28px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, var(--color-accent), #1a7a96);
-      color: #fff;
-      font-size: 15px;
-      font-weight: 700;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.2s;
-      font-family: inherit;
-      flex-shrink: 0;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .resume-download-btn::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .resume-download-btn:hover::after { opacity: 1; }
-    .resume-download-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 32px rgba(43,156,186,0.45);
-    }
-
-    .resume-download-btn svg { flex-shrink: 0; }
-
-    @media (max-width: 600px) {
-      .resume-card { padding: 24px 20px; gap: 20px; }
-      .resume-download-btn { width: 100%; justify-content: center; }
-    }
-
-    .exp-date-badge {
-      background: rgba(232, 170, 74, 0.1);
-      border: 1px solid rgba(232, 170, 74, 0.3);
-      color: var(--color-gold);
-      padding: 5px 12px;
-      border-radius: var(--radius-badge);
-      font-size: 12px;
-      font-weight: 600;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-
-    .exp-date-badge--current {
-      background: rgba(232, 170, 74, 0.15);
-      border-color: var(--color-gold);
-      animation: glowGold 2s ease-in-out infinite;
-    }
-
-    .exp-date-badge--dim {
-      background: rgba(74, 90, 106, 0.15);
-      border-color: rgba(74, 90, 106, 0.3);
-      color: var(--color-muted);
-      animation: none;
-    }
-
-    /* "Tap to expand" affordance */
-    .exp-expand-hint {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 14px;
-      font-size: 12.5px;
-      color: var(--color-accent);
-      font-weight: 500;
-      letter-spacing: 0.5px;
-      user-select: none;
-    }
-
-    .expand-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 20px; height: 20px;
-      border-radius: 50%;
-      border: 1px solid rgba(43, 156, 186, 0.4);
-      font-size: 13px;
-      transition: transform 0.3s, border-color 0.3s;
-    }
-
-    .exp-card--expanded .expand-icon {
-      transform: rotate(180deg);
-      border-color: var(--color-accent-light);
-    }
-
-    /* Accordion body — animates height via max-height */
-    .exp-bullets-wrapper {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .exp-card--expanded .exp-bullets-wrapper { max-height: 1400px; }
-
-    .exp-bullets {
-      list-style: none;
-      padding: 18px 0 4px;
-      display: flex;
-      flex-direction: column;
-      gap: 11px;
-    }
-
-    .exp-bullets li {
-      display: flex;
-      gap: 12px;
-      font-size: 13.5px;
-      color: #b0c0d0;
-      line-height: 1.65;
-    }
-
-    .exp-bullets li::before {
-      content: '▸';
-      color: var(--color-accent);
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
-
-    /* ============================================================
-       SOFT SKILLS GRID
-       ============================================================ */
-    .soft-skills-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
-
-    .soft-skill-card {
-      background: var(--color-bg-card);
-      border: 1px solid var(--color-border);
-      border-radius: 14px;
-      padding: 20px 16px;
-      text-align: center;
-      backdrop-filter: blur(8px);
-      transition: border-color 0.3s, background 0.3s, transform 0.3s, box-shadow 0.3s, color 0.3s;
-      font-size: 14px;
-      color: var(--color-text);
-      font-weight: 500;
-    }
-
-    .soft-skill-card:hover {
-      border-color: rgba(232, 170, 74, 0.4);
-      background: rgba(232, 170, 74, 0.05);
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(232, 170, 74, 0.1);
-      color: var(--color-gold-light);
-    }
-
-    .soft-skill-icon { font-size: 26px; margin-bottom: 8px; display: block; }
-
-
-    /* ============================================================
-       EDUCATION CARDS
-       ============================================================ */
-    .education-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .edu-card {
-      background: var(--color-bg-card);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-card);
-      padding: 24px;
-      backdrop-filter: blur(8px);
-      transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
-      position: relative;
-      overflow: hidden;
-      /* Flex column so year badge always sits at the bottom regardless of text height */
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Bottom-edge bar that sweeps in on hover */
-    .edu-card::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--color-accent), var(--color-gold));
-      transform: scaleX(0);
-      transition: transform 0.35s;
-    }
-
-    .edu-card:hover::after  { transform: scaleX(1); }
-    .edu-card:hover {
-      border-color: rgba(43, 156, 186, 0.4);
-      transform: translateY(-4px);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
-    }
-
-    .edu-icon   { font-size: 28px; margin-bottom: 12px; }
-    .edu-degree { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; }
-    .edu-inst   { font-size: 12.5px; color: var(--color-muted); margin-bottom: 12px; line-height: 1.5; flex: 1; }
-
-    .edu-year-badge {
-      display: inline-block;
-      background: rgba(43, 156, 186, 0.1);
-      border: 1px solid rgba(43, 156, 186, 0.25);
-      color: var(--color-accent-light);
-      padding: 3px 10px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-
-    /* ============================================================
-       FLIP CARD  (used for GNIIT edu card — explains what it is)
-
-       Structure:
-         .flip-card-wrapper       — sets perspective, fixed height
-           .flip-card-inner       — rotates on click
-             .flip-card-front     — what you see by default
-             .flip-card-back      — revealed after flip
-       ============================================================ */
-
-    /* Wrapper — fixed height so both faces are same size */
-    .flip-card-wrapper {
-      perspective: 1000px;
-      height: 220px;             /* fixed — both faces fill this exactly */
-    }
-
-    .flip-card-inner {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      transform-style: preserve-3d;
-    }
-
-    /* Flipped state — toggled by JS */
-    .flip-card-wrapper.flipped .flip-card-inner {
-      transform: rotateY(180deg);
-    }
-
-    .flip-card-front,
-    .flip-card-back {
-      position: absolute;
-      inset: 0;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      border-radius: var(--radius-card);
-      padding: 24px;
-      background: var(--color-bg-card);
-      border: 1px solid var(--color-border);
-      backdrop-filter: blur(8px);
-      overflow: hidden;
-    }
-
-    /* Front inherits normal edu-card appearance */
-    .flip-card-front {
-      cursor: pointer;
-      transition: border-color 0.3s, box-shadow 0.3s;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Push year badge + hint to bottom on front face */
-    .flip-card-front .edu-inst { flex: 1; }
-
-    .flip-card-front::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--color-accent), var(--color-gold));
-      transform: scaleX(0);
-      transition: transform 0.35s;
-    }
-
-    .flip-card-wrapper:hover .flip-card-front::after { transform: scaleX(1); }
-    .flip-card-wrapper:hover .flip-card-front {
-      border-color: rgba(43, 156, 186, 0.4);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25);
-    }
-
-    /* "Tap to learn more" hint — visible only on front */
-    .flip-hint {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      margin-top: 12px;
-      font-size: 11px;
-      color: var(--color-accent);
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      animation: hintPulse 2.5s ease-in-out infinite;
-    }
-
-    .flip-hint-icon {
-      font-size: 13px;
-      animation: hintBounce 2.5s ease-in-out infinite;
-    }
-
-    @keyframes hintPulse {
-      0%, 100% { opacity: 0.6; }
-      50%       { opacity: 1; }
-    }
-
-    @keyframes hintBounce {
-      0%, 100% { transform: translateX(0); }
-      50%       { transform: translateX(3px); }
-    }
-
-    /* Back face — info about GNIIT */
-    .flip-card-back {
-      transform: rotateY(180deg);
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;   /* top-align so text doesn't float */
-      border-color: rgba(232, 170, 74, 0.35);
-      background: rgba(20, 29, 48, 0.95);
-      overflow-y: auto;
-    }
-
-    /* Scrollbar styling to match dark theme */
-    .flip-card-back::-webkit-scrollbar { width: 4px; }
-    .flip-card-back::-webkit-scrollbar-track { background: transparent; }
-    .flip-card-back::-webkit-scrollbar-thumb { background: rgba(43,156,186,0.4); border-radius: 2px; }
-
-    .flip-back-title {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--color-gold-light);
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .flip-back-body {
-      font-size: 12.5px;
-      color: var(--color-muted);
-      line-height: 1.65;
-    }
-
-    .flip-back-close {
-      margin-top: 14px;
-      font-size: 11px;
-      color: var(--color-accent);
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-
-    /* Taller on mobile — text wraps more in narrow viewport */
-    @media (max-width: 768px) {
-      .flip-card-wrapper { height: 260px; }
-    }
-
-    @media (max-width: 480px) {
-      .flip-card-wrapper { height: 300px; }
-    }
-
-
-    /* ============================================================
-       GLOBAL — prevent text bleed on small viewports
-       ============================================================ */
-    .page-section, .exp-bullets li, .highlight-body, .section-subtext {
-      overflow-wrap: break-word;
-      word-break: break-word;
-    }
-
-    /* ============================================================
-       NAME VALIDATOR DEMO SECTION
-       ============================================================ */
-    #section-validator {
-      padding: var(--gap-section) 0 40px;
-    }
-
-    .validator-card {
-      background: var(--color-bg-card);
-      border: 1px solid var(--color-border);
-      border-radius: 24px;
-      padding: 40px 40px 36px;
-      backdrop-filter: blur(12px);
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* Animated gradient top border */
-    .validator-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--color-accent), var(--color-gold), var(--color-accent-light), var(--color-accent));
-      background-size: 300% 100%;
-      animation: timerBorderScroll 4s linear infinite;
-    }
-
-    .validator-note {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 11px;
-      color: var(--color-dim);
-      background: rgba(74,90,106,0.15);
-      border: 1px solid rgba(74,90,106,0.25);
-      border-radius: 8px;
-      padding: 4px 10px;
-      margin-bottom: 28px;
-      font-style: italic;
-    }
-
-    /* Input row */
-    .validator-inputs {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap: 16px;
-      align-items: center;
-      margin-bottom: 28px;
-    }
-
-    .validator-input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .validator-label {
-      font-size: 11px;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      color: var(--color-muted);
-      font-weight: 600;
-    }
-
-    .validator-input {
-      background: rgba(10,14,26,0.8);
-      border: 1px solid var(--color-border);
-      border-radius: 12px;
-      padding: 14px 18px;
-      font-size: 16px;
-      color: #fff;
-      font-family: inherit;
-      width: 100%;
-      outline: none;
-      transition: border-color 0.25s, box-shadow 0.25s;
-      letter-spacing: 0.3px;
-    }
-
-    .validator-input::placeholder { color: var(--color-dim); }
-
-    .validator-input:focus {
-      border-color: var(--color-accent);
-      box-shadow: 0 0 0 3px rgba(43,156,186,0.15);
-    }
-
-    .validator-input.input-match {
-      border-color: #34c780;
-      box-shadow: 0 0 0 3px rgba(52,199,128,0.15);
-    }
-
-    .validator-input.input-nomatch {
-      border-color: #e05a5a;
-      box-shadow: 0 0 0 3px rgba(224,90,90,0.12);
-    }
-
-    /* VS divider */
-    .validator-vs {
-      font-size: 13px;
-      font-weight: 800;
-      color: var(--color-dim);
-      letter-spacing: 2px;
-      text-align: center;
-      user-select: none;
-      padding-top: 22px;   /* align with input vertically */
-    }
-
-    /* ── Threshold knob row ── */
-    .threshold-row {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      background: rgba(10,14,26,0.5);
-      border: 1px solid var(--color-border);
-      border-radius: 12px;
-      padding: 16px 22px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
-    }
-
-    .threshold-label-group { display: flex; flex-direction: column; gap: 3px; flex: 1; }
-
-    .threshold-label {
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--color-gold);
-    }
-
-    .threshold-hint { font-size: 11px; color: var(--color-dim); }
-
-    /* Knob container */
-    .knob-group {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      user-select: none;
-    }
-
-    .knob-wrap {
-      position: relative;
-      width: 72px;
-      height: 72px;
-      cursor: grab;
-      touch-action: none;
-    }
-
-    .knob-wrap:active { cursor: grabbing; }
-
-    /* SVG fills the knob-wrap */
-    .knob-svg { width: 100%; height: 100%; overflow: visible; }
-
-    .knob-val {
-      font-size: 15px;
-      font-weight: 800;
-      color: var(--color-accent-light);
-      text-align: center;
-      letter-spacing: 0.5px;
-    }
-
-    .knob-sub {
-      font-size: 10px;
-      color: var(--color-dim);
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      text-align: center;
-    }
-
-    /* ── Story panel ── */
-    .story-trigger {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: none;
-      border: 1px solid rgba(232,170,74,0.3);
-      border-radius: 20px;
-      color: var(--color-gold);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      padding: 6px 14px;
-      cursor: pointer;
-      transition: background 0.2s, border-color 0.2s, transform 0.2s;
-      margin-bottom: 20px;
-      font-family: inherit;
-    }
-
-    .story-trigger:hover {
-      background: rgba(232,170,74,0.08);
-      border-color: var(--color-gold);
-      transform: translateY(-1px);
-    }
-
-    .story-panel {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1);
-    }
-
-    .story-panel.open { max-height: 500px; }
-
-    .story-inner {
-      background: rgba(10,14,26,0.7);
-      border: 1px solid rgba(232,170,74,0.2);
-      border-radius: 14px;
-      padding: 22px 24px;
-      margin-bottom: 20px;
-      position: relative;
-      overflow-y: auto;
-      max-height: 320px;
-    }
-
-    .story-inner::-webkit-scrollbar { width: 4px; }
-    .story-inner::-webkit-scrollbar-track { background: transparent; }
-    .story-inner::-webkit-scrollbar-thumb { background: rgba(232,170,74,0.3); border-radius: 2px; }
-
-    .story-heading {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--color-gold-light);
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .story-beat {
-      display: flex;
-      gap: 14px;
-      margin-bottom: 14px;
-    }
-
-    .story-beat-icon {
-      font-size: 16px;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
-    .story-beat-text {
-      font-size: 13px;
-      color: var(--color-muted);
-      line-height: 1.7;
-    }
-
-    .story-beat-text strong { color: #d0dce8; font-weight: 600; }
-
-    /* Compare button */
-    .validator-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      padding: 15px 24px;
-      border-radius: 14px;
-      border: none;
-      cursor: pointer;
-      font-size: 15px;
-      font-weight: 700;
-      font-family: inherit;
-      letter-spacing: 0.5px;
-      background: linear-gradient(135deg, var(--color-accent), #1a7a96);
-      color: #fff;
-      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .validator-btn::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
-      opacity: 0;
-      transition: opacity 0.2s;
-    }
-
-    .validator-btn:hover::after  { opacity: 1; }
-    .validator-btn:hover         { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(43,156,186,0.4); }
-    .validator-btn:active        { transform: translateY(0); }
-    .validator-btn:disabled      { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-    /* Results panel */
-    .validator-result {
-      display: none;
-      margin-top: 28px;
-      padding-top: 28px;
-      border-top: 1px solid var(--color-border);
-    }
-
-    .validator-result.visible { display: block; }
-
-    /* Verdict banner */
-    .verdict-banner {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 20px 24px;
-      border-radius: 16px;
-      margin-bottom: 24px;
-      transition: all 0.4s;
-    }
-
-    .verdict-banner.match {
-      background: rgba(52,199,128,0.1);
-      border: 1px solid rgba(52,199,128,0.3);
-    }
-
-    .verdict-banner.nomatch {
-      background: rgba(224,90,90,0.1);
-      border: 1px solid rgba(224,90,90,0.3);
-    }
-
-    .verdict-icon { font-size: 32px; flex-shrink: 0; }
-
-    .verdict-text-block { flex: 1; }
-
-    .verdict-title {
-      font-size: 18px;
-      font-weight: 800;
-      margin-bottom: 3px;
-    }
-
-    .verdict-banner.match   .verdict-title { color: #5bd4a0; }
-    .verdict-banner.nomatch .verdict-title { color: #e07a7a; }
-
-    .verdict-subtitle {
-      font-size: 13px;
-      color: var(--color-muted);
-    }
-
-    /* Score gauge */
-    .score-gauge-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    .score-gauge-label {
-      font-size: 11px;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--color-muted);
-      white-space: nowrap;
-      width: 120px;
-      flex-shrink: 0;
-    }
-
-    .score-gauge-track {
-      flex: 1;
-      height: 8px;
-      background: rgba(255,255,255,0.06);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    .score-gauge-fill {
-      height: 100%;
-      border-radius: 4px;
-      width: 0%;
-      transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
-    }
-
-    .score-gauge-fill.high   { background: linear-gradient(90deg, #34c780, #5bd4a0); }
-    .score-gauge-fill.medium { background: linear-gradient(90deg, var(--color-gold), var(--color-gold-light)); }
-    .score-gauge-fill.low    { background: linear-gradient(90deg, #e05a5a, #e07a7a); }
-
-    .score-gauge-value {
-      font-size: 13px;
-      font-weight: 700;
-      width: 44px;
-      text-align: right;
-      flex-shrink: 0;
-    }
-
-    /* Algorithm breakdown grid */
-    .algo-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .algo-card {
-      background: rgba(10,14,26,0.6);
-      border: 1px solid var(--color-border);
-      border-radius: 12px;
-      padding: 14px 16px;
-    }
-
-    .algo-name {
-      font-size: 10.5px;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--color-muted);
-      margin-bottom: 8px;
-    }
-
-    .algo-bar-track {
-      height: 5px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 3px;
-      overflow: hidden;
-      margin-bottom: 5px;
-    }
-
-    .algo-bar-fill {
-      height: 100%;
-      border-radius: 3px;
-      width: 0%;
-      background: linear-gradient(90deg, var(--color-accent), var(--color-accent-light));
-      transition: width 1s cubic-bezier(0.4,0,0.2,1);
-    }
-
-    .algo-score-val {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--color-accent-light);
-    }
-
-    /* Special match reason chips */
-    .match-reason-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      background: rgba(232,170,74,0.1);
-      border: 1px solid rgba(232,170,74,0.3);
-      color: var(--color-gold-light);
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 600;
-      margin-right: 8px;
-      margin-bottom: 4px;
-    }
-
-    /* Mobile */
-    @media (max-width: 640px) {
-      .validator-card     { padding: 24px 18px; }
-      .validator-inputs   { grid-template-columns: 1fr; gap: 12px; }
-      .validator-vs       { display: none; }
-      .algo-grid          { grid-template-columns: 1fr 1fr; }
-      .score-gauge-label  { width: 80px; font-size: 10px; }
-    }
-
-
-    /* ============================================================
-       FOOTER
-       ============================================================ */
-    #site-footer {
-      position: relative;
-      z-index: 1;
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 40px 24px;
-      border-top: 1px solid var(--color-border);
-      text-align: center;
-      color: var(--color-dim);
-      font-size: 13px;
-    }
-
-    #site-footer a { color: var(--color-accent); text-decoration: none; }
-
-    .footer-name {
-      font-size: 20px;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--color-accent-light), var(--color-gold));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-bottom: 8px;
-    }
-
-
-    /* ============================================================
-       KEYFRAME ANIMATIONS
-       ============================================================ */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes blink {
-      50% { opacity: 0; }
-    }
-
-
-    @keyframes pulseDot {
-      0%, 100% { box-shadow: 0 0 0 4px rgba(232, 170, 74, 0.3); }
-      50%       { box-shadow: 0 0 0 8px rgba(232, 170, 74, 0.1); }
-    }
-
-    @keyframes glowGold {
-      0%, 100% { box-shadow: 0 0 8px rgba(232, 170, 74, 0.2); }
-      50%       { box-shadow: 0 0 20px rgba(232, 170, 74, 0.5); }
-    }
-
-
-    /* ============================================================
-       RESPONSIVE — TABLET  (≤ 768px)
-       ============================================================ */
-    @media (max-width: 768px) {
-      #navbar { padding: 0 20px; }
-
-      /* Hide horizontal links, show hamburger */
-      .nav-links    { display: none; }
-      #nav-hamburger { display: flex; }
-
-      #page-content { padding: 0 16px 60px; }
-
-      .stats-row            { grid-template-columns: 1fr 1fr; }
-      .highlights-grid      { grid-template-columns: 1fr; }
-      .education-grid       { grid-template-columns: 1fr 1fr; }
-      .soft-skills-grid     { grid-template-columns: 1fr 1fr; }
-
-      .exp-card { padding: 20px 20px; }
-
-    }
-
-
-    /* ============================================================
-       RESPONSIVE — PHONE  (≤ 480px)
-       ============================================================ */
-    @media (max-width: 480px) {
-      #hero { min-height: auto; padding: 90px 0 48px; }
-
-      .hero-summary { font-size: 14px; }
-
-      .contact-pill { font-size: 12px; padding: 6px 12px; }
-
-      .stats-row        { grid-template-columns: 1fr 1fr; gap: 10px; }
-      .stat-card        { padding: 18px 10px; }
-
-      .highlights-grid  { grid-template-columns: 1fr; }
-      .education-grid   { grid-template-columns: 1fr; }
-      .soft-skills-grid { grid-template-columns: 1fr; }
-
-      /* Timeline: tighten the left gutter */
-      .timeline        { padding-left: 24px; }
-      .timeline-dot    { left: -22px; width: 12px; height: 12px; }
-
-      .exp-card        { padding: 18px 16px; border-radius: 14px; }
-      .exp-title       { font-size: 15px; }
-      .exp-header      { flex-direction: column; gap: 8px; }
-
-      .section-heading { font-size: 24px; }
-    }
-
-  </style>
+  <!-- Stylesheet — all visual design tokens, layout, and animations -->
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <!-- Particle background — driven by JS below -->
+  <!-- Particle background — driven by JS -->
   <canvas id="particle-canvas"></canvas>
 
   <!-- ============================================================
@@ -1869,10 +41,10 @@
   <!-- Mobile navigation drawer (toggled by hamburger) -->
   <div id="nav-drawer">
     <a href="#section-validator" onclick="closeDrawer()" style="color:var(--color-gold)">Live Demo ✦</a>
-    <a href="#section-about"     onclick="closeDrawer()">About</a>
-    <a href="#section-skills"    onclick="closeDrawer()">Skills</a>
+    <a href="#section-about"      onclick="closeDrawer()">About</a>
+    <a href="#section-skills"     onclick="closeDrawer()">Skills</a>
     <a href="#section-experience" onclick="closeDrawer()">Experience</a>
-    <a href="#section-education" onclick="closeDrawer()">Education</a>
+    <a href="#section-education"  onclick="closeDrawer()">Education</a>
   </div>
 
   <!-- ============================================================
@@ -1930,34 +102,27 @@
         </span>
       </div>
 
-      <!-- ── Career Timer (below contact pills, above section break) ──
-           JS reads CAREER_PERIODS from the script block.
-           Periods rendered latest-first by JS (array reversed in render).
-           ─────────────────────────────────────────────────────────────── -->
+      <!-- Career Timer — JS reads CAREER_PERIODS array in main.js -->
       <div class="career-timer-card" style="margin-top: 40px; opacity: 0; animation: fadeUp 0.6s 1.2s forwards;">
-
         <div class="career-timer-heading">
           <span class="live-dot"></span>
           Career Clock — Time Spent Engineering
         </div>
-
         <div class="timer-periods" id="timer-periods-container">
-          <!-- Populated by careerTimer() in JS -->
+          <!-- Populated by careerTimer() in main.js -->
         </div>
-
         <div class="timer-total-row">
           <div class="timer-total-label">Total Active Experience</div>
           <div class="timer-total-display" id="timer-total-display">
-            <!-- Populated by careerTimer() in JS -->
+            <!-- Populated by careerTimer() in main.js -->
           </div>
         </div>
-
       </div>
 
     </section><!-- /hero -->
 
 
-    <!-- ── NAME VALIDATOR DEMO (moved here — key highlight) ─── -->
+    <!-- ── NAME VALIDATOR DEMO ───────────────────────────────── -->
     <section id="section-validator" class="page-section" style="padding-top:40px;">
 
       <div class="section-eyebrow reveal">
@@ -1967,18 +132,19 @@
 
       <h2 class="section-heading reveal">PAN Name <span>Validator</span></h2>
       <p class="section-subtext reveal">
-        A real algorithm I designed &amp; built at IndiaLends — weighted ensemble of proprietary similarity techniques tuned for Indian name variations. Try it live.
+        A real algorithm I designed &amp; built at IndiaLends — weighted ensemble of proprietary
+        similarity techniques tuned for Indian name variations. Try it live.
       </p>
 
       <div class="validator-card reveal">
 
+        <!-- Top bar: demo note + GitHub link + info tooltip -->
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
           <div class="validator-note" style="margin-bottom:0;">
             ⚙️ Interactive demo of a C# production system — ported to JS for illustration only
           </div>
-          <!-- View Source button + ℹ️ tooltip -->
-          <div style="display:inline-flex; align-items:center; gap:8px;">
 
+          <div style="display:inline-flex; align-items:center; gap:8px;">
             <a href="https://github.com/Dev-Deepanshu-Kumar/IndianFuzzyNameMatcher"
                target="_blank" rel="noopener"
                style="display:inline-flex; align-items:center; gap:7px;
@@ -1995,7 +161,7 @@
               View Source
             </a>
 
-            <!-- ℹ️ info button — tooltip rendered in <body> via JS to escape overflow:hidden -->
+            <!-- ℹ️ button — tooltip appended to body by initSourceTooltip() in main.js -->
             <span id="src-info-btn"
                   style="display:inline-flex; align-items:center; justify-content:center;
                          width:22px; height:22px; border-radius:50%;
@@ -2005,10 +171,10 @@
                          transition:border-color 0.2s, color 0.2s;">
               i
             </span>
-
           </div>
         </div>
 
+        <!-- Name inputs -->
         <div class="validator-inputs">
           <div class="validator-input-group">
             <div class="validator-label">Name on PAN Card</div>
@@ -2023,10 +189,11 @@
           </div>
         </div>
 
-        <!-- Story button + collapsible panel -->
+        <!-- Story toggle — collapses/expands the origin story -->
         <button class="story-trigger" onclick="toggleStory(this)">
           <span>📖</span> The story behind this
         </button>
+
         <div class="story-panel" id="story-panel">
           <div class="story-inner">
             <div class="story-heading">🔍 Why I built this</div>
@@ -2034,56 +201,71 @@
             <div class="story-beat">
               <span class="story-beat-icon">🔎</span>
               <div class="story-beat-text">
-                In a digital lending platform, applicants submit their PAN card details as part of identity verification. The challenge: <strong>ensuring the name entered by the applicant actually matches the name registered on the PAN</strong> — something that sounds simple but is surprisingly tricky given how many variations a single name can have.
+                In a digital lending platform, applicants submit their PAN card details as part of
+                identity verification. The challenge: <strong>ensuring the name entered by the applicant
+                actually matches the name registered on the PAN</strong> — something that sounds simple
+                but is surprisingly tricky given how many variations a single name can have.
               </div>
             </div>
 
             <div class="story-beat">
               <span class="story-beat-icon">💡</span>
               <div class="story-beat-text">
-                The fix was two third-party API calls on every submission — one to fetch the PAN holder's name, one to score similarity. They worked, but <strong>every call had a cost</strong>. Under marketing campaigns with high traffic, that cost multiplied fast.
+                The fix was two third-party API calls on every submission — one to fetch the PAN
+                holder's name, one to score similarity. They worked, but <strong>every call had a
+                cost</strong>. Under marketing campaigns with high traffic, that cost multiplied fast.
               </div>
             </div>
 
             <div class="story-beat">
               <span class="story-beat-icon">🧪</span>
               <div class="story-beat-text">
-                I noticed that real-world name variations are actually quite limited — typos, transliterations, initials, reversed order. I hypothesised that a <strong>weighted combination of string-similarity algorithms</strong> tuned for Indian names could replace most of those API calls locally, at zero marginal cost.
+                I noticed that real-world name variations are quite limited — typos, transliterations,
+                initials, reversed order. I hypothesised that a <strong>weighted combination of
+                string-similarity algorithms</strong> tuned for Indian names could replace most of
+                those API calls locally, at zero marginal cost.
               </div>
             </div>
 
             <div class="story-beat">
               <span class="story-beat-icon">📊</span>
               <div class="story-beat-text">
-                I researched, built a prototype, and validated it against <strong>30,000 historical records</strong>. Presented to the architect (who helped tune the weights), then to Risk Management. Got approved. Deployed with a <strong>fallback band</strong> — scores near the threshold still hit the external API as a safety net, avoiding false rejections on edge cases.
+                I researched, built a prototype, and validated it against <strong>30,000 historical
+                records</strong>. Presented to the architect (who helped tune the weights), then to
+                Risk Management. Got approved. Deployed with a <strong>fallback band</strong> — scores
+                near the threshold still hit the external API as a safety net.
               </div>
             </div>
 
             <div class="story-beat">
               <span class="story-beat-icon">📉</span>
               <div class="story-beat-text">
-                Result: <strong>significant reduction in external API calls</strong> on clear-match and clear-reject cases, cutting both latency and cost — while keeping the original API as a backstop for ambiguous scores.
+                Result: <strong>significant reduction in external API calls</strong> on clear-match and
+                clear-reject cases, cutting both latency and cost — while keeping the original API as
+                a backstop for ambiguous scores.
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Threshold tuning knob -->
+        <!-- Threshold rotary knob — SVG built by initKnob() in main.js -->
         <div class="threshold-row">
           <div class="threshold-label-group">
             <span class="threshold-label">Match Threshold</span>
             <span class="threshold-hint">Drag the knob · lower = lenient · higher = strict</span>
-            <span class="threshold-hint" style="margin-top:3px; color: rgba(232,170,74,0.6);">Production threshold was 70% with a ±5% fallback band</span>
+            <span class="threshold-hint" style="margin-top:3px; color:rgba(232,170,74,0.6);">
+              Production threshold was 70% with a ±5% fallback band
+            </span>
           </div>
           <div class="knob-group">
             <div class="knob-wrap" id="knob-wrap">
-              <!-- SVG drawn by JS — knob-init() below -->
+              <!-- SVG drawn by initKnob() in main.js -->
             </div>
             <div class="knob-val" id="knob-val">72%</div>
             <div class="knob-sub">Threshold</div>
           </div>
         </div>
-        <!-- Hidden input kept for runValidator() to read -->
+        <!-- Hidden input read by runValidator() in main.js -->
         <input type="hidden" id="vld-threshold" value="72">
 
         <button class="validator-btn" id="vld-btn" onclick="runValidator()">
@@ -2093,6 +275,7 @@
           Compare Names
         </button>
 
+        <!-- Results panel — shown after first comparison -->
         <div class="validator-result" id="vld-result">
 
           <div class="verdict-banner" id="vld-verdict">
@@ -2114,7 +297,7 @@
           </div>
 
           <div class="algo-grid" id="vld-algo-grid">
-            <!-- populated by JS — algo names are codenames, not implementation details -->
+            <!-- Algo cards injected by runValidator() — codenames, not algorithm names -->
           </div>
 
         </div><!-- /validator-result -->
@@ -2134,58 +317,48 @@
 
       <!--
         STATS CARDS
-        Each card: data-target = the final number JS animates to.
-        data-suffix = text appended after the count animation finishes.
-        Edit the label text and data attributes to change what's shown.
+        data-target = final number JS animates to
+        data-suffix = text appended when animation completes
       -->
       <div class="stats-row">
-
         <div class="stat-card reveal reveal-d1">
           <span class="stat-number" data-target="5" data-suffix="+">0</span>
           <div class="stat-label">Years Backend Engineering Experience</div>
         </div>
-
         <div class="stat-card reveal reveal-d2">
           <span class="stat-number" data-target="3" data-suffix="">0</span>
           <div class="stat-label">Industries — SaaS · FinTech · Healthcare</div>
         </div>
-
         <div class="stat-card reveal reveal-d3">
           <span class="stat-number" data-target="3" data-suffix="">0</span>
           <div class="stat-label">Backend Services Designed &amp; Built</div>
         </div>
-
       </div>
 
       <h2 class="section-heading reveal">Key <span>Highlights</span></h2>
       <p class="section-subtext reveal">Things that moved the needle — not just tasks shipped.</p>
 
       <div class="highlights-grid">
-
         <div class="highlight-card reveal reveal-d1">
           <span class="highlight-icon">📦</span>
           <div class="highlight-title">Shared Platform Library</div>
           <p class="highlight-body">Built a reusable .NET Standard NuGet library integrating AWS Secrets Manager, Redis caching, and resiliency patterns (retry, circuit-breaker) — adopted across the platform to enable secure, region-aware credential resolution as part of a container migration effort.</p>
         </div>
-
         <div class="highlight-card reveal reveal-d2">
           <span class="highlight-icon">💡</span>
           <div class="highlight-title">Cost Reduction via Smarts</div>
           <p class="highlight-body">Designed a confidence-based PAN name-matching approach validated against 30K+ historical records, cutting unnecessary third-party verification API calls and reducing operational costs without sacrificing accuracy.</p>
         </div>
-
         <div class="highlight-card reveal reveal-d3">
           <span class="highlight-icon">⚙️</span>
           <div class="highlight-title">Reusable P&amp;S Microservice</div>
           <p class="highlight-body">Engineered a Planning &amp; Scheduling microservice — technician assignment, scheduling, labour-entry — as an independently deployable capability using DDD aggregate patterns, designed for adoption across multiple products.</p>
         </div>
-
         <div class="highlight-card reveal reveal-d4">
           <span class="highlight-icon">🚀</span>
           <div class="highlight-title">Release &amp; Reliability Owner</div>
           <p class="highlight-body">Served as Release Representative across multiple production releases and led a Maintenance &amp; Reliability initiative resolving customer-reported defects across Work Orders, Dashboard, Inventory, and Purchasing.</p>
         </div>
-
       </div>
 
     </section><!-- /about -->
@@ -2202,7 +375,7 @@
       <h2 class="section-heading reveal">Core <span>Skills</span></h2>
       <p class="section-subtext reveal">Hover any tag — each one has a story behind it.</p>
 
-      <!-- tag-blue = core backend | tag-gold = data/DevOps | tag-green = cloud/testing -->
+      <!-- tag-blue = backend/languages | tag-gold = data/DevOps | tag-green = cloud/testing -->
 
       <div class="skill-category reveal">
         <div class="skill-category-title">Languages</div>
@@ -2335,18 +508,19 @@
                 <div class="exp-title">Software Engineer</div>
                 <a class="exp-company" href="https://www.assetmanagement.siemens.com/" target="_blank" rel="noopener">
                   Siemens — Asset Management Software
-                  <svg class="exp-company-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  <svg class="exp-company-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+                    <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                  </svg>
                 </a>
                 <div class="exp-location">📍 Noida, India &nbsp;·&nbsp; Formerly Brightly Software &nbsp;·&nbsp; Enterprise CMMS Platform</div>
               </div>
               <div class="exp-date-badge exp-date-badge--current">Jan 2024 — Present</div>
             </div>
-
             <div class="exp-expand-hint">
               <span>View contributions</span>
               <span class="expand-icon">↓</span>
             </div>
-
             <div class="exp-bullets-wrapper">
               <ul class="exp-bullets">
                 <li>Contributed to modernising a 170-project, multi-tenant ASP.NET MVC enterprise SaaS platform serving 2,500+ organisations — developing modular .NET/.NET Core services and RESTful APIs applying DDD and Clean Architecture principles.</li>
@@ -2373,18 +547,19 @@
                 <div class="exp-title">Software Engineer</div>
                 <a class="exp-company" href="https://indialends.com/" target="_blank" rel="noopener">
                   IndiaLends — GC Web Ventures Pvt Ltd
-                  <svg class="exp-company-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  <svg class="exp-company-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+                    <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                  </svg>
                 </a>
                 <div class="exp-location">📍 Gurugram, India &nbsp;·&nbsp; FinTech Digital Lending</div>
               </div>
               <div class="exp-date-badge">Apr 2022 — Dec 2023</div>
             </div>
-
             <div class="exp-expand-hint">
               <span>View contributions</span>
               <span class="expand-icon">↓</span>
             </div>
-
             <div class="exp-bullets-wrapper">
               <ul class="exp-bullets">
                 <li>Identified an opportunity to reduce third-party PAN verification costs and proposed a local PAN holder name-validation approach using weighted string-similarity algorithms. Validated against 30K+ historical records and collaborated with Architecture and Risk Management teams to productionise a confidence-based fallback strategy.</li>
@@ -2423,18 +598,19 @@
                 <div class="exp-title">Software Development Engineer I</div>
                 <a class="exp-company" href="https://www.telebu.com/" target="_blank" rel="noopener">
                   Telebu Communications LLP
-                  <svg class="exp-company-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  <svg class="exp-company-icon" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/>
+                    <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                  </svg>
                 </a>
                 <div class="exp-location">📍 Hyderabad, India &nbsp;·&nbsp; Healthcare Platform — Tabiib</div>
               </div>
               <div class="exp-date-badge">Dec 2019 — Dec 2020</div>
             </div>
-
             <div class="exp-expand-hint">
               <span>View contributions</span>
               <span class="expand-icon">↓</span>
             </div>
-
             <div class="exp-bullets-wrapper">
               <ul class="exp-bullets">
                 <li>Implemented backend APIs supporting doctor search, appointment scheduling, and healthcare management operations on the Tabiib platform.</li>
@@ -2462,30 +638,12 @@
       <h2 class="section-heading reveal">Soft <span>Skills</span></h2>
 
       <div class="soft-skills-grid" style="margin-top: 28px;">
-        <div class="soft-skill-card reveal reveal-d1">
-          <span class="soft-skill-icon">🧩</span>
-          Analytical Problem-Solving
-        </div>
-        <div class="soft-skill-card reveal reveal-d2">
-          <span class="soft-skill-icon">🤝</span>
-          Cross-Functional Collaboration
-        </div>
-        <div class="soft-skill-card reveal reveal-d3">
-          <span class="soft-skill-icon">💬</span>
-          Clear Technical Communication
-        </div>
-        <div class="soft-skill-card reveal reveal-d1">
-          <span class="soft-skill-icon">🎯</span>
-          Ownership &amp; Accountability
-        </div>
-        <div class="soft-skill-card reveal reveal-d2">
-          <span class="soft-skill-icon">🔄</span>
-          Adaptability
-        </div>
-        <div class="soft-skill-card reveal reveal-d3">
-          <span class="soft-skill-icon">⏱️</span>
-          Time Management
-        </div>
+        <div class="soft-skill-card reveal reveal-d1"><span class="soft-skill-icon">🧩</span>Analytical Problem-Solving</div>
+        <div class="soft-skill-card reveal reveal-d2"><span class="soft-skill-icon">🤝</span>Cross-Functional Collaboration</div>
+        <div class="soft-skill-card reveal reveal-d3"><span class="soft-skill-icon">💬</span>Clear Technical Communication</div>
+        <div class="soft-skill-card reveal reveal-d1"><span class="soft-skill-icon">🎯</span>Ownership &amp; Accountability</div>
+        <div class="soft-skill-card reveal reveal-d2"><span class="soft-skill-icon">🔄</span>Adaptability</div>
+        <div class="soft-skill-card reveal reveal-d3"><span class="soft-skill-icon">⏱️</span>Time Management</div>
       </div>
 
     </section><!-- /soft-skills -->
@@ -2517,11 +675,10 @@
           <span class="edu-year-badge">2013 – 2016</span>
         </div>
 
-        <!-- GNIIT is a flip card — front shows the degree, back explains what GNIIT is -->
+        <!-- GNIIT flip card — click front to see what GNIIT is, click back to return -->
         <div class="flip-card-wrapper reveal reveal-d3" onclick="flipCard(this)">
           <div class="flip-card-inner">
 
-            <!-- Front face -->
             <div class="flip-card-front">
               <div class="edu-icon">🏅</div>
               <div class="edu-degree">GNIIT — Software Engineering</div>
@@ -2533,11 +690,14 @@
               <span class="edu-year-badge" style="margin-top:8px;">2017 · Excellent</span>
             </div>
 
-            <!-- Back face — click again to flip back -->
             <div class="flip-card-back">
               <div class="flip-back-title">🎓 What is GNIIT?</div>
               <p class="flip-back-body">
-                <strong style="color:#fff;">GNIIT (Graduate in Network IT)</strong> is a 3-year industry-oriented software engineering programme offered by NIIT — one of India's premier IT education networks. Covering full-stack development, databases, networking, and software engineering fundamentals, it is widely recognised in the Indian IT industry as a strong practical foundation alongside a formal degree.
+                <strong style="color:#fff;">GNIIT (Graduate in Network IT)</strong> is a 3-year
+                industry-oriented software engineering programme offered by NIIT — one of India's
+                premier IT education networks. Covering full-stack development, databases,
+                networking, and software engineering fundamentals, it is widely recognised in the
+                Indian IT industry as a strong practical foundation alongside a formal degree.
               </p>
               <div class="flip-back-close">← Tap to go back</div>
             </div>
@@ -2559,11 +719,9 @@
       </div>
 
       <div class="resume-card reveal">
-
         <div class="resume-icon-wrap">
           <div class="resume-icon-bg">📄</div>
         </div>
-
         <div class="resume-text">
           <div class="resume-title">Download My Resume</div>
           <div class="resume-subtitle">
@@ -2574,13 +732,11 @@
             <span class="resume-tag">PDF · A4</span>
             <span class="resume-tag">5+ Years Experience</span>
             <span class="resume-tag">.NET · C# · Backend</span>
+            <!-- Date updated dynamically by main.js -->
             <span class="resume-tag" id="resume-updated">Updated Jul 2026</span>
           </div>
         </div>
-
-        <a href="Deepanshu_Kumar_Resume.pdf"
-           download="Deepanshu_Kumar_Resume.pdf"
-           class="resume-download-btn">
+        <a href="Deepanshu_Kumar_Resume.pdf" download="Deepanshu_Kumar_Resume.pdf" class="resume-download-btn">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
             <polyline points="7 10 12 15 17 10"/>
@@ -2588,7 +744,6 @@
           </svg>
           Download Resume
         </a>
-
       </div>
 
     </section><!-- /resume -->
@@ -2610,875 +765,8 @@
   </footer>
 
 
-  <!-- ============================================================
-       JAVASCRIPT
-
-       Functions are grouped and named for easy navigation:
-         particleSystem()     — canvas particle background
-         typedTitleEffect()   — cycling typed text in the hero
-         navBehaviours()      — scroll shadow + hamburger toggle
-         scrollReveal()       — IntersectionObserver fade-ins
-         statCounters()       — animated count-up numbers
-         toggleExpCard()      — expand/collapse job cards (global, called from HTML)
-       ============================================================ -->
-  <script>
-
-    // ── Particle background ────────────────────────────────────
-    function particleSystem() {
-      const canvas = document.getElementById('particle-canvas');
-      const ctx    = canvas.getContext('2d');
-      let W, H, particles = [];
-      let mouseX = -9999, mouseY = -9999;
-
-      const PARTICLE_COUNT  = 80;
-      const LINE_MAX_DIST   = 130;
-      const MOUSE_REPEL_RADIUS = 160;
-
-      function resizeCanvas() {
-        W = canvas.width  = window.innerWidth;
-        H = canvas.height = window.innerHeight;
-      }
-
-      class Particle {
-        constructor(spawnAnywhere) {
-          this.reset(spawnAnywhere);
-        }
-
-        reset(spawnAnywhere) {
-          this.x   = Math.random() * W;
-          this.y   = spawnAnywhere ? Math.random() * H : -10;
-          this.vx  = (Math.random() - 0.5) * 0.35;
-          this.vy  = Math.random() * 0.3 + 0.1;
-          this.r   = Math.random() * 1.5 + 0.5;
-          this.alpha = Math.random() * 0.5 + 0.15;
-          const roll = Math.random();
-          this.color = roll > 0.6 ? '#2b9cba' : roll > 0.3 ? '#e8aa4a' : '#1ecbe1';
-        }
-
-        update() {
-          const dx   = this.x - mouseX;
-          const dy   = this.y - mouseY;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < MOUSE_REPEL_RADIUS) {
-            const force = (MOUSE_REPEL_RADIUS - dist) / MOUSE_REPEL_RADIUS * 0.8;
-            this.vx += (dx / dist) * force * 0.05;
-            this.vy += (dy / dist) * force * 0.05;
-          }
-
-          this.vx *= 0.99;
-          this.vy *= 0.99;
-          this.x  += this.vx;
-          this.y  += this.vy;
-
-          if (this.y > H + 10 || this.x < -50 || this.x > W + 50) {
-            this.reset(false);
-          }
-        }
-
-        draw() {
-          ctx.save();
-          ctx.globalAlpha = this.alpha;
-          ctx.fillStyle   = this.color;
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-        }
-      }
-
-      function drawConnectingLines() {
-        for (let i = 0; i < particles.length; i++) {
-          for (let j = i + 1; j < particles.length; j++) {
-            const dx   = particles[i].x - particles[j].x;
-            const dy   = particles[i].y - particles[j].y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist < LINE_MAX_DIST) {
-              const alpha = (1 - dist / LINE_MAX_DIST) * 0.12;
-              ctx.save();
-              ctx.globalAlpha = alpha;
-              ctx.strokeStyle = '#2b9cba';
-              ctx.lineWidth   = 0.6;
-              ctx.beginPath();
-              ctx.moveTo(particles[i].x, particles[i].y);
-              ctx.lineTo(particles[j].x, particles[j].y);
-              ctx.stroke();
-              ctx.restore();
-            }
-          }
-        }
-      }
-
-      function animationLoop() {
-        ctx.clearRect(0, 0, W, H);
-        particles.forEach(p => { p.update(); p.draw(); });
-        drawConnectingLines();
-        requestAnimationFrame(animationLoop);
-      }
-
-      window.addEventListener('resize',     () => { resizeCanvas(); particles = []; for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle(true)); });
-      document.addEventListener('mousemove', e  => { mouseX = e.clientX; mouseY = e.clientY; });
-      document.addEventListener('mouseleave', () => { mouseX = -9999; mouseY = -9999; });
-
-      resizeCanvas();
-      for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle(true));
-      animationLoop();
-    }
-
-
-    // ── Typed title effect ─────────────────────────────────────
-    function typedTitleEffect() {
-      const phrases = [
-        'C# · .NET · ASP.NET Core',
-        'Enterprise SaaS · 5+ Years',
-        'Clean Architecture · DDD',
-        'REST APIs · Microservices',
-        'Building things that scale.',
-      ];
-
-      const el = document.getElementById('typed-text');
-      let phraseIndex  = 0;
-      let charIndex    = 0;
-      let isDeleting   = false;
-      let pauseFrames  = 0;
-
-      function tick() {
-        const currentPhrase = phrases[phraseIndex];
-
-        if (pauseFrames > 0) {
-          pauseFrames--;
-          setTimeout(tick, 40);
-          return;
-        }
-
-        if (!isDeleting) {
-          el.textContent = currentPhrase.slice(0, charIndex + 1);
-          charIndex++;
-          if (charIndex >= currentPhrase.length) {
-            isDeleting  = true;
-            pauseFrames = 55;
-          }
-          setTimeout(tick, 70);
-        } else {
-          el.textContent = currentPhrase.slice(0, charIndex - 1);
-          charIndex--;
-          if (charIndex <= 0) {
-            isDeleting  = false;
-            phraseIndex = (phraseIndex + 1) % phrases.length;
-            pauseFrames = 12;
-          }
-          setTimeout(tick, 35);
-        }
-      }
-
-      setTimeout(tick, 1000);
-    }
-
-
-    // ── Navigation behaviours ──────────────────────────────────
-    function navBehaviours() {
-      const navbar     = document.getElementById('navbar');
-      const hamburger  = document.getElementById('nav-hamburger');
-      const drawer     = document.getElementById('nav-drawer');
-
-      // Scroll shadow
-      window.addEventListener('scroll', () => {
-        navbar.classList.toggle('scrolled', window.scrollY > 20);
-      });
-
-      // Hamburger toggle
-      hamburger.addEventListener('click', () => {
-        drawer.classList.toggle('open');
-      });
-    }
-
-    // Global function called from nav-drawer link onclick attributes
-    function closeDrawer() {
-      document.getElementById('nav-drawer').classList.remove('open');
-    }
-
-
-    // ── Scroll reveal (IntersectionObserver) ──────────────────
-    function scrollReveal() {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add('visible');
-
-          // Trigger count animation if this card has a stat number
-          const statNum = entry.target.querySelector('[data-target]');
-          if (statNum && !statNum.dataset.animated) {
-            statNum.dataset.animated = '1';
-            animateStatNumber(statNum);
-          }
-        });
-      }, { threshold: 0.12 });
-
-      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    }
-
-
-    // ── Stat number count-up animation ────────────────────────
-    function animateStatNumber(el) {
-      const target = parseInt(el.dataset.target, 10);
-      const suffix = el.dataset.suffix || '';
-      let startTime = null;
-      const DURATION = 1400;
-
-      function step(timestamp) {
-        if (!startTime) startTime = timestamp;
-        const progress = Math.min((timestamp - startTime) / DURATION, 1);
-        const eased    = 1 - Math.pow(1 - progress, 3);  // ease-out cubic
-
-        el.textContent = Math.floor(eased * target) + (progress < 1 ? '' : suffix);
-
-        if (progress < 1) requestAnimationFrame(step);
-      }
-
-      requestAnimationFrame(step);
-    }
-
-
-    // ── Experience card expand / collapse ─────────────────────
-    // Called from onclick on each .exp-card (except .exp-card--dim)
-    function toggleExpCard(cardElement) {
-      cardElement.classList.toggle('exp-card--expanded');
-    }
-
-
-    // ── Flip card (GNIIT education card) ──────────────────────
-    // Called from onclick on .flip-card-wrapper
-    function flipCard(wrapperElement) {
-      wrapperElement.classList.toggle('flipped');
-    }
-
-
-    // ── Career Timer ──────────────────────────────────────────
-    //
-    // EDIT THIS ARRAY to update dates if your employment changes.
-    // Each object:
-    //   label  — displayed name of the role/company
-    //   start  — first day of work  (YYYY, MM-1, DD)  ← month is 0-indexed (Jan=0)
-    //   end    — last day of work   (YYYY, MM-1, DD), or null = still working
-    //
-    const CAREER_PERIODS = [
-      {
-        label: 'Telebu Communications (Tabiib)',
-        start: new Date(2019, 11, 2),   // 2 Dec 2019  (month 11 = December)
-        end:   new Date(2020, 11, 31),  // 31 Dec 2020
-      },
-      {
-        label: 'IndiaLends',
-        start: new Date(2022, 3, 18),   // 18 Apr 2022  (month 3 = April)
-        end:   new Date(2023, 11, 20),  // 20 Dec 2023
-      },
-      {
-        label: 'Siemens — Asset Management Software',
-        start: new Date(2024, 0, 2),    // 2 Jan 2024   (month 0 = January)
-        end:   null,                    // null = still working, ticks in real-time
-      },
-    ];
-
-    function careerTimer() {
-      const periodsContainer = document.getElementById('timer-periods-container');
-      const totalContainer   = document.getElementById('timer-total-display');
-
-      // Render latest-first — reverse a copy, keep original index for element IDs
-      const periodsLatestFirst = [...CAREER_PERIODS].reverse();
-
-      // Build one row per period (DOM created once, values updated every second)
-      const periodRows = periodsLatestFirst.map((period, i) => {
-        const isActive = period.end === null;
-
-        const row = document.createElement('div');
-        row.innerHTML = `
-          ${ i > 0 ? '<div class="timer-divider"></div>' : '' }
-          <div class="timer-period">
-            <div>
-              <div class="timer-period-label">
-                ${ isActive ? '<span style="color:var(--color-gold)">▶ </span>' : '' }
-                ${ period.label }
-              </div>
-              <div class="timer-period-dates">
-                ${ formatDate(period.start) } → ${ isActive ? 'Present' : formatDate(period.end) }
-              </div>
-            </div>
-            <div class="timer-display" id="timer-period-${ i }"></div>
-          </div>
-        `;
-        periodsContainer.appendChild(row);
-
-        return document.getElementById(`timer-period-${ i }`);
-      });
-
-      // Render function — called every second
-      function render() {
-        const now        = new Date();
-        let totalMs      = 0;
-
-        periodsLatestFirst.forEach((period, i) => {
-          const endDate = period.end === null ? now : period.end;
-          const ms      = Math.max(0, endDate - period.start);
-          totalMs      += ms;
-          renderUnits(periodRows[i], ms);
-        });
-
-        renderUnits(totalContainer, totalMs);
-      }
-
-      render();
-      setInterval(render, 1000);
-    }
-
-    // Break a millisecond duration into y/mo/d/h/m/s and inject into a container element
-    function renderUnits(container, ms) {
-      const totalSeconds = Math.floor(ms / 1000);
-      const totalMinutes = Math.floor(totalSeconds / 60);
-      const totalHours   = Math.floor(totalMinutes / 60);
-      const totalDays    = Math.floor(totalHours   / 24);
-      const totalMonths  = Math.floor(totalDays    / 30.4375);  // average month
-      const years        = Math.floor(totalMonths  / 12);
-      const months       = totalMonths % 12;
-      const days         = totalDays   % Math.round(30.4375);
-      const hours        = totalHours  % 24;
-      const minutes      = totalMinutes % 60;
-      const seconds      = totalSeconds % 60;
-
-      const units = [
-        { v: years,   l: 'Yrs'  },
-        { v: months,  l: 'Mos'  },
-        { v: days,    l: 'Days' },
-        { v: hours,   l: 'Hrs'  },
-        { v: minutes, l: 'Min'  },
-        { v: seconds, l: 'Sec'  },
-      ];
-
-      container.innerHTML = units.map(u => `
-        <div class="timer-unit">
-          <span class="timer-value">${ String(u.v).padStart(2, '0') }</span>
-          <span class="timer-unit-label">${ u.l }</span>
-        </div>
-      `).join('');
-    }
-
-    // Format a Date as "2 Dec 2019"
-    function formatDate(date) {
-      return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    }
-
-
-    // ── Name Validator Engine ─────────────────────────────────
-    // Proprietary weighted ensemble — ported from C# production system.
-    // IIFE: all internals are private. Public surface: _nv.score(a,b,threshold).
-    // Algorithm codenames intentional — implementation details not exposed.
-    const _nv=(function(){
-      // Weights array — order matches _E4, _E1, _E5, _E2, _E6, _E3 in _composite()
-      // DL+JW weighted higher — position-aware, handle transpositions correctly.
-      // Bigram methods (NGram/Cosine/Jaccard) penalise transpositions too harshly.
-      const _W=[0.30,0.08,0.20,0.30,0.06,0.06];
-      const _clean=s=>s.toUpperCase().replace(/[^A-Z0-9 ]/g,'');
-
-      // E2 — sequence proximity scorer
-      function _E2(a,b){
-        if(a===b)return 1;const l1=a.length,l2=b.length;if(!l1||!l2)return 0;
-        const wn=Math.max(Math.floor(Math.max(l1,l2)/2)-1,0);
-        const f1=new Array(l1).fill(false),f2=new Array(l2).fill(false);let mc=0;
-        for(let i=0;i<l1;i++){const lo=Math.max(0,i-wn),hi=Math.min(i+wn+1,l2);
-          for(let j=lo;j<hi;j++){if(f2[j]||a[i]!==b[j])continue;f1[i]=f2[j]=true;mc++;break;}}
-        if(!mc)return 0;let t=0,k=0;
-        for(let i=0;i<l1;i++){if(!f1[i])continue;while(!f2[k])k++;if(a[i]!==b[k])t++;k++;}
-        const jv=(mc/l1+mc/l2+(mc-t/2)/mc)/3;let p=0;
-        for(let i=0;i<Math.min(4,Math.min(l1,l2));i++){if(a[i]===b[i])p++;else break;}
-        return jv+p*0.1*(1-jv);
-      }
-
-      // E4 — edit-distance normalizer (transposition-aware)
-      function _E4(a,b){
-        const l1=a.length,l2=b.length,d=[];
-        for(let i=0;i<=l1;i++){d[i]=[];for(let j=0;j<=l2;j++)d[i][j]=i?j?0:i:j;}
-        for(let i=1;i<=l1;i++)for(let j=1;j<=l2;j++){
-          const c=a[i-1]===b[j-1]?0:1;
-          d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+c);
-          if(i>1&&j>1&&a[i-1]===b[j-2]&&a[i-2]===b[j-1])d[i][j]=Math.min(d[i][j],d[i-2][j-2]+c);
-        }
-        return 1-d[l1][l2]/Math.max(l1,l2,1);
-      }
-
-      // E1 — subsequence token overlap
-      function _E1(a,b,n=2){
-        if(a===b)return 1;if(a.length<n||b.length<n)return 0;
-        const g=s=>{const r=[];for(let i=0;i<=s.length-n;i++)r.push(s.slice(i,i+n));return r;};
-        const ga=g(a),gb=g(b),cnt={};
-        gb.forEach(x=>cnt[x]=(cnt[x]||0)+1);let sh=0;
-        ga.forEach(x=>{if(cnt[x]>0){sh++;cnt[x]--;}});
-        return 2*sh/(ga.length+gb.length);
-      }
-
-      // E6 — vector projection scorer
-      function _E6(a,b){
-        if(a===b)return 1;if(a.length<2||b.length<2)return 0;
-        const bv=s=>{const v={};for(let i=0;i<s.length-1;i++){const k=s.slice(i,i+2);v[k]=(v[k]||0)+1;}return v;};
-        const v1=bv(a),v2=bv(b);let dot=0,m1=0,m2=0;
-        Object.keys(v1).forEach(k=>{dot+=v1[k]*(v2[k]||0);m1+=v1[k]*v1[k];});
-        Object.keys(v2).forEach(k=>{m2+=v2[k]*v2[k];});
-        return(!m1||!m2)?0:dot/(Math.sqrt(m1)*Math.sqrt(m2));
-      }
-
-      // E3 — set-intersection ratio
-      function _E3(a,b){
-        const w1=a.split(' ').filter(Boolean), w2=b.split(' ').filter(Boolean);
-        if(w1.length>1||w2.length>1){
-          // multi-token: word-level Jaccard (original behaviour)
-          const s1=new Set(w1),s2=new Set(w2);
-          const inter=[...s1].filter(x=>s2.has(x)).length;
-          return inter/(s1.size+s2.size-inter);
-        }
-        // single token: character bigram Jaccard
-        const g=s=>{const r=new Set();for(let i=0;i<s.length-1;i++)r.add(s.slice(i,i+2));return r;};
-        const g1=g(a),g2=g(b);
-        const inter=[...g1].filter(x=>g2.has(x)).length;
-        const union=g1.size+g2.size-inter;
-        return union===0?0:inter/union;
-      }
-
-      // E5 — phonetic normalizer (Indian transliteration variants)
-      function _norm(s){
-        let x=s.toLowerCase();
-        x=x.replace(/ee|ii|ea/g,'i').replace(/aa/g,'a').replace(/oo|uu/g,'u');
-        x=x.replace(/dh/g,'d').replace(/gh/g,'g').replace(/kh/g,'k').replace(/th/g,'t').replace(/bh/g,'b');
-        x=x.replace(/ph/g,'f').replace(/w/g,'v').replace(/z/g,'j');
-        x=x.replace(/c(?!h)/g,'k');x=x.replace(/(.)\1+/g,'$1');
-        if(x.length>3&&x.endsWith('a'))x=x.slice(0,-1);
-        return x;
-      }
-      function _E5(a,b){return(a.length<=1||b.length<=1)?0:_E2(_norm(a),_norm(b));}
-
-      // Title/abbreviation sanitizer
-      function _san(n){
-        const va={'MD':'MOHAMMAD','MOHD':'MOHAMMAD','KR':'KUMAR','KRI':'KUMARI','PT':'PANDIT'};
-        const st=['DR','MR','MRS','JR','SR','SHRI','SMT','ADV','MS','MISS','SIR','MLA','MP'];
-        let w=n.split(' ');
-        if(va[w[0]])w[0]=va[w[0]];if(va[w[w.length-1]])w[w.length-1]=va[w[w.length-1]];
-        n=w.join(' ');
-        st.forEach(p=>{if(n.startsWith(p+' '))n=n.slice(p.length+1);if(n.endsWith(' '+p))n=n.slice(0,-(p.length+1));});
-        return n.trim();
-      }
-
-      function _dedup(ws){return ws.reduce((a,w)=>(!a.length||a[a.length-1]!==w)?(a.push(w),a):a,[]);}
-
-      function*_perms(arr,r){
-        if(!r){yield[];return;}
-        for(let i=0;i<arr.length;i++)for(const p of _perms(arr.filter((_,j)=>j!==i),r-1))yield[arr[i],...p];
-      }
-      function _abbrevs(nm){
-        const tk=nm.split(' '),out=new Set();
-        for(let r=0;r<=tk.length;r++)for(const p of _perms(tk,r))out.add(p.join(''));
-        return out;
-      }
-      function _abbrevPnC(nm){
-        const tk=nm.split(' '),out=new Set();
-        for(let it=1;it<tk.length;it++)for(let i=0;i<=tk.length-it;i++){
-          const t=[...tk];for(let j=i;j<i+it;j++)t[j]=tk[j][0]||'';
-          for(const a of _abbrevs(t.join(' ')))out.add(a);
-        }
-        return out;
-      }
-
-      // Composite weighted score — returns per-algo breakdown under codenames
-      function _composite(n1,n2){
-        const a=n1.replace(/ /g,''),b=n2.replace(/ /g,'');
-        const sc=[_E4(a,b),_E1(a,b),_E5(a,b),_E2(a,b),_E6(a,b),_E3(n1,n2)];
-        return{
-          combined:sc.reduce((s,v,i)=>s+v*_W[i],0),
-          // Codenames shown in UI — intentionally do not reveal algorithm family
-          algos:{'Lens-A':sc[3],'Lens-B':sc[2],'Lens-C':sc[1],'Lens-D':sc[0],'Lens-E':sc[4],'Lens-F':sc[5]}
-        };
-      }
-
-      return{
-        score(r1,r2,thr){
-          const threshold=typeof thr==='number'?thr/100:0.72;
-          let n1=_clean(r1).trim(),n2=_clean(r2).trim();
-          if(!n1||!n2)return{match:false,fuzzy:0,special:false,reason:'empty',algos:{}};
-          if(n1===n2)return{match:true,fuzzy:1,special:true,reason:'exact',algos:{}};
-          let s1=_san(n1),s2=_san(n2);
-          const w1=_dedup(s1.split(' ')),w2=_dedup(s2.split(' '));
-          if(w1.length===w2.length&&[...w1].reverse().join('')===w2.join(''))
-            return{match:true,fuzzy:1,special:true,reason:'reversed',algos:{}};
-          if(w1.length===2&&w2.length===2){
-            const cm=w1.find(x=>w2.includes(x));
-            const hi=[...w1,...w2].some(x=>x.length===1);
-            if(cm&&!hi){
-              const f=_composite(w1.filter(x=>x!==cm).join(''),w2.filter(x=>x!==cm).join(''));
-              return{match:f.combined>=threshold,fuzzy:f.combined,special:false,reason:'',algos:f.algos};
-            }
-          }
-          const lg=n1.length>=n2.length?n1:n2,sh=(n1.length>=n2.length?n2:n1).replace(/ /g,'');
-          if(_abbrevs(lg).has(sh))return{match:true,fuzzy:1,special:true,reason:'abbreviation',algos:{}};
-          if(_abbrevPnC(lg).has(sh))return{match:true,fuzzy:1,special:true,reason:'abbreviation',algos:{}};
-          const f=_composite(s1,s2);
-          return{match:f.combined>=threshold,fuzzy:f.combined,special:false,reason:'',algos:f.algos};
-        }
-      };
-    })();
-
-    // ── Story panel toggle ─────────────────────────────────────
-    function toggleStory(btn){
-      const panel=document.getElementById('story-panel');
-      const open=panel.classList.toggle('open');
-      btn.querySelector('span:last-of-type') // text span
-      btn.innerHTML=open
-        ?'<span>📖</span> Hide story'
-        :'<span>📖</span> The story behind this';
-    }
-
-    // ── Rotary knob ────────────────────────────────────────────
-    // Drag (mouse + touch) rotates SVG needle. Maps 50–90% range
-    // to a 240° arc (−120° to +120° from bottom). Updates hidden input.
-    function initKnob(){
-      const wrap   = document.getElementById('knob-wrap');
-      const valEl  = document.getElementById('knob-val');
-      const hidden = document.getElementById('vld-threshold');
-      if(!wrap) return;
-
-      const MIN=50, MAX=90, DEFAULT=72;
-      const ARC_DEG=240;  // total sweep degrees
-      const START_DEG=150; // start angle (clock, 0=top): 150° = bottom-left
-
-      let currentVal=DEFAULT;
-
-      // Build SVG
-      const NS='http://www.w3.org/2000/svg';
-      const svg=document.createElementNS(NS,'svg');
-      svg.setAttribute('viewBox','0 0 72 72');
-      svg.classList.add('knob-svg');
-
-      // Track arc (full background)
-      const trackPath=document.createElementNS(NS,'path');
-      trackPath.setAttribute('fill','none');
-      trackPath.setAttribute('stroke','rgba(255,255,255,0.07)');
-      trackPath.setAttribute('stroke-width','4');
-      trackPath.setAttribute('stroke-linecap','round');
-
-      // Active arc (filled portion)
-      const activePath=document.createElementNS(NS,'path');
-      activePath.setAttribute('fill','none');
-      activePath.setAttribute('stroke','url(#knobGrad)');
-      activePath.setAttribute('stroke-width','4');
-      activePath.setAttribute('stroke-linecap','round');
-
-      // Gradient def
-      const defs=document.createElementNS(NS,'defs');
-      const grad=document.createElementNS(NS,'linearGradient');
-      grad.setAttribute('id','knobGrad');
-      grad.setAttribute('x1','0%'); grad.setAttribute('y1','0%');
-      grad.setAttribute('x2','100%'); grad.setAttribute('y2','100%');
-      const s1=document.createElementNS(NS,'stop');
-      s1.setAttribute('offset','0%'); s1.setAttribute('stop-color','#2b9cba');
-      const s2=document.createElementNS(NS,'stop');
-      s2.setAttribute('offset','100%'); s2.setAttribute('stop-color','#e8aa4a');
-      grad.appendChild(s1); grad.appendChild(s2); defs.appendChild(grad);
-
-      // Knob body
-      const body=document.createElementNS(NS,'circle');
-      body.setAttribute('cx','36'); body.setAttribute('cy','36'); body.setAttribute('r','22');
-      body.setAttribute('fill','rgba(20,29,48,0.95)');
-      body.setAttribute('stroke','rgba(43,90,102,0.5)'); body.setAttribute('stroke-width','1.5');
-
-      // Indicator dot (the "notch" on a real knob)
-      const dot=document.createElementNS(NS,'circle');
-      dot.setAttribute('r','3');
-      dot.setAttribute('fill','#1ecbe1');
-
-      // Glow filter
-      const filter=document.createElementNS(NS,'filter');
-      filter.setAttribute('id','knobGlow');
-      const fe=document.createElementNS(NS,'feGaussianBlur');
-      fe.setAttribute('stdDeviation','2'); fe.setAttribute('result','blur');
-      filter.appendChild(fe);
-      defs.appendChild(filter);
-
-      const glowCircle=document.createElementNS(NS,'circle');
-      glowCircle.setAttribute('cx','36'); glowCircle.setAttribute('cy','36');
-      glowCircle.setAttribute('r','22');
-      glowCircle.setAttribute('fill','none');
-      glowCircle.setAttribute('stroke','rgba(43,156,186,0.0)');
-      glowCircle.setAttribute('stroke-width','8');
-      glowCircle.setAttribute('filter','url(#knobGlow)');
-      glowCircle.setAttribute('id','knob-glow');
-
-      svg.appendChild(defs);
-      svg.appendChild(trackPath);
-      svg.appendChild(activePath);
-      svg.appendChild(glowCircle);
-      svg.appendChild(body);
-      svg.appendChild(dot);
-      wrap.appendChild(svg);
-
-      // Polar arc helpers
-      function toRad(d){ return d*Math.PI/180; }
-      function polarPoint(cx,cy,r,deg){
-        const rad=toRad(deg-90); // 0° = top
-        return{x:cx+r*Math.cos(rad), y:cy+r*Math.sin(rad)};
-      }
-      function arcPath(cx,cy,r,startDeg,endDeg){
-        const s=polarPoint(cx,cy,r,startDeg);
-        const e=polarPoint(cx,cy,r,endDeg);
-        const sweep=((endDeg-startDeg)+360)%360;
-        const large=sweep>180?1:0;
-        return`M${s.x.toFixed(3)},${s.y.toFixed(3)} A${r},${r},0,${large},1,${e.x.toFixed(3)},${e.y.toFixed(3)}`;
-      }
-
-      function render(val){
-        const t=(val-MIN)/(MAX-MIN); // 0..1
-        const endDeg=START_DEG+t*ARC_DEG;
-        const endFull=START_DEG+ARC_DEG;
-
-        trackPath.setAttribute('d', arcPath(36,36,28,START_DEG,endFull));
-        activePath.setAttribute('d', arcPath(36,36,28,START_DEG,endDeg));
-
-        // Indicator dot position
-        const dp=polarPoint(36,36,16,endDeg);
-        dot.setAttribute('cx',dp.x.toFixed(3));
-        dot.setAttribute('cy',dp.y.toFixed(3));
-
-        valEl.textContent=val+'%';
-        hidden.value=val;
-
-        // Glow intensity rises with value
-        const intensity=(t*0.35).toFixed(2);
-        glowCircle.setAttribute('stroke',`rgba(43,156,186,${intensity})`);
-      }
-
-      render(DEFAULT);
-
-      // Drag logic — angle from centre → value
-      let dragging=false, lastAngle=null;
-
-      function angleFromCentre(e){
-        const r=wrap.getBoundingClientRect();
-        const cx=r.left+r.width/2, cy=r.top+r.height/2;
-        const px=e.touches?e.touches[0].clientX:e.clientX;
-        const py=e.touches?e.touches[0].clientY:e.clientY;
-        return Math.atan2(py-cy,px-cx)*180/Math.PI; // −180..180
-      }
-
-      function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
-
-      function onDragStart(e){
-        dragging=true;
-        lastAngle=angleFromCentre(e);
-        e.preventDefault();
-      }
-
-      function onDragMove(e){
-        if(!dragging)return;
-        const angle=angleFromCentre(e);
-        let delta=angle-lastAngle;
-        // Wrap-around: if jump > 180° it crossed the ±180 boundary
-        if(delta>180) delta-=360;
-        if(delta<-180) delta+=360;
-        lastAngle=angle;
-        // 1° of knob rotation ≈ ARC_DEG/(MAX-MIN) value units
-        const step=delta*(MAX-MIN)/ARC_DEG;
-        currentVal=clamp(Math.round(currentVal+step),MIN,MAX);
-        render(currentVal);
-        e.preventDefault();
-      }
-
-      function onDragEnd(){ dragging=false; lastAngle=null; }
-
-      wrap.addEventListener('mousedown',  onDragStart);
-      wrap.addEventListener('touchstart', onDragStart, {passive:false});
-      window.addEventListener('mousemove',  onDragMove);
-      window.addEventListener('touchmove',  onDragMove, {passive:false});
-      window.addEventListener('mouseup',    onDragEnd);
-      window.addEventListener('touchend',   onDragEnd);
-
-      // Scroll wheel also works
-      wrap.addEventListener('wheel',e=>{
-        e.preventDefault();
-        currentVal=clamp(currentVal+(e.deltaY<0?1:-1),MIN,MAX);
-        render(currentVal);
-      },{passive:false});
-    }
-
-    // ── runValidator — called from Compare button & Enter key ──
-    function runValidator(){
-      const n1=document.getElementById('vld-name1').value.trim();
-      const n2=document.getElementById('vld-name2').value.trim();
-      if(!n1||!n2)return;
-      const thr=parseInt(document.getElementById('vld-threshold').value,10);
-
-      const btn=document.getElementById('vld-btn');
-      btn.disabled=true;
-      setTimeout(()=>btn.disabled=false,600);
-
-      const res=_nv.score(n1,n2,thr);
-
-      // Input border feedback
-      ['vld-name1','vld-name2'].forEach(id=>{
-        const el=document.getElementById(id);
-        el.classList.remove('input-match','input-nomatch');
-        el.classList.add(res.match?'input-match':'input-nomatch');
-      });
-
-      // Verdict
-      document.getElementById('vld-verdict').className='verdict-banner '+(res.match?'match':'nomatch');
-      document.getElementById('vld-icon').textContent=res.match?'✅':'❌';
-      document.getElementById('vld-verdict-title').textContent=res.match?'Names Match':'Names Do Not Match';
-
-      let sub='';
-      if(res.special){
-        const lbl={exact:'Exact match',reversed:'Name parts in reversed order',abbreviation:'One name is an abbreviation of the other'};
-        sub=lbl[res.reason]||'Deterministic match';
-      } else {
-        sub=`Composite score: ${Math.round(res.fuzzy*100)}% (threshold ${thr}%)`;
-      }
-      document.getElementById('vld-verdict-sub').textContent=sub;
-
-      const rrow=document.getElementById('vld-reason-row');
-      if(res.special){rrow.style.display='block';rrow.innerHTML=`<span class="match-reason-chip">⚡ ${sub}</span>`;}
-      else rrow.style.display='none';
-
-      // Score gauge
-      const pct=Math.round(res.fuzzy*100);
-      const gfill=document.getElementById('vld-gauge-combined');
-      const gval=document.getElementById('vld-gauge-combined-val');
-      gfill.className='score-gauge-fill '+(pct>=thr?'high':pct>=thr*0.75?'medium':'low');
-      gval.textContent=pct+'%';
-      gval.style.color=pct>=thr?'#5bd4a0':pct>=(thr*0.75)?'var(--color-gold-light)':'#e07a7a';
-      setTimeout(()=>gfill.style.width=Math.min(pct,100)+'%',50);
-
-      // Threshold marker on gauge
-      const track=gfill.parentElement;
-      let marker=track.querySelector('.thr-marker');
-      if(!marker){marker=document.createElement('div');marker.className='thr-marker';
-        marker.style.cssText='position:absolute;top:0;bottom:0;width:2px;background:rgba(232,170,74,0.7);border-radius:1px;';
-        track.style.position='relative';track.appendChild(marker);}
-      marker.style.left=Math.min(thr,100)+'%';
-
-      // Algorithm breakdown
-      const grid=document.getElementById('vld-algo-grid');
-      grid.innerHTML='';
-      Object.entries(res.algos).forEach(([name,val])=>{
-        const p=Math.round(val*100);
-        const card=document.createElement('div');card.className='algo-card';
-        card.innerHTML=`<div class="algo-name">${name}</div>
-          <div class="algo-bar-track"><div class="algo-bar-fill" style="width:0%" data-pct="${p}"></div></div>
-          <div class="algo-score-val">${p}%</div>`;
-        grid.appendChild(card);
-      });
-      setTimeout(()=>grid.querySelectorAll('.algo-bar-fill').forEach(el=>{el.style.width=Math.min(+el.dataset.pct,100)+'%';}),80);
-
-      document.getElementById('vld-result').classList.add('visible');
-    }
-
-    // Enter key fires comparison
-    ['vld-name1','vld-name2'].forEach(id=>{
-      document.getElementById(id)?.addEventListener('keydown',e=>{if(e.key==='Enter')runValidator();});
-    });
-
-
-    // ── Source info tooltip ───────────────────────────────────
-    // Appended to <body> so it escapes any overflow:hidden ancestor.
-    function initSourceTooltip() {
-      const btn = document.getElementById('src-info-btn');
-      if (!btn) return;
-
-      // Create tooltip once, attach to body
-      const tip = document.createElement('div');
-      tip.id = 'src-tooltip';
-      tip.innerHTML = `
-        <div style="font-size:11px;font-weight:700;letter-spacing:1px;
-                    text-transform:uppercase;color:var(--color-accent);margin-bottom:8px;">
-          About this code
-        </div>
-        The GitHub repo is a <strong style="color:#d0dce8;">portfolio-adapted version</strong>
-        of the original production system. Core matching algorithms are unchanged.
-        The interactive console, config system, and file structure were added
-        specifically for this public showcase.
-        <div class="tip-arrow"></div>`;
-
-      tip.style.cssText = `
-        position:fixed; width:260px; background:rgba(10,14,26,0.98);
-        border:1px solid rgba(43,90,102,0.6); border-radius:12px;
-        padding:14px 16px; font-size:12.5px; line-height:1.65;
-        color:var(--color-muted); opacity:0; pointer-events:none;
-        transition:opacity 0.2s; z-index:9999;
-        box-shadow:0 12px 40px rgba(0,0,0,0.6);`;
-
-      // Arrow style
-      const style = document.createElement('style');
-      style.textContent = `.tip-arrow {
-        position:absolute; bottom:-6px; right:14px;
-        width:10px; height:10px; background:rgba(10,14,26,0.98);
-        border-right:1px solid rgba(43,90,102,0.6);
-        border-bottom:1px solid rgba(43,90,102,0.6);
-        transform:rotate(45deg); }`;
-      document.head.appendChild(style);
-      document.body.appendChild(tip);
-
-      function showTip() {
-        const r = btn.getBoundingClientRect();
-        tip.style.opacity = '1';
-        tip.style.pointerEvents = 'auto';
-        btn.style.borderColor = 'var(--color-accent)';
-        btn.style.color = 'var(--color-accent-light)';
-        // Position above the button, right-aligned
-        const tipW = 260;
-        let left = r.right - tipW;
-        if (left < 8) left = 8;
-        tip.style.left = left + 'px';
-        tip.style.top  = (r.top - tip.offsetHeight - 10) + 'px';
-        // Recalc after render (height known now)
-        requestAnimationFrame(() => {
-          tip.style.top = (r.top - tip.offsetHeight - 10) + 'px';
-        });
-      }
-
-      function hideTip() {
-        tip.style.opacity = '0';
-        tip.style.pointerEvents = 'none';
-        btn.style.borderColor = 'rgba(122,143,166,0.35)';
-        btn.style.color = 'var(--color-muted)';
-      }
-
-      let pinned = false;
-      btn.addEventListener('mouseenter', showTip);
-      btn.addEventListener('mouseleave', () => { if (!pinned) hideTip(); });
-      btn.addEventListener('click', () => {
-        pinned = !pinned;
-        pinned ? showTip() : hideTip();
-      });
-      // Click outside unpins
-      document.addEventListener('click', e => {
-        if (pinned && e.target !== btn) { pinned = false; hideTip(); }
-      });
-    }
-
-
-    // ── Resume "always current" date tag ──────────────────────
-    (function(){
-      const el = document.getElementById('resume-updated');
-      if (!el) return;
-      const now = new Date();
-      const label = now.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
-      el.textContent = 'Updated ' + label;
-    })();
-
-
-    // ── Bootstrap all behaviours ───────────────────────────────
-    particleSystem();
-    typedTitleEffect();
-    navBehaviours();
-    scrollReveal();
-    careerTimer();
-    initKnob();
-    initSourceTooltip();
-
-  </script>
+  <!-- All JavaScript — see js/main.js for function documentation -->
+  <script src="js/main.js"></script>
 
 </body>
 </html>

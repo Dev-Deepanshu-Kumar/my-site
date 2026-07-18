@@ -1,0 +1,856 @@
+
+    // ── Particle background ────────────────────────────────────
+    function particleSystem() {
+      const canvas = document.getElementById('particle-canvas');
+      const ctx    = canvas.getContext('2d');
+      let W, H, particles = [];
+      let mouseX = -9999, mouseY = -9999;
+
+      const PARTICLE_COUNT  = 80;
+      const LINE_MAX_DIST   = 130;
+      const MOUSE_REPEL_RADIUS = 160;
+
+      function resizeCanvas() {
+        W = canvas.width  = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+
+      class Particle {
+        constructor(spawnAnywhere) {
+          this.reset(spawnAnywhere);
+        }
+
+        reset(spawnAnywhere) {
+          this.x   = Math.random() * W;
+          this.y   = spawnAnywhere ? Math.random() * H : -10;
+          this.vx  = (Math.random() - 0.5) * 0.35;
+          this.vy  = Math.random() * 0.3 + 0.1;
+          this.r   = Math.random() * 1.5 + 0.5;
+          this.alpha = Math.random() * 0.5 + 0.15;
+          const roll = Math.random();
+          this.color = roll > 0.6 ? '#2b9cba' : roll > 0.3 ? '#e8aa4a' : '#1ecbe1';
+        }
+
+        update() {
+          const dx   = this.x - mouseX;
+          const dy   = this.y - mouseY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < MOUSE_REPEL_RADIUS) {
+            const force = (MOUSE_REPEL_RADIUS - dist) / MOUSE_REPEL_RADIUS * 0.8;
+            this.vx += (dx / dist) * force * 0.05;
+            this.vy += (dy / dist) * force * 0.05;
+          }
+
+          this.vx *= 0.99;
+          this.vy *= 0.99;
+          this.x  += this.vx;
+          this.y  += this.vy;
+
+          if (this.y > H + 10 || this.x < -50 || this.x > W + 50) {
+            this.reset(false);
+          }
+        }
+
+        draw() {
+          ctx.save();
+          ctx.globalAlpha = this.alpha;
+          ctx.fillStyle   = this.color;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      function drawConnectingLines() {
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx   = particles[i].x - particles[j].x;
+            const dy   = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < LINE_MAX_DIST) {
+              const alpha = (1 - dist / LINE_MAX_DIST) * 0.12;
+              ctx.save();
+              ctx.globalAlpha = alpha;
+              ctx.strokeStyle = '#2b9cba';
+              ctx.lineWidth   = 0.6;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+              ctx.restore();
+            }
+          }
+        }
+      }
+
+      function animationLoop() {
+        ctx.clearRect(0, 0, W, H);
+        particles.forEach(p => { p.update(); p.draw(); });
+        drawConnectingLines();
+        requestAnimationFrame(animationLoop);
+      }
+
+      window.addEventListener('resize',     () => { resizeCanvas(); particles = []; for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle(true)); });
+      document.addEventListener('mousemove', e  => { mouseX = e.clientX; mouseY = e.clientY; });
+      document.addEventListener('mouseleave', () => { mouseX = -9999; mouseY = -9999; });
+
+      resizeCanvas();
+      for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle(true));
+      animationLoop();
+    }
+
+
+    // ── Typed title effect ─────────────────────────────────────
+    function typedTitleEffect() {
+      const phrases = [
+        'C# · .NET · ASP.NET Core',
+        'Enterprise SaaS · 5+ Years',
+        'Clean Architecture · DDD',
+        'REST APIs · Microservices',
+        'Building things that scale.',
+      ];
+
+      const el = document.getElementById('typed-text');
+      let phraseIndex  = 0;
+      let charIndex    = 0;
+      let isDeleting   = false;
+      let pauseFrames  = 0;
+
+      function tick() {
+        const currentPhrase = phrases[phraseIndex];
+
+        if (pauseFrames > 0) {
+          pauseFrames--;
+          setTimeout(tick, 40);
+          return;
+        }
+
+        if (!isDeleting) {
+          el.textContent = currentPhrase.slice(0, charIndex + 1);
+          charIndex++;
+          if (charIndex >= currentPhrase.length) {
+            isDeleting  = true;
+            pauseFrames = 55;
+          }
+          setTimeout(tick, 70);
+        } else {
+          el.textContent = currentPhrase.slice(0, charIndex - 1);
+          charIndex--;
+          if (charIndex <= 0) {
+            isDeleting  = false;
+            phraseIndex = (phraseIndex + 1) % phrases.length;
+            pauseFrames = 12;
+          }
+          setTimeout(tick, 35);
+        }
+      }
+
+      setTimeout(tick, 1000);
+    }
+
+
+    // ── Navigation behaviours ──────────────────────────────────
+    function navBehaviours() {
+      const navbar     = document.getElementById('navbar');
+      const hamburger  = document.getElementById('nav-hamburger');
+      const drawer     = document.getElementById('nav-drawer');
+
+      // Scroll shadow
+      window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 20);
+      });
+
+      // Hamburger toggle
+      hamburger.addEventListener('click', () => {
+        drawer.classList.toggle('open');
+      });
+    }
+
+    // Global function called from nav-drawer link onclick attributes
+    function closeDrawer() {
+      document.getElementById('nav-drawer').classList.remove('open');
+    }
+
+
+    // ── Scroll reveal (IntersectionObserver) ──────────────────
+    function scrollReveal() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('visible');
+
+          // Trigger count animation if this card has a stat number
+          const statNum = entry.target.querySelector('[data-target]');
+          if (statNum && !statNum.dataset.animated) {
+            statNum.dataset.animated = '1';
+            animateStatNumber(statNum);
+          }
+        });
+      }, { threshold: 0.12 });
+
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    }
+
+
+    // ── Stat number count-up animation ────────────────────────
+    function animateStatNumber(el) {
+      const target = parseInt(el.dataset.target, 10);
+      const suffix = el.dataset.suffix || '';
+      let startTime = null;
+      const DURATION = 1400;
+
+      function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const progress = Math.min((timestamp - startTime) / DURATION, 1);
+        const eased    = 1 - Math.pow(1 - progress, 3);  // ease-out cubic
+
+        el.textContent = Math.floor(eased * target) + (progress < 1 ? '' : suffix);
+
+        if (progress < 1) requestAnimationFrame(step);
+      }
+
+      requestAnimationFrame(step);
+    }
+
+
+    // ── Experience card expand / collapse ─────────────────────
+    // Called from onclick on each .exp-card (except .exp-card--dim)
+    function toggleExpCard(cardElement) {
+      cardElement.classList.toggle('exp-card--expanded');
+    }
+
+
+    // ── Flip card (GNIIT education card) ──────────────────────
+    // Called from onclick on .flip-card-wrapper
+    function flipCard(wrapperElement) {
+      wrapperElement.classList.toggle('flipped');
+    }
+
+
+    // ── Career Timer ──────────────────────────────────────────
+    //
+    // EDIT THIS ARRAY to update dates if your employment changes.
+    // Each object:
+    //   label  — displayed name of the role/company
+    //   start  — first day of work  (YYYY, MM-1, DD)  ← month is 0-indexed (Jan=0)
+    //   end    — last day of work   (YYYY, MM-1, DD), or null = still working
+    //
+    const CAREER_PERIODS = [
+      {
+        label: 'Telebu Communications (Tabiib)',
+        start: new Date(2019, 11, 2),   // 2 Dec 2019  (month 11 = December)
+        end:   new Date(2020, 11, 31),  // 31 Dec 2020
+      },
+      {
+        label: 'IndiaLends',
+        start: new Date(2022, 3, 18),   // 18 Apr 2022  (month 3 = April)
+        end:   new Date(2023, 11, 20),  // 20 Dec 2023
+      },
+      {
+        label: 'Siemens — Asset Management Software',
+        start: new Date(2024, 0, 2),    // 2 Jan 2024   (month 0 = January)
+        end:   null,                    // null = still working, ticks in real-time
+      },
+    ];
+
+    function careerTimer() {
+      const periodsContainer = document.getElementById('timer-periods-container');
+      const totalContainer   = document.getElementById('timer-total-display');
+
+      // Render latest-first — reverse a copy, keep original index for element IDs
+      const periodsLatestFirst = [...CAREER_PERIODS].reverse();
+
+      // Build one row per period (DOM created once, values updated every second)
+      const periodRows = periodsLatestFirst.map((period, i) => {
+        const isActive = period.end === null;
+
+        const row = document.createElement('div');
+        row.innerHTML = `
+          ${ i > 0 ? '<div class="timer-divider"></div>' : '' }
+          <div class="timer-period">
+            <div>
+              <div class="timer-period-label">
+                ${ isActive ? '<span style="color:var(--color-gold)">▶ </span>' : '' }
+                ${ period.label }
+              </div>
+              <div class="timer-period-dates">
+                ${ formatDate(period.start) } → ${ isActive ? 'Present' : formatDate(period.end) }
+              </div>
+            </div>
+            <div class="timer-display" id="timer-period-${ i }"></div>
+          </div>
+        `;
+        periodsContainer.appendChild(row);
+
+        return document.getElementById(`timer-period-${ i }`);
+      });
+
+      // Render function — called every second
+      function render() {
+        const now        = new Date();
+        let totalMs      = 0;
+
+        periodsLatestFirst.forEach((period, i) => {
+          const endDate = period.end === null ? now : period.end;
+          const ms      = Math.max(0, endDate - period.start);
+          totalMs      += ms;
+          renderUnits(periodRows[i], ms);
+        });
+
+        renderUnits(totalContainer, totalMs);
+      }
+
+      render();
+      setInterval(render, 1000);
+    }
+
+    // Break a millisecond duration into y/mo/d/h/m/s and inject into a container element
+    function renderUnits(container, ms) {
+      const totalSeconds = Math.floor(ms / 1000);
+      const totalMinutes = Math.floor(totalSeconds / 60);
+      const totalHours   = Math.floor(totalMinutes / 60);
+      const totalDays    = Math.floor(totalHours   / 24);
+      const totalMonths  = Math.floor(totalDays    / 30.4375);  // average month
+      const years        = Math.floor(totalMonths  / 12);
+      const months       = totalMonths % 12;
+      const days         = totalDays   % Math.round(30.4375);
+      const hours        = totalHours  % 24;
+      const minutes      = totalMinutes % 60;
+      const seconds      = totalSeconds % 60;
+
+      const units = [
+        { v: years,   l: 'Yrs'  },
+        { v: months,  l: 'Mos'  },
+        { v: days,    l: 'Days' },
+        { v: hours,   l: 'Hrs'  },
+        { v: minutes, l: 'Min'  },
+        { v: seconds, l: 'Sec'  },
+      ];
+
+      container.innerHTML = units.map(u => `
+        <div class="timer-unit">
+          <span class="timer-value">${ String(u.v).padStart(2, '0') }</span>
+          <span class="timer-unit-label">${ u.l }</span>
+        </div>
+      `).join('');
+    }
+
+    // Format a Date as "2 Dec 2019"
+    function formatDate(date) {
+      return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+
+    // ── Name Validator Engine ─────────────────────────────────
+    // Proprietary weighted ensemble — ported from C# production system.
+    // IIFE: all internals are private. Public surface: _nv.score(a,b,threshold).
+    // Algorithm codenames intentional — implementation details not exposed.
+    const _nv=(function(){
+      // Weights array — order matches _E4, _E1, _E5, _E2, _E6, _E3 in _composite()
+      // DL+JW weighted higher — position-aware, handle transpositions correctly.
+      // Bigram methods (NGram/Cosine/Jaccard) penalise transpositions too harshly.
+      const _W=[0.30,0.08,0.20,0.30,0.06,0.06];
+      const _clean=s=>s.toUpperCase().replace(/[^A-Z0-9 ]/g,'');
+
+      // E2 — sequence proximity scorer
+      function _E2(a,b){
+        if(a===b)return 1;const l1=a.length,l2=b.length;if(!l1||!l2)return 0;
+        const wn=Math.max(Math.floor(Math.max(l1,l2)/2)-1,0);
+        const f1=new Array(l1).fill(false),f2=new Array(l2).fill(false);let mc=0;
+        for(let i=0;i<l1;i++){const lo=Math.max(0,i-wn),hi=Math.min(i+wn+1,l2);
+          for(let j=lo;j<hi;j++){if(f2[j]||a[i]!==b[j])continue;f1[i]=f2[j]=true;mc++;break;}}
+        if(!mc)return 0;let t=0,k=0;
+        for(let i=0;i<l1;i++){if(!f1[i])continue;while(!f2[k])k++;if(a[i]!==b[k])t++;k++;}
+        const jv=(mc/l1+mc/l2+(mc-t/2)/mc)/3;let p=0;
+        for(let i=0;i<Math.min(4,Math.min(l1,l2));i++){if(a[i]===b[i])p++;else break;}
+        return jv+p*0.1*(1-jv);
+      }
+
+      // E4 — edit-distance normalizer (transposition-aware)
+      function _E4(a,b){
+        const l1=a.length,l2=b.length,d=[];
+        for(let i=0;i<=l1;i++){d[i]=[];for(let j=0;j<=l2;j++)d[i][j]=i?j?0:i:j;}
+        for(let i=1;i<=l1;i++)for(let j=1;j<=l2;j++){
+          const c=a[i-1]===b[j-1]?0:1;
+          d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+c);
+          if(i>1&&j>1&&a[i-1]===b[j-2]&&a[i-2]===b[j-1])d[i][j]=Math.min(d[i][j],d[i-2][j-2]+c);
+        }
+        return 1-d[l1][l2]/Math.max(l1,l2,1);
+      }
+
+      // E1 — subsequence token overlap
+      function _E1(a,b,n=2){
+        if(a===b)return 1;if(a.length<n||b.length<n)return 0;
+        const g=s=>{const r=[];for(let i=0;i<=s.length-n;i++)r.push(s.slice(i,i+n));return r;};
+        const ga=g(a),gb=g(b),cnt={};
+        gb.forEach(x=>cnt[x]=(cnt[x]||0)+1);let sh=0;
+        ga.forEach(x=>{if(cnt[x]>0){sh++;cnt[x]--;}});
+        return 2*sh/(ga.length+gb.length);
+      }
+
+      // E6 — vector projection scorer
+      function _E6(a,b){
+        if(a===b)return 1;if(a.length<2||b.length<2)return 0;
+        const bv=s=>{const v={};for(let i=0;i<s.length-1;i++){const k=s.slice(i,i+2);v[k]=(v[k]||0)+1;}return v;};
+        const v1=bv(a),v2=bv(b);let dot=0,m1=0,m2=0;
+        Object.keys(v1).forEach(k=>{dot+=v1[k]*(v2[k]||0);m1+=v1[k]*v1[k];});
+        Object.keys(v2).forEach(k=>{m2+=v2[k]*v2[k];});
+        return(!m1||!m2)?0:dot/(Math.sqrt(m1)*Math.sqrt(m2));
+      }
+
+      // E3 — set-intersection ratio
+      function _E3(a,b){
+        const w1=a.split(' ').filter(Boolean), w2=b.split(' ').filter(Boolean);
+        if(w1.length>1||w2.length>1){
+          // multi-token: word-level Jaccard (original behaviour)
+          const s1=new Set(w1),s2=new Set(w2);
+          const inter=[...s1].filter(x=>s2.has(x)).length;
+          return inter/(s1.size+s2.size-inter);
+        }
+        // single token: character bigram Jaccard
+        const g=s=>{const r=new Set();for(let i=0;i<s.length-1;i++)r.add(s.slice(i,i+2));return r;};
+        const g1=g(a),g2=g(b);
+        const inter=[...g1].filter(x=>g2.has(x)).length;
+        const union=g1.size+g2.size-inter;
+        return union===0?0:inter/union;
+      }
+
+      // E5 — phonetic normalizer (Indian transliteration variants)
+      function _norm(s){
+        let x=s.toLowerCase();
+        x=x.replace(/ee|ii|ea/g,'i').replace(/aa/g,'a').replace(/oo|uu/g,'u');
+        x=x.replace(/dh/g,'d').replace(/gh/g,'g').replace(/kh/g,'k').replace(/th/g,'t').replace(/bh/g,'b');
+        x=x.replace(/ph/g,'f').replace(/w/g,'v').replace(/z/g,'j');
+        x=x.replace(/c(?!h)/g,'k');x=x.replace(/(.)\1+/g,'$1');
+        if(x.length>3&&x.endsWith('a'))x=x.slice(0,-1);
+        return x;
+      }
+      function _E5(a,b){return(a.length<=1||b.length<=1)?0:_E2(_norm(a),_norm(b));}
+
+      // Title/abbreviation sanitizer
+      function _san(n){
+        const va={'MD':'MOHAMMAD','MOHD':'MOHAMMAD','KR':'KUMAR','KRI':'KUMARI','PT':'PANDIT'};
+        const st=['DR','MR','MRS','JR','SR','SHRI','SMT','ADV','MS','MISS','SIR','MLA','MP'];
+        let w=n.split(' ');
+        if(va[w[0]])w[0]=va[w[0]];if(va[w[w.length-1]])w[w.length-1]=va[w[w.length-1]];
+        n=w.join(' ');
+        st.forEach(p=>{if(n.startsWith(p+' '))n=n.slice(p.length+1);if(n.endsWith(' '+p))n=n.slice(0,-(p.length+1));});
+        return n.trim();
+      }
+
+      function _dedup(ws){return ws.reduce((a,w)=>(!a.length||a[a.length-1]!==w)?(a.push(w),a):a,[]);}
+
+      function*_perms(arr,r){
+        if(!r){yield[];return;}
+        for(let i=0;i<arr.length;i++)for(const p of _perms(arr.filter((_,j)=>j!==i),r-1))yield[arr[i],...p];
+      }
+      function _abbrevs(nm){
+        const tk=nm.split(' '),out=new Set();
+        for(let r=0;r<=tk.length;r++)for(const p of _perms(tk,r))out.add(p.join(''));
+        return out;
+      }
+      function _abbrevPnC(nm){
+        const tk=nm.split(' '),out=new Set();
+        for(let it=1;it<tk.length;it++)for(let i=0;i<=tk.length-it;i++){
+          const t=[...tk];for(let j=i;j<i+it;j++)t[j]=tk[j][0]||'';
+          for(const a of _abbrevs(t.join(' ')))out.add(a);
+        }
+        return out;
+      }
+
+      // Composite weighted score — returns per-algo breakdown under codenames
+      function _composite(n1,n2){
+        const a=n1.replace(/ /g,''),b=n2.replace(/ /g,'');
+        const sc=[_E4(a,b),_E1(a,b),_E5(a,b),_E2(a,b),_E6(a,b),_E3(n1,n2)];
+        return{
+          combined:sc.reduce((s,v,i)=>s+v*_W[i],0),
+          // Codenames shown in UI — intentionally do not reveal algorithm family
+          algos:{'Lens-A':sc[3],'Lens-B':sc[2],'Lens-C':sc[1],'Lens-D':sc[0],'Lens-E':sc[4],'Lens-F':sc[5]}
+        };
+      }
+
+      return{
+        score(r1,r2,thr){
+          const threshold=typeof thr==='number'?thr/100:0.72;
+          let n1=_clean(r1).trim(),n2=_clean(r2).trim();
+          if(!n1||!n2)return{match:false,fuzzy:0,special:false,reason:'empty',algos:{}};
+          if(n1===n2)return{match:true,fuzzy:1,special:true,reason:'exact',algos:{}};
+          let s1=_san(n1),s2=_san(n2);
+          const w1=_dedup(s1.split(' ')),w2=_dedup(s2.split(' '));
+          if(w1.length===w2.length&&[...w1].reverse().join('')===w2.join(''))
+            return{match:true,fuzzy:1,special:true,reason:'reversed',algos:{}};
+          if(w1.length===2&&w2.length===2){
+            const cm=w1.find(x=>w2.includes(x));
+            const hi=[...w1,...w2].some(x=>x.length===1);
+            if(cm&&!hi){
+              const f=_composite(w1.filter(x=>x!==cm).join(''),w2.filter(x=>x!==cm).join(''));
+              return{match:f.combined>=threshold,fuzzy:f.combined,special:false,reason:'',algos:f.algos};
+            }
+          }
+          const lg=n1.length>=n2.length?n1:n2,sh=(n1.length>=n2.length?n2:n1).replace(/ /g,'');
+          if(_abbrevs(lg).has(sh))return{match:true,fuzzy:1,special:true,reason:'abbreviation',algos:{}};
+          if(_abbrevPnC(lg).has(sh))return{match:true,fuzzy:1,special:true,reason:'abbreviation',algos:{}};
+          const f=_composite(s1,s2);
+          return{match:f.combined>=threshold,fuzzy:f.combined,special:false,reason:'',algos:f.algos};
+        }
+      };
+    })();
+
+    // ── Story panel toggle ─────────────────────────────────────
+    function toggleStory(btn){
+      const panel=document.getElementById('story-panel');
+      const open=panel.classList.toggle('open');
+      btn.querySelector('span:last-of-type') // text span
+      btn.innerHTML=open
+        ?'<span>📖</span> Hide story'
+        :'<span>📖</span> The story behind this';
+    }
+
+    // ── Rotary knob ────────────────────────────────────────────
+    // Drag (mouse + touch) rotates SVG needle. Maps 50–90% range
+    // to a 240° arc (−120° to +120° from bottom). Updates hidden input.
+    function initKnob(){
+      const wrap   = document.getElementById('knob-wrap');
+      const valEl  = document.getElementById('knob-val');
+      const hidden = document.getElementById('vld-threshold');
+      if(!wrap) return;
+
+      const MIN=50, MAX=90, DEFAULT=72;
+      const ARC_DEG=240;  // total sweep degrees
+      const START_DEG=150; // start angle (clock, 0=top): 150° = bottom-left
+
+      let currentVal=DEFAULT;
+
+      // Build SVG
+      const NS='http://www.w3.org/2000/svg';
+      const svg=document.createElementNS(NS,'svg');
+      svg.setAttribute('viewBox','0 0 72 72');
+      svg.classList.add('knob-svg');
+
+      // Track arc (full background)
+      const trackPath=document.createElementNS(NS,'path');
+      trackPath.setAttribute('fill','none');
+      trackPath.setAttribute('stroke','rgba(255,255,255,0.07)');
+      trackPath.setAttribute('stroke-width','4');
+      trackPath.setAttribute('stroke-linecap','round');
+
+      // Active arc (filled portion)
+      const activePath=document.createElementNS(NS,'path');
+      activePath.setAttribute('fill','none');
+      activePath.setAttribute('stroke','url(#knobGrad)');
+      activePath.setAttribute('stroke-width','4');
+      activePath.setAttribute('stroke-linecap','round');
+
+      // Gradient def
+      const defs=document.createElementNS(NS,'defs');
+      const grad=document.createElementNS(NS,'linearGradient');
+      grad.setAttribute('id','knobGrad');
+      grad.setAttribute('x1','0%'); grad.setAttribute('y1','0%');
+      grad.setAttribute('x2','100%'); grad.setAttribute('y2','100%');
+      const s1=document.createElementNS(NS,'stop');
+      s1.setAttribute('offset','0%'); s1.setAttribute('stop-color','#2b9cba');
+      const s2=document.createElementNS(NS,'stop');
+      s2.setAttribute('offset','100%'); s2.setAttribute('stop-color','#e8aa4a');
+      grad.appendChild(s1); grad.appendChild(s2); defs.appendChild(grad);
+
+      // Knob body
+      const body=document.createElementNS(NS,'circle');
+      body.setAttribute('cx','36'); body.setAttribute('cy','36'); body.setAttribute('r','22');
+      body.setAttribute('fill','rgba(20,29,48,0.95)');
+      body.setAttribute('stroke','rgba(43,90,102,0.5)'); body.setAttribute('stroke-width','1.5');
+
+      // Indicator dot (the "notch" on a real knob)
+      const dot=document.createElementNS(NS,'circle');
+      dot.setAttribute('r','3');
+      dot.setAttribute('fill','#1ecbe1');
+
+      // Glow filter
+      const filter=document.createElementNS(NS,'filter');
+      filter.setAttribute('id','knobGlow');
+      const fe=document.createElementNS(NS,'feGaussianBlur');
+      fe.setAttribute('stdDeviation','2'); fe.setAttribute('result','blur');
+      filter.appendChild(fe);
+      defs.appendChild(filter);
+
+      const glowCircle=document.createElementNS(NS,'circle');
+      glowCircle.setAttribute('cx','36'); glowCircle.setAttribute('cy','36');
+      glowCircle.setAttribute('r','22');
+      glowCircle.setAttribute('fill','none');
+      glowCircle.setAttribute('stroke','rgba(43,156,186,0.0)');
+      glowCircle.setAttribute('stroke-width','8');
+      glowCircle.setAttribute('filter','url(#knobGlow)');
+      glowCircle.setAttribute('id','knob-glow');
+
+      svg.appendChild(defs);
+      svg.appendChild(trackPath);
+      svg.appendChild(activePath);
+      svg.appendChild(glowCircle);
+      svg.appendChild(body);
+      svg.appendChild(dot);
+      wrap.appendChild(svg);
+
+      // Polar arc helpers
+      function toRad(d){ return d*Math.PI/180; }
+      function polarPoint(cx,cy,r,deg){
+        const rad=toRad(deg-90); // 0° = top
+        return{x:cx+r*Math.cos(rad), y:cy+r*Math.sin(rad)};
+      }
+      function arcPath(cx,cy,r,startDeg,endDeg){
+        const s=polarPoint(cx,cy,r,startDeg);
+        const e=polarPoint(cx,cy,r,endDeg);
+        const sweep=((endDeg-startDeg)+360)%360;
+        const large=sweep>180?1:0;
+        return`M${s.x.toFixed(3)},${s.y.toFixed(3)} A${r},${r},0,${large},1,${e.x.toFixed(3)},${e.y.toFixed(3)}`;
+      }
+
+      function render(val){
+        const t=(val-MIN)/(MAX-MIN); // 0..1
+        const endDeg=START_DEG+t*ARC_DEG;
+        const endFull=START_DEG+ARC_DEG;
+
+        trackPath.setAttribute('d', arcPath(36,36,28,START_DEG,endFull));
+        activePath.setAttribute('d', arcPath(36,36,28,START_DEG,endDeg));
+
+        // Indicator dot position
+        const dp=polarPoint(36,36,16,endDeg);
+        dot.setAttribute('cx',dp.x.toFixed(3));
+        dot.setAttribute('cy',dp.y.toFixed(3));
+
+        valEl.textContent=val+'%';
+        hidden.value=val;
+
+        // Glow intensity rises with value
+        const intensity=(t*0.35).toFixed(2);
+        glowCircle.setAttribute('stroke',`rgba(43,156,186,${intensity})`);
+      }
+
+      render(DEFAULT);
+
+      // Drag logic — angle from centre → value
+      let dragging=false, lastAngle=null;
+
+      function angleFromCentre(e){
+        const r=wrap.getBoundingClientRect();
+        const cx=r.left+r.width/2, cy=r.top+r.height/2;
+        const px=e.touches?e.touches[0].clientX:e.clientX;
+        const py=e.touches?e.touches[0].clientY:e.clientY;
+        return Math.atan2(py-cy,px-cx)*180/Math.PI; // −180..180
+      }
+
+      function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+
+      function onDragStart(e){
+        dragging=true;
+        lastAngle=angleFromCentre(e);
+        e.preventDefault();
+      }
+
+      function onDragMove(e){
+        if(!dragging)return;
+        const angle=angleFromCentre(e);
+        let delta=angle-lastAngle;
+        // Wrap-around: if jump > 180° it crossed the ±180 boundary
+        if(delta>180) delta-=360;
+        if(delta<-180) delta+=360;
+        lastAngle=angle;
+        // 1° of knob rotation ≈ ARC_DEG/(MAX-MIN) value units
+        const step=delta*(MAX-MIN)/ARC_DEG;
+        currentVal=clamp(Math.round(currentVal+step),MIN,MAX);
+        render(currentVal);
+        e.preventDefault();
+      }
+
+      function onDragEnd(){ dragging=false; lastAngle=null; }
+
+      wrap.addEventListener('mousedown',  onDragStart);
+      wrap.addEventListener('touchstart', onDragStart, {passive:false});
+      window.addEventListener('mousemove',  onDragMove);
+      window.addEventListener('touchmove',  onDragMove, {passive:false});
+      window.addEventListener('mouseup',    onDragEnd);
+      window.addEventListener('touchend',   onDragEnd);
+
+      // Scroll wheel also works
+      wrap.addEventListener('wheel',e=>{
+        e.preventDefault();
+        currentVal=clamp(currentVal+(e.deltaY<0?1:-1),MIN,MAX);
+        render(currentVal);
+      },{passive:false});
+    }
+
+    // ── runValidator — called from Compare button & Enter key ──
+    function runValidator(){
+      const n1=document.getElementById('vld-name1').value.trim();
+      const n2=document.getElementById('vld-name2').value.trim();
+      if(!n1||!n2)return;
+      const thr=parseInt(document.getElementById('vld-threshold').value,10);
+
+      const btn=document.getElementById('vld-btn');
+      btn.disabled=true;
+      setTimeout(()=>btn.disabled=false,600);
+
+      const res=_nv.score(n1,n2,thr);
+
+      // Input border feedback
+      ['vld-name1','vld-name2'].forEach(id=>{
+        const el=document.getElementById(id);
+        el.classList.remove('input-match','input-nomatch');
+        el.classList.add(res.match?'input-match':'input-nomatch');
+      });
+
+      // Verdict
+      document.getElementById('vld-verdict').className='verdict-banner '+(res.match?'match':'nomatch');
+      document.getElementById('vld-icon').textContent=res.match?'✅':'❌';
+      document.getElementById('vld-verdict-title').textContent=res.match?'Names Match':'Names Do Not Match';
+
+      let sub='';
+      if(res.special){
+        const lbl={exact:'Exact match',reversed:'Name parts in reversed order',abbreviation:'One name is an abbreviation of the other'};
+        sub=lbl[res.reason]||'Deterministic match';
+      } else {
+        sub=`Composite score: ${Math.round(res.fuzzy*100)}% (threshold ${thr}%)`;
+      }
+      document.getElementById('vld-verdict-sub').textContent=sub;
+
+      const rrow=document.getElementById('vld-reason-row');
+      if(res.special){rrow.style.display='block';rrow.innerHTML=`<span class="match-reason-chip">⚡ ${sub}</span>`;}
+      else rrow.style.display='none';
+
+      // Score gauge
+      const pct=Math.round(res.fuzzy*100);
+      const gfill=document.getElementById('vld-gauge-combined');
+      const gval=document.getElementById('vld-gauge-combined-val');
+      gfill.className='score-gauge-fill '+(pct>=thr?'high':pct>=thr*0.75?'medium':'low');
+      gval.textContent=pct+'%';
+      gval.style.color=pct>=thr?'#5bd4a0':pct>=(thr*0.75)?'var(--color-gold-light)':'#e07a7a';
+      setTimeout(()=>gfill.style.width=Math.min(pct,100)+'%',50);
+
+      // Threshold marker on gauge
+      const track=gfill.parentElement;
+      let marker=track.querySelector('.thr-marker');
+      if(!marker){marker=document.createElement('div');marker.className='thr-marker';
+        marker.style.cssText='position:absolute;top:0;bottom:0;width:2px;background:rgba(232,170,74,0.7);border-radius:1px;';
+        track.style.position='relative';track.appendChild(marker);}
+      marker.style.left=Math.min(thr,100)+'%';
+
+      // Algorithm breakdown
+      const grid=document.getElementById('vld-algo-grid');
+      grid.innerHTML='';
+      Object.entries(res.algos).forEach(([name,val])=>{
+        const p=Math.round(val*100);
+        const card=document.createElement('div');card.className='algo-card';
+        card.innerHTML=`<div class="algo-name">${name}</div>
+          <div class="algo-bar-track"><div class="algo-bar-fill" style="width:0%" data-pct="${p}"></div></div>
+          <div class="algo-score-val">${p}%</div>`;
+        grid.appendChild(card);
+      });
+      setTimeout(()=>grid.querySelectorAll('.algo-bar-fill').forEach(el=>{el.style.width=Math.min(+el.dataset.pct,100)+'%';}),80);
+
+      document.getElementById('vld-result').classList.add('visible');
+    }
+
+    // Enter key fires comparison
+    ['vld-name1','vld-name2'].forEach(id=>{
+      document.getElementById(id)?.addEventListener('keydown',e=>{if(e.key==='Enter')runValidator();});
+    });
+
+
+    // ── Source info tooltip ───────────────────────────────────
+    // Appended to <body> so it escapes any overflow:hidden ancestor.
+    function initSourceTooltip() {
+      const btn = document.getElementById('src-info-btn');
+      if (!btn) return;
+
+      // Create tooltip once, attach to body
+      const tip = document.createElement('div');
+      tip.id = 'src-tooltip';
+      tip.innerHTML = `
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;
+                    text-transform:uppercase;color:var(--color-accent);margin-bottom:8px;">
+          About this code
+        </div>
+        The GitHub repo is a <strong style="color:#d0dce8;">portfolio-adapted version</strong>
+        of the original production system. Core matching algorithms are unchanged.
+        The interactive console, config system, and file structure were added
+        specifically for this public showcase.
+        <div class="tip-arrow"></div>`;
+
+      tip.style.cssText = `
+        position:fixed; width:260px; background:rgba(10,14,26,0.98);
+        border:1px solid rgba(43,90,102,0.6); border-radius:12px;
+        padding:14px 16px; font-size:12.5px; line-height:1.65;
+        color:var(--color-muted); opacity:0; pointer-events:none;
+        transition:opacity 0.2s; z-index:9999;
+        box-shadow:0 12px 40px rgba(0,0,0,0.6);`;
+
+      // Arrow style
+      const style = document.createElement('style');
+      style.textContent = `.tip-arrow {
+        position:absolute; bottom:-6px; right:14px;
+        width:10px; height:10px; background:rgba(10,14,26,0.98);
+        border-right:1px solid rgba(43,90,102,0.6);
+        border-bottom:1px solid rgba(43,90,102,0.6);
+        transform:rotate(45deg); }`;
+      document.head.appendChild(style);
+      document.body.appendChild(tip);
+
+      function showTip() {
+        const r = btn.getBoundingClientRect();
+        tip.style.opacity = '1';
+        tip.style.pointerEvents = 'auto';
+        btn.style.borderColor = 'var(--color-accent)';
+        btn.style.color = 'var(--color-accent-light)';
+        // Position above the button, right-aligned
+        const tipW = 260;
+        let left = r.right - tipW;
+        if (left < 8) left = 8;
+        tip.style.left = left + 'px';
+        tip.style.top  = (r.top - tip.offsetHeight - 10) + 'px';
+        // Recalc after render (height known now)
+        requestAnimationFrame(() => {
+          tip.style.top = (r.top - tip.offsetHeight - 10) + 'px';
+        });
+      }
+
+      function hideTip() {
+        tip.style.opacity = '0';
+        tip.style.pointerEvents = 'none';
+        btn.style.borderColor = 'rgba(122,143,166,0.35)';
+        btn.style.color = 'var(--color-muted)';
+      }
+
+      let pinned = false;
+      btn.addEventListener('mouseenter', showTip);
+      btn.addEventListener('mouseleave', () => { if (!pinned) hideTip(); });
+      btn.addEventListener('click', () => {
+        pinned = !pinned;
+        pinned ? showTip() : hideTip();
+      });
+      // Click outside unpins
+      document.addEventListener('click', e => {
+        if (pinned && e.target !== btn) { pinned = false; hideTip(); }
+      });
+    }
+
+
+    // ── Resume "always current" date tag ──────────────────────
+    (function(){
+      const el = document.getElementById('resume-updated');
+      if (!el) return;
+      const now = new Date();
+      const label = now.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+      el.textContent = 'Updated ' + label;
+    })();
+
+
+    // ── Bootstrap all behaviours ───────────────────────────────
+    particleSystem();
+    typedTitleEffect();
+    navBehaviours();
+    scrollReveal();
+    careerTimer();
+    initKnob();
+    initSourceTooltip();
+
