@@ -845,6 +845,311 @@
     })();
 
 
+    // ── Scroll progress bar ───────────────────────────────────
+    // Thin accent line across top of page — fills as user scrolls
+    function scrollProgressBar() {
+      const bar = document.createElement('div');
+      bar.id = 'scroll-progress';
+      bar.style.cssText = `
+        position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+        background: linear-gradient(90deg, #2b9cba, #1ecbe1, #e8aa4a);
+        z-index: 10000; transition: width 0.1s linear;
+        border-radius: 0 2px 2px 0;
+        box-shadow: 0 0 8px rgba(30,203,225,0.5);
+      `;
+      document.body.appendChild(bar);
+
+      window.addEventListener('scroll', () => {
+        const scrollTop    = window.scrollY;
+        const docHeight    = document.documentElement.scrollHeight - window.innerHeight;
+        const pct          = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        bar.style.width    = Math.min(pct, 100) + '%';
+      }, { passive: true });
+    }
+
+
+    // ── 3-D card tilt on hover ────────────────────────────────
+    // Applies to highlight cards, stat cards, edu cards.
+    // Follows cursor within the card, resets on leave.
+    function cardTilt() {
+      const TILT_MAX = 8; // degrees max tilt
+      const selectors = [
+        '.highlight-card',
+        '.stat-card',
+        '.edu-card',
+        '.soft-skill-card',
+      ];
+
+      document.querySelectorAll(selectors.join(',')).forEach(card => {
+        // Ensure card has the right transform-style
+        card.style.transformStyle = 'preserve-3d';
+        card.style.transition     = 'transform 0.1s ease, box-shadow 0.2s ease';
+        card.style.willChange     = 'transform';
+
+        card.addEventListener('mousemove', e => {
+          const rect    = card.getBoundingClientRect();
+          const cx      = rect.left + rect.width  / 2;
+          const cy      = rect.top  + rect.height / 2;
+          const dx      = (e.clientX - cx) / (rect.width  / 2); // -1..1
+          const dy      = (e.clientY - cy) / (rect.height / 2); // -1..1
+          const rotX    = (-dy * TILT_MAX).toFixed(2);
+          const rotY    = ( dx * TILT_MAX).toFixed(2);
+          card.style.transform   = `perspective(600px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale(1.03)`;
+          card.style.boxShadow   = `0 16px 40px rgba(30,203,225,0.15), 0 0 0 1px rgba(30,203,225,0.12)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+          card.style.transform = 'perspective(600px) rotateX(0deg) rotateY(0deg) scale(1)';
+          card.style.boxShadow = '';
+        });
+      });
+    }
+
+
+    // ── Active section highlight in nav ──────────────────────
+    // Scroll-based: on each scroll event, find which section's top
+    // is closest to (but still above) 40% down the viewport.
+    // Clears when scrolled to very bottom of page.
+    function activeNavHighlight() {
+      const sectionIds = [
+        'section-validator',
+        'section-about',
+        'section-skills',
+        'section-experience',
+        'section-education',
+      ];
+
+      const navLinks = document.querySelectorAll('.nav-links a');
+
+      function update() {
+        const triggerY   = window.innerHeight * 0.4;
+        const pageBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 10;
+
+        let activeId = null;
+
+        if (!pageBottom) {
+          // Find the last section whose top is above the trigger line
+          sectionIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const top = el.getBoundingClientRect().top;
+            if (top <= triggerY) activeId = id;
+          });
+        }
+
+        navLinks.forEach(link => {
+          const matches = activeId && link.getAttribute('href') === '#' + activeId;
+          link.style.color      = matches ? 'var(--color-accent-light, #1ecbe1)' : '';
+          link.style.fontWeight = matches ? '700' : '';
+        });
+      }
+
+      window.addEventListener('scroll', update, { passive: true });
+      update();
+    }
+
+
+    // ── Skill tag context tooltips ────────────────────────────
+    // Each tag shows a 1-line "how I used this" blurb on hover.
+    function skillTagTooltips() {
+      const STORIES = {
+        'C#'                : 'Primary language across all 3 roles — APIs, services, background workers',
+        'SQL'               : 'T-SQL stored procs, query optimisation, schema migrations across all roles',
+        'JavaScript'        : 'Frontend logic at IndiaLends + interactive elements on this portfolio',
+        'ASP.NET Core'      : 'Built Minimal APIs, middleware, and custom auth schemes across multiple services',
+        '.NET Core'         : 'Target framework for all greenfield services since IndiaLends',
+        'Minimal APIs'      : 'Used for dashboard satellite service — lightweight, no controller overhead',
+        'REST APIs'         : 'Designed and consumed REST contracts across all three companies',
+        'CQRS / MediatR'    : 'Used across most feature work — clean separation of commands and queries via MediatR pipeline',
+        'Domain-Driven Design': 'P&S microservice modelled around DDD aggregates — clear boundaries, no anemic domain',
+        'Clean Architecture': 'Applied in dashboard service — strict layer separation: API → UseCases → Domain',
+        'Microservices'     : 'Dashboard + planning & scheduling both independently deployable from the monolith',
+        'Resiliency Patterns': 'Polly retry + circuit-breaker specifically for database connection handling in shared library',
+        'BDD'               : 'SpecFlow / ReqnRoll acceptance tests — .feature files as living regression documentation',
+        'Azure Functions'   : 'Timer triggers: nightly scheduled reports + CRM jobs (low-traffic window); Queue triggers: async retry workflows and non-blocking logging; Blob triggers: document processing on upload; HTTP triggers: lightweight API endpoints',
+        'Entity Framework 6': 'EF6 on .NET 4.8 — large multi-tenant enterprise codebase, per-tenant DB architecture',
+        'EF Core'           : 'Used in .NET 8/9 services for greenfield data access layers',
+        'Dapper'            : 'Replaced EF in dashboard hot paths — raw SQL, significantly faster under load',
+        'LINQ'              : 'Everyday — projections, filtering, aggregation across all .NET work',
+        'T-SQL'             : 'Stored procs, CTEs, window functions for reporting and bulk operations',
+        'SQL Server'        : 'Primary DB at Siemens — large multi-tenant schema across thousands of clients',
+        'PostgreSQL'        : 'Used in Java-based and .NET microservices',
+        'Redis'             : 'Session store + L1/L2 cache for API response acceleration',
+        'Azure App Service' : 'Ran Azure Functions across multiple trigger types: Timer (reports), Queue (retry/logging), Blob (documents), HTTP (lightweight APIs)',
+        'Azure Service Bus' : 'Loan repayment reminders — Azure Queue has a max TTL of days/weeks, but repayment schedules span years; Service Bus supported scheduling messages years in advance',
+        'Azure Blob Storage': 'Stored loan documents, ID photos, and pre-generated reports ready for analytics teams each morning',
+        'AWS Secrets Manager': 'DB credential resolution in a shared .NET library — region-aware, supports rotation without redeployment',
+        'Message Queues'    : 'Service-to-service async communication; used Azure Queue with retry-before-poison pattern',
+        'Docker'            : 'Used locally to run multiple dependent services together for development — configuration done by the platform team',
+        'OIDC / OAuth2'     : 'Worked on projects using OIDC and OAuth2 — integration, flow debugging, and consuming tokens; not protocol implementation',
+        'JWT'               : 'Worked with JWT-protected services — token validation, claims extraction; not issuer setup',
+        'Auth0'             : 'Worked on projects using Auth0 as the identity provider — integration and configuration side',
+        'Cookie Auth Scheme': 'Built a custom cookie authentication handler for a .NET 8 service — delegating session validation to a central auth service',
+        'VAPT Remediation'  : 'Resolved injection, broken auth, and missing header findings from pen-test reports at IndiaLends',
+        'Azure DevOps'      : 'CI/CD pipelines, release gates, and board management at IndiaLends',
+        'Jenkins'           : 'Build + deploy pipelines for production releases at Siemens',
+        'TeamCity'          : 'Build server for .NET solutions and internal NuGet publishing at Siemens',
+        'SonarQube'         : 'Static analysis quality gate — issues had to be resolved before PRs could merge',
+        'Snyk'              : 'Dependency vulnerability scanning in CI — flagged risky package versions',
+        'Grafana'           : 'Production monitoring dashboards for microservices at Siemens',
+        'Datadog'           : 'APM traces and log monitoring across services',
+        'MyGet (NuGet feed)': 'Internal NuGet feed — published shared libraries consumed across all .NET repos',
+        'NUnit'             : 'Unit + integration test runner across .NET services',
+        'SpecFlow'          : 'BDD acceptance tests — Gherkin .feature files with C# step definitions',
+        'ReqnRoll'          : 'SpecFlow open-source successor — migrated seamlessly, same Gherkin syntax',
+        'Moq'               : 'Mocking framework — repository and service layer mocks in unit tests',
+        'Unit Testing'      : 'Wrote tests for business logic, custom auth handlers, query and command handlers',
+        'Integration Testing': 'Real-DB integration tests covering repository and service layers end-to-end',
+        'Git'               : 'Daily — feature branches, PRs, rebasing across all roles',
+        'Azure Repos'       : 'Git hosting at IndiaLends for main projects; also used TFS (Team Foundation Server) for a CDN-related project there',
+        'Bitbucket'         : 'Code hosting at Siemens — Bitbucket with PR pipelines and branch policies',
+        'Swagger / OpenAPI' : 'Auto-generated API docs on all ASP.NET Core services',
+        'Postman'           : 'API testing + environment collections for all services',
+        'GitHub Copilot'    : 'Used for boilerplate acceleration — I review every suggestion before accepting',
+        'Claude Code'       : 'AI pair programmer for architecture exploration and building this portfolio',
+        'Jira'              : 'Sprint planning, bug tracking, and release management across all roles',
+        'Scrum'             : '2-week sprints, daily standups, sprint reviews and retrospectives',
+        'Kanban'            : 'Maintenance & Reliability initiative ran as a continuous Kanban flow',
+      };
+
+      // Build one shared tooltip element
+      const tip = document.createElement('div');
+      tip.id = 'skill-tip';
+      tip.style.cssText = `
+        position: fixed; max-width: 280px;
+        background: rgba(10,14,26,0.97);
+        border: 1px solid rgba(43,156,186,0.4);
+        border-radius: 10px; padding: 10px 14px;
+        font-size: 12px; line-height: 1.6; color: #a8bfcc;
+        pointer-events: none; opacity: 0;
+        transition: opacity 0.15s ease;
+        z-index: 9998;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      `;
+      document.body.appendChild(tip);
+
+      document.querySelectorAll('.skill-tags .tag').forEach(tag => {
+        const story = STORIES[tag.textContent.trim()];
+        if (!story) return;
+
+        tag.style.cursor = 'help';
+
+        tag.addEventListener('mouseenter', e => {
+          tip.textContent = story;
+          tip.style.opacity = '1';
+          positionTip(e);
+        });
+
+        tag.addEventListener('mousemove', positionTip);
+
+        tag.addEventListener('mouseleave', () => {
+          tip.style.opacity = '0';
+        });
+      });
+
+      function positionTip(e) {
+        const pad  = 12;
+        const tipW = 280;
+        let left   = e.clientX + pad;
+        let top    = e.clientY + pad;
+        if (left + tipW > window.innerWidth - 8) left = e.clientX - tipW - pad;
+        if (top + 80    > window.innerHeight - 8) top  = e.clientY - 80 - pad;
+        tip.style.left = left + 'px';
+        tip.style.top  = top  + 'px';
+      }
+    }
+
+
+    // ── Resume download toast ─────────────────────────────────
+    // Timer counts only while THIS tab is visible (Page Visibility API).
+    // Pauses when user switches to PDF tab, resumes when they come back.
+    function showDownloadToast() {
+      const existing = document.getElementById('download-toast');
+      if (existing) existing.remove();
+
+      const toast = document.createElement('div');
+      toast.id = 'download-toast';
+      toast.innerHTML = `
+        <div style="font-weight:700; font-size:15px; color:#fff; margin-bottom:8px;">
+          Thanks for taking the time to look.
+        </div>
+        <div style="font-size:13px; color:#a8bfcc; line-height:1.6;">
+          Happy to go deeper on anything that stands out.
+          <br><br>
+          <a href="mailto:Deepanshu.Kumar@Outlook.in"
+             style="color:#1ecbe1; text-decoration:none; font-weight:600;">
+            Deepanshu.Kumar@Outlook.in
+          </a>
+          <br>
+          <span style="color:rgba(168,191,204,0.6); font-size:12px;">Open to exciting opportunities. Looking forward to the conversation.</span>
+        </div>
+      `;
+      toast.style.cssText = `
+        position: fixed; bottom: 32px; right: 32px;
+        background: rgba(10,14,26,0.97);
+        border: 1px solid rgba(43,156,186,0.5);
+        border-radius: 14px; padding: 20px 24px;
+        text-align: center; max-width: 260px;
+        box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(30,203,225,0.1);
+        z-index: 99999;
+        animation: toastIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
+      `;
+      document.body.appendChild(toast);
+
+      if (!document.getElementById('toast-style')) {
+        const s = document.createElement('style');
+        s.id = 'toast-style';
+        s.textContent = `
+          @keyframes toastIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
+          }
+          @keyframes toastOut {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to   { opacity: 0; transform: translateY(10px) scale(0.95); }
+          }
+        `;
+        document.head.appendChild(s);
+      }
+
+      // Count down only while tab is visible — 5000ms total active time
+      const TOTAL_MS = 5000;
+      let remaining  = TOTAL_MS;
+      let lastTick   = Date.now();
+      let ticker     = null;
+
+      function dismiss() {
+        document.removeEventListener('visibilitychange', onVisibility);
+        clearInterval(ticker);
+        const t = document.getElementById('download-toast');
+        if (!t) return;
+        t.style.animation = 'toastOut 0.3s ease forwards';
+        setTimeout(() => t.remove(), 320);
+      }
+
+      function startTick() {
+        lastTick = Date.now();
+        ticker = setInterval(() => {
+          remaining -= Date.now() - lastTick;
+          lastTick   = Date.now();
+          if (remaining <= 0) dismiss();
+        }, 200);
+      }
+
+      function onVisibility() {
+        if (document.hidden) {
+          clearInterval(ticker);        // tab hidden — pause
+        } else {
+          lastTick = Date.now();        // tab visible — resume
+          startTick();
+        }
+      }
+
+      document.addEventListener('visibilitychange', onVisibility);
+      startTick();
+    }
+
+
     // ── Bootstrap all behaviours ───────────────────────────────
     particleSystem();
     typedTitleEffect();
@@ -853,4 +1158,34 @@
     careerTimer();
     initKnob();
     initSourceTooltip();
+    scrollProgressBar();
+    cardTilt();
+    activeNavHighlight();
+    skillTagTooltips();
+
+    // Intercept resume download from any download button.
+    // Show toast on click + re-show fresh when user returns from PDF tab.
+    (function() {
+      const btns = [
+        document.getElementById('resume-dl-btn'),
+        document.getElementById('nav-resume-dl-btn'),
+      ].filter(Boolean);
+
+      let downloaded = false;
+
+      btns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          downloaded = true;
+          window.open(btn.getAttribute('href'), '_blank');
+          showDownloadToast();
+        });
+      });
+
+      document.addEventListener('visibilitychange', function() {
+        if (!document.hidden && downloaded) {
+          showDownloadToast();
+        }
+      });
+    })();
 

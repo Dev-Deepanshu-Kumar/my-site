@@ -29,7 +29,7 @@
       <li><a href="#section-skills">Skills</a></li>
       <li><a href="#section-experience">Experience</a></li>
       <li><a href="#section-education">Education</a></li>
-      <li><a href="Deepanshu_Kumar_Resume.pdf" download style="color:var(--color-muted)">↓ Resume</a></li>
+      <li><a href="Deepanshu_Kumar_Resume.pdf" download id="nav-resume-dl-btn" style="color:var(--color-muted)">↓ Resume</a></li>
     </ul>
 
     <!-- Mobile hamburger button -->
@@ -65,7 +65,7 @@
 
       <p class="hero-summary">
         Backend engineer with 5+ years crafting enterprise SaaS and FinTech systems.
-        I thrive at the intersection of clean architecture and real-world scale — RESTful APIs,
+        I thrive at the intersection of clean architecture and real-world scale: RESTful APIs,
         distributed services, multi-tenant platforms, and modernisation of legacy codebases.
       </p>
 
@@ -132,7 +132,7 @@
 
       <h2 class="section-heading reveal">PAN Name <span>Validator</span></h2>
       <p class="section-subtext reveal">
-        A real algorithm I designed &amp; built at IndiaLends — weighted ensemble of proprietary
+        A real algorithm I designed &amp; built at IndiaLends: a weighted ensemble of proprietary
         similarity techniques tuned for Indian name variations. Try it live.
       </p>
 
@@ -141,7 +141,7 @@
         <!-- Top bar: demo note + GitHub link + info tooltip -->
         <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:20px;">
           <div class="validator-note" style="margin-bottom:0;">
-            ⚙️ Interactive demo of a C# production system — ported to JS for illustration only
+            ⚙️ Interactive demo of a C# production system, ported to JS for illustration only
           </div>
 
           <div style="display:inline-flex; align-items:center; gap:8px;">
@@ -203,7 +203,7 @@
               <div class="story-beat-text">
                 In a digital lending platform, applicants submit their PAN card details as part of
                 identity verification. The challenge: <strong>ensuring the name entered by the applicant
-                actually matches the name registered on the PAN</strong> — something that sounds simple
+                actually matches the name registered on the PAN.</strong> Something that sounds simple
                 but is surprisingly tricky given how many variations a single name can have.
               </div>
             </div>
@@ -211,7 +211,7 @@
             <div class="story-beat">
               <span class="story-beat-icon">💡</span>
               <div class="story-beat-text">
-                The fix was two third-party API calls on every submission — one to fetch the PAN
+                The fix was two third-party API calls on every submission: one to fetch the PAN
                 holder's name, one to score similarity. They worked, but <strong>every call had a
                 cost</strong>. Under marketing campaigns with high traffic, that cost multiplied fast.
               </div>
@@ -220,7 +220,7 @@
             <div class="story-beat">
               <span class="story-beat-icon">🧪</span>
               <div class="story-beat-text">
-                I noticed that real-world name variations are quite limited — typos, transliterations,
+                I noticed that real-world name variations are quite limited: typos, transliterations,
                 initials, reversed order. I hypothesised that a <strong>weighted combination of
                 string-similarity algorithms</strong> tuned for Indian names could replace most of
                 those API calls locally, at zero marginal cost.
@@ -232,7 +232,7 @@
               <div class="story-beat-text">
                 I researched, built a prototype, and validated it against <strong>30,000 historical
                 records</strong>. Presented to the architect (who helped tune the weights), then to
-                Risk Management. Got approved. Deployed with a <strong>fallback band</strong> — scores
+                Risk Management. Got approved. Deployed with a <strong>fallback band</strong>; scores
                 near the threshold still hit the external API as a safety net.
               </div>
             </div>
@@ -241,7 +241,7 @@
               <span class="story-beat-icon">📉</span>
               <div class="story-beat-text">
                 Result: <strong>significant reduction in external API calls</strong> on clear-match and
-                clear-reject cases, cutting both latency and cost — while keeping the original API as
+                clear-reject cases, cutting both latency and cost, while keeping the original API as
                 a backstop for ambiguous scores.
               </div>
             </div>
@@ -327,7 +327,7 @@
         </div>
         <div class="stat-card reveal reveal-d2">
           <span class="stat-number" data-target="3" data-suffix="">0</span>
-          <div class="stat-label">Industries — SaaS · FinTech · Healthcare</div>
+          <div class="stat-label">Industries: SaaS · FinTech · Healthcare</div>
         </div>
         <div class="stat-card reveal reveal-d3">
           <span class="stat-number" data-target="3" data-suffix="">0</span>
@@ -336,13 +336,13 @@
       </div>
 
       <h2 class="section-heading reveal">Key <span>Highlights</span></h2>
-      <p class="section-subtext reveal">Things that moved the needle — not just tasks shipped.</p>
+      <p class="section-subtext reveal">Things that moved the needle, not just tasks shipped.</p>
 
       <div class="highlights-grid">
         <div class="highlight-card reveal reveal-d1">
           <span class="highlight-icon">📦</span>
           <div class="highlight-title">Shared Platform Library</div>
-          <p class="highlight-body">Built a reusable .NET Standard NuGet library integrating AWS Secrets Manager, Redis caching, and resiliency patterns (retry, circuit-breaker) — adopted across the platform to enable secure, region-aware credential resolution as part of a container migration effort.</p>
+          <p class="highlight-body">Built a reusable .NET Standard NuGet library integrating AWS Secrets Manager, Redis caching, and resiliency patterns (retry, circuit-breaker). Adopted across the platform to enable secure, region-aware credential resolution as part of a container migration effort.</p>
         </div>
         <div class="highlight-card reveal reveal-d2">
           <span class="highlight-icon">💡</span>
@@ -352,7 +352,7 @@
         <div class="highlight-card reveal reveal-d3">
           <span class="highlight-icon">⚙️</span>
           <div class="highlight-title">Reusable P&amp;S Microservice</div>
-          <p class="highlight-body">Engineered a Planning &amp; Scheduling microservice — technician assignment, scheduling, labour-entry — as an independently deployable capability using DDD aggregate patterns, designed for adoption across multiple products.</p>
+          <p class="highlight-body">Engineered a Planning &amp; Scheduling microservice covering technician assignment, scheduling, and labour-entry as an independently deployable capability using DDD aggregate patterns, designed for adoption across multiple products.</p>
         </div>
         <div class="highlight-card reveal reveal-d4">
           <span class="highlight-icon">🚀</span>
@@ -373,7 +373,7 @@
       </div>
 
       <h2 class="section-heading reveal">Core <span>Skills</span></h2>
-      <p class="section-subtext reveal">Hover any tag — each one has a story behind it.</p>
+      <p class="section-subtext reveal">Hover any tag to see how I used it.</p>
 
       <!-- tag-blue = backend/languages | tag-gold = data/DevOps | tag-green = cloud/testing -->
 
@@ -523,14 +523,14 @@
             </div>
             <div class="exp-bullets-wrapper">
               <ul class="exp-bullets">
-                <li>Contributed to modernising a 170-project, multi-tenant ASP.NET MVC enterprise SaaS platform serving 2,500+ organisations — developing modular .NET/.NET Core services and RESTful APIs applying DDD and Clean Architecture principles.</li>
+                <li>Contributed to modernising a 170-project, multi-tenant ASP.NET MVC enterprise SaaS platform serving 2,500+ organisations, developing modular .NET/.NET Core services and RESTful APIs applying DDD and Clean Architecture principles.</li>
                 <li>Designed and implemented backend APIs for an enterprise dashboard as an independently deployable satellite service (Strangler Fig pattern), enabling independent feature releases from the monolithic application and supporting gradual microservices-oriented modernisation.</li>
                 <li>Optimised dashboard performance by replacing Entity Framework-based data access with Dapper + SQL stored procedures, introducing lazy loading, paginated APIs, and independently loaded widgets.</li>
-                <li>Engineered a Planning &amp; Scheduling microservice covering technician assignment, scheduling, and labour-entry as an independently deployable service applying DDD aggregate patterns — designed as a reusable capability across multiple enterprise products.</li>
+                <li>Engineered a Planning &amp; Scheduling microservice covering technician assignment, scheduling, and labour-entry as an independently deployable service applying DDD aggregate patterns, designed as a reusable capability across multiple enterprise products.</li>
                 <li>Built a reusable .NET Standard shared library (internal NuGet via MyGet) integrating AWS Secrets Manager, Redis caching, and resiliency patterns (retry, circuit-breaker) for secure region-aware database credential resolution as part of the Windows/IIS-to-Linux-container migration.</li>
                 <li>Implemented secure .NET 8 Minimal APIs protected through a custom cookie authentication scheme that delegates session validation to a centralised auth service, integrating with an enterprise ecosystem based on OIDC, Auth0, and JWT.</li>
-                <li>Developed BDD-driven unit and integration tests using NUnit, SpecFlow/ReqnRoll, and Moq — improving regression coverage and confidence in production releases.</li>
-                <li>Served as Release Representative across multiple production releases — supporting release planning, API reviews, rollback validation, package versioning, and production monitoring via Jenkins, TeamCity, Datadog, Grafana, SonarQube, and Snyk.</li>
+                <li>Developed BDD-driven unit and integration tests using NUnit, SpecFlow/ReqnRoll, and Moq, improving regression coverage and confidence in production releases.</li>
+                <li>Served as Release Representative across multiple production releases, supporting release planning, API reviews, rollback validation, package versioning, and production monitoring via Jenkins, TeamCity, Datadog, Grafana, SonarQube, and Snyk.</li>
                 <li>Contributed to a dedicated Maintenance &amp; Reliability initiative resolving customer-reported defects across Work Orders, Dashboard, Inventory, Purchasing, and related modules.</li>
               </ul>
             </div>
@@ -726,7 +726,7 @@
           <div class="resume-title">Download My Resume</div>
           <div class="resume-subtitle">
             Prefer a traditional format? The full resume covers everything on this page
-            — and fits neatly on two pages of A4.
+            It fits neatly on two pages of A4.
           </div>
           <div class="resume-tags">
             <span class="resume-tag">PDF · A4</span>
@@ -736,7 +736,7 @@
             <span class="resume-tag" id="resume-updated">Updated Jul 2026</span>
           </div>
         </div>
-        <a href="Deepanshu_Kumar_Resume.pdf" download="Deepanshu_Kumar_Resume.pdf" class="resume-download-btn">
+        <a href="Deepanshu_Kumar_Resume.pdf" download="Deepanshu_Kumar_Resume.pdf" class="resume-download-btn" id="resume-dl-btn">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
             <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
             <polyline points="7 10 12 15 17 10"/>
