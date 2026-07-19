@@ -1053,7 +1053,7 @@
       transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .exp-card--expanded .exp-bullets-wrapper { max-height: 1400px; }
+    .exp-card--expanded .exp-bullets-wrapper { max-height: 4000px; }
 
     .exp-bullets {
       list-style: none;
@@ -2023,6 +2023,7 @@
       .soft-skills-grid     { grid-template-columns: 1fr 1fr; }
 
       .exp-card { padding: 20px 20px; }
+      .recog-cards { grid-template-columns: 1fr; }
 
     }
 
@@ -2054,6 +2055,7 @@
 
       .section-heading { font-size: 24px; }
       .recog-cards     { grid-template-columns: 1fr; }
+      .recog-quote     { font-size: 11px; }
     }
 
 /* ── Recognitions section ───────────────────────────────────────── */
