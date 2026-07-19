@@ -859,9 +859,9 @@
 
       function applyKnobTheme() {
         const light = isLight();
-        trackPath.setAttribute('stroke', light ? 'rgba(160,120,60,0.18)' : 'rgba(255,255,255,0.07)');
-        body.setAttribute('fill',   light ? 'rgba(255,251,240,0.97)' : 'rgba(20,29,48,0.95)');
-        body.setAttribute('stroke', light ? 'rgba(160,120,60,0.4)'   : 'rgba(43,90,102,0.5)');
+        trackPath.setAttribute('stroke', light ? 'rgba(26,122,150,0.18)' : 'rgba(255,255,255,0.07)');
+        body.setAttribute('fill',   light ? '#fdfaf0'                    : 'rgba(20,29,48,0.95)');
+        body.setAttribute('stroke', light ? 'rgba(26,122,150,0.45)'      : 'rgba(43,90,102,0.5)');
       }
 
       function render(val) {
