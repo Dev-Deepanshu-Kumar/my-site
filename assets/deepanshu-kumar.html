@@ -33,11 +33,27 @@
     margin: 0 auto;
   }
 
-  /* ---- Screen-only: floating page card on blob canvas ---- */
+  /* ---- Page card: gradient blooms render in both browser and PDF ---- */
+  .page {
+    background-color: #ffffff;
+    background-image:
+      radial-gradient(ellipse at 4% 6%,   rgba(43,90,102,0.13)  0%, transparent 42%),
+      radial-gradient(ellipse at 96% 4%,  rgba(165,121,59,0.11) 0%, transparent 38%),
+      radial-gradient(ellipse at 2% 54%,  rgba(95,155,115,0.09) 0%, transparent 36%),
+      radial-gradient(ellipse at 98% 58%, rgba(138,122,188,0.09)0%, transparent 36%),
+      radial-gradient(ellipse at 52% 98%, rgba(43,90,102,0.08)  0%, transparent 44%),
+      repeating-linear-gradient(
+        -48deg,
+        transparent 0px, transparent 38px,
+        rgba(43,90,102,0.018) 38px, rgba(43,90,102,0.018) 39px
+      );
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
   @media screen {
     html, body { background: #EAF4F4; min-height: 100vh; }
     .page {
-      background: #ffffff;
       box-shadow: 0 4px 32px rgba(28,62,71,0.14), 0 1px 6px rgba(28,62,71,0.07);
       border-radius: 3px;
       padding: 8mm 9mm;
@@ -47,7 +63,7 @@
   @media print {
     html, body { background: none; }
     .bg-blobs { display: none !important; }
-    .page { margin: 0; padding: 0; box-shadow: none; }
+    .page { margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
   }
 
   /* ---- Blob background ---- */
@@ -148,7 +164,7 @@
     border-style: solid;
     border-width: 0 72px 95px 0;
     border-color: transparent var(--accent-deep) transparent transparent;
-    opacity: 0.08;
+    opacity: 0.30;
   }
 
   .highlight-panel {
@@ -337,7 +353,7 @@
     <h1 class="name">DEEPANSHU KUMAR</h1>
     <div class="title-line">SOFTWARE ENGINEER &middot; .NET &middot; 5+ YEARS</div>
     <div class="contact-line">
-      <a href="mailto:Deepanshu.Kumar@Outlook.in">Deepanshu.Kumar@Outlook.in</a><span class="sep">|</span>+91 88096 01358<span class="sep">|</span>Portfolio: <a href="https://deepanshu-kumar.dev">deepanshu-kumar.dev</a><span class="sep">|</span><a href="https://www.linkedin.com/in/deepanshu-kumar-dev">linkedin.com/in/deepanshu-kumar-dev</a><span class="sep">|</span>Noida, India
+      <a href="mailto:Deepanshu.Kumar@Outlook.in">Deepanshu.Kumar@Outlook.in</a><span class="sep">|</span>+91 88096 01358<span class="sep">|</span><span style="white-space:nowrap">Portfolio: <a href="https://deepanshu-kumar.dev">deepanshu-kumar.dev</a></span><span class="sep">|</span><a href="https://www.linkedin.com/in/deepanshu-kumar-dev">linkedin.com/in/deepanshu-kumar-dev</a><span class="sep">|</span>Noida, India
     </div>
   </header>
 
@@ -463,7 +479,7 @@
     <div class="edu-date">2017 | Excellent</div>
   </div>
 
-  <footer class="print-note">Open in a browser → Print (Ctrl/Cmd+P) → Save as PDF. Margins are pre-set for A4.</footer>
+  <footer class="print-note">Best viewed in a browser &mdash; prints cleanly to A4 PDF.</footer>
 
 </div>
 </body>
