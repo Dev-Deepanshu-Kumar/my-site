@@ -20,7 +20,6 @@
 
   html, body {
     margin: 0; padding: 0;
-    background: linear-gradient(170deg, #E4F1F1 0%, #EDF6F6 35%, #F3F9F9 70%, #F8FBFB 100%);
     color: var(--ink);
     font-family: Arial, Helvetica, "Segoe UI", sans-serif;
     font-size: 9.7pt;
@@ -32,6 +31,105 @@
   .page {
     max-width: 7.55in;
     margin: 0 auto;
+  }
+
+  /* ---- Screen-only: floating page card on blob canvas ---- */
+  @media screen {
+    html, body { background: #EAF4F4; min-height: 100vh; }
+    .page {
+      background: #ffffff;
+      box-shadow: 0 4px 32px rgba(28,62,71,0.14), 0 1px 6px rgba(28,62,71,0.07);
+      border-radius: 3px;
+      padding: 8mm 9mm;
+      margin: 28px auto 40px auto;
+    }
+  }
+  @media print {
+    html, body { background: none; }
+    .bg-blobs { display: none !important; }
+    .page { margin: 0; padding: 0; box-shadow: none; }
+  }
+
+  /* ---- Blob background ---- */
+  .bg-blobs {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+    background: #EAF4F4;
+  }
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+  }
+  /* teal */
+  .b1 {
+    width: 500px; height: 400px;
+    background: radial-gradient(circle at 50% 50%, rgba(43,90,102,0.28) 0%, transparent 68%);
+    top: -130px; left: -90px;
+    animation: blobDrift1 38s ease-in-out infinite;
+  }
+  /* amber-gold */
+  .b2 {
+    width: 420px; height: 340px;
+    background: radial-gradient(circle at 50% 50%, rgba(165,121,59,0.20) 0%, transparent 68%);
+    top: 4%; right: -70px;
+    animation: blobDrift2 46s ease-in-out infinite;
+  }
+  /* sage-green */
+  .b3 {
+    width: 380px; height: 460px;
+    background: radial-gradient(circle at 50% 50%, rgba(95,155,115,0.19) 0%, transparent 68%);
+    bottom: 8%; left: -60px;
+    animation: blobDrift3 54s ease-in-out infinite;
+  }
+  /* lavender */
+  .b4 {
+    width: 440px; height: 310px;
+    background: radial-gradient(circle at 50% 50%, rgba(138,122,188,0.16) 0%, transparent 68%);
+    bottom: 4%; right: -90px;
+    animation: blobDrift4 42s ease-in-out infinite;
+  }
+  /* rose */
+  .b5 {
+    width: 350px; height: 370px;
+    background: radial-gradient(circle at 50% 50%, rgba(198,122,122,0.15) 0%, transparent 68%);
+    top: 38%; left: 32%;
+    animation: blobDrift5 62s ease-in-out infinite;
+  }
+
+  @keyframes blobDrift1 {
+    0%   { transform: translate(0,0)      scale(1); }
+    30%  { transform: translate(170px,210px)  scale(1.13); }
+    62%  { transform: translate(80px,420px)   scale(0.91); }
+    100% { transform: translate(0,0)      scale(1); }
+  }
+  @keyframes blobDrift2 {
+    0%   { transform: translate(0,0)       scale(1); }
+    35%  { transform: translate(-210px,190px)  scale(1.09); }
+    68%  { transform: translate(-110px,370px)  scale(0.93); }
+    100% { transform: translate(0,0)       scale(1); }
+  }
+  @keyframes blobDrift3 {
+    0%   { transform: translate(0,0)       scale(1); }
+    38%  { transform: translate(230px,-160px)  scale(1.11); }
+    72%  { transform: translate(100px,-300px)  scale(0.95); }
+    100% { transform: translate(0,0)       scale(1); }
+  }
+  @keyframes blobDrift4 {
+    0%   { transform: translate(0,0)       scale(1); }
+    32%  { transform: translate(-190px,-130px) scale(1.07); }
+    70%  { transform: translate(-70px,-270px)  scale(0.91); }
+    100% { transform: translate(0,0)       scale(1); }
+  }
+  @keyframes blobDrift5 {
+    0%   { transform: translate(0,0)        scale(1); }
+    25%  { transform: translate(110px,-210px)  scale(1.16); }
+    52%  { transform: translate(-160px,-100px) scale(0.87); }
+    76%  { transform: translate(-90px,160px)   scale(1.09); }
+    100% { transform: translate(0,0)        scale(1); }
   }
 
   /* ---------- Header ---------- */
@@ -225,6 +323,13 @@
 </style>
 </head>
 <body>
+<div class="bg-blobs" aria-hidden="true">
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="blob b4"></div>
+  <div class="blob b5"></div>
+</div>
 <div class="page">
 
   <header>
@@ -308,7 +413,7 @@
   <div class="role-block">
     <div class="role-intro">
     <div class="role-header">
-      <span class="role-title">Career Sabbatical &middot; Independent Study &amp; Upskilling</span>
+      <span class="role-title">Career Sabbatical &middot; Planned Career Break</span>
       <span class="role-date">Jan 2021 – Mar 2022</span>
     </div>
     <p class="role-desc">Took a planned career break during the COVID-19 pandemic, amid industry-wide uncertainty, to focus on personal priorities and reassess long-term career direction, before returning to full-time software engineering roles.</p>

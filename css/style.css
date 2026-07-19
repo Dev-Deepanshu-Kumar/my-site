@@ -1282,6 +1282,7 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 16px;
+      align-items: stretch;
     }
 
     .edu-card {
@@ -1345,7 +1346,7 @@
     /* Wrapper — fixed height so both faces are same size */
     .flip-card-wrapper {
       perspective: 1000px;
-      height: 220px;             /* fixed — both faces fill this exactly */
+      height: 220px;             /* desktop default — overridden per breakpoint below */
     }
 
     .flip-card-inner {
@@ -1473,13 +1474,21 @@
       text-transform: uppercase;
     }
 
-    /* Taller on mobile — text wraps more in narrow viewport */
+    /* Taller on tablet — 3-col grid means narrower cards, text wraps more */
+    @media (max-width: 920px) {
+      .flip-card-wrapper { height: 280px; }
+      /* all edu cards same height so grid stays symmetric */
+      .edu-card { min-height: 280px; }
+    }
+
     @media (max-width: 768px) {
-      .flip-card-wrapper { height: 260px; }
+      .flip-card-wrapper { height: 300px; }
+      .edu-card { min-height: 300px; }
     }
 
     @media (max-width: 480px) {
-      .flip-card-wrapper { height: 300px; }
+      .flip-card-wrapper { height: 320px; }
+      .edu-card { min-height: 320px; }
     }
 
 
