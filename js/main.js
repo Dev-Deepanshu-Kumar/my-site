@@ -315,7 +315,49 @@
       }, 450);
     }
 
-    // Renders recognition cards and screenshot strip from data/recognitions.json
+    // Renders recognition cards and screenshot strip.
+    // Source of truth: data/recognitions.json (edit on GitHub).
+    // FALLBACK_RECOGNITIONS used when fetch is unavailable (e.g. local file://).
+    // Keep both in sync when adding/removing entries.
+    const FALLBACK_RECOGNITIONS = [
+      {
+        points: "+10 pts",
+        title: "Sprint Star · 2 Consecutive Sprints",
+        relation: "Direct Manager", relationType: "manager",
+        quote: "Congratulations on being chosen sprint star for 2 consecutive sprints — you have shown great progress in handling your tasks, contributing towards team goals, and building knowledge on existing AE workflows. Keep it up!",
+        by: "Anuj Tandon, Manager Software Engineering",
+        company: "Siemens Asset Management Software",
+        screenshot: "images/awards/award-sprint-star-consecutive.png"
+      },
+      {
+        points: "+15 pts",
+        title: "Sprint Star · Teams Transformer",
+        relation: "Direct Manager", relationType: "manager",
+        quote: "Your efforts have been recognized and we value your contributions immensely. You demonstrated great team spirit, ensured continuity, provided valuable inputs for requirements analysis, and completed your tasks well. Keep doing the good work!",
+        by: "Anuj Tandon, Manager Software Engineering",
+        company: "Siemens Asset Management Software",
+        screenshot: "images/awards/award-sprint-star-transformer.png"
+      },
+      {
+        points: "+10 pts",
+        title: "Cross-Team Collaboration",
+        relation: "Senior Colleague", relationType: "senior",
+        quote: "Deepanshu's contribution has been recognized beyond his own team. He took up a time-sensitive, complex task for another team's parts-reorder initiative, showed great flexibility and adaptability in quickly understanding the work, and helped develop and hand over the story seamlessly. Kudos!",
+        by: "Anuj Tandon, Manager Software Engineering",
+        company: "Siemens Asset Management Software",
+        screenshot: "images/awards/award-cross-team.png"
+      },
+      {
+        points: "Recognition",
+        title: "Dashboard Architecture · Team Unicron",
+        relation: "Team", relationType: "team",
+        quote: "The team built the foundation for the new dashboard using efficient architecture patterns — service and microfrontend components for faster deploys and better scalability. They showed the courage to choose the harder route, moved swiftly, and completed the first two features. Way to go!",
+        by: "Anuj Tandon, Manager Software Engineering",
+        company: "Siemens Asset Management Software",
+        screenshot: "images/awards/award-team-unicron-dashboard.png"
+      }
+    ];
+
     async function loadRecognitions() {
       const cardsEl  = document.getElementById('recog-cards');
       const scrollEl = document.getElementById('awards-scroll');
@@ -324,11 +366,10 @@
       let items;
       try {
         const res = await fetch('data/recognitions.json');
-        if (!res.ok) throw new Error('fetch failed');
+        if (!res.ok) throw new Error();
         items = await res.json();
       } catch (_) {
-        cardsEl.innerHTML = '<p style="color:var(--color-muted);font-size:13px;">Recognitions unavailable.</p>';
-        return;
+        items = FALLBACK_RECOGNITIONS;
       }
 
       // render text cards
