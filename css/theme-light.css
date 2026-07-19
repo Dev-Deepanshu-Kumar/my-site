@@ -71,10 +71,10 @@
   -webkit-text-fill-color: var(--color-text) !important;
 }
 
-/* Section headings — deep warm ink */
+/* Section headings — warm dark amber-brown, not pure black */
 [data-theme="light"] .section-heading {
-  color: #1a1008;
-  -webkit-text-fill-color: #1a1008;
+  color: #3d2010;
+  -webkit-text-fill-color: #3d2010;
 }
 
 /* Stat numbers — keep teal→gold gradient */
@@ -186,6 +186,14 @@
 [data-theme="light"] .timer-divider {
   background: linear-gradient(to right, rgba(160, 120, 60, 0.2), transparent);
 }
+/* timer numbers — warm teal-to-amber instead of cyan-to-gold */
+[data-theme="light"] .timer-value {
+  background: linear-gradient(135deg, #1a7a96, #b8720a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+[data-theme="light"] .timer-unit-label { color: var(--color-dim); }
 
 /* ── Story panel ── */
 [data-theme="light"] .story-panel {
