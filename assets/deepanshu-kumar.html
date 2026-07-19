@@ -3,8 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <title>Deepanshu Kumar - Resume</title>
+<meta name="description" content="Deepanshu Kumar — Backend Software Engineer with 5+ years in .NET, ASP.NET Core, Azure, and enterprise SaaS. Open to new opportunities.">
+<meta name="robots" content="index, follow">
+<!-- structured data: resume/person, visible to crawlers -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Deepanshu Kumar",
+  "jobTitle": "Software Engineer",
+  "url": "https://deepanshu-kumar.dev",
+  "email": "Deepanshu.Kumar@Outlook.in",
+  "address": { "@type": "PostalAddress", "addressLocality": "Noida", "addressCountry": "IN" },
+  "sameAs": ["https://www.linkedin.com/in/deepanshu-kumar-dev"]
+}
+</script>
 <style>
-  @page { size: A4; margin: 8mm 9mm; }
+  @page { size: A4; margin: 12mm 6mm; }
 
   :root{
     --ink:#1C2B33;
@@ -28,25 +43,18 @@
     print-color-adjust: exact;
   }
 
+  /* ---- Page card: gradient blooms — explicit rgba(x,x,x,0) not 'transparent'
+     avoids PDF banding bug in Windows Print to PDF / Chrome Save as PDF ---- */
   .page {
     max-width: 7.55in;
     margin: 0 auto;
-  }
-
-  /* ---- Page card: gradient blooms render in both browser and PDF ---- */
-  .page {
     background-color: #ffffff;
     background-image:
-      radial-gradient(ellipse at 4% 6%,   rgba(43,90,102,0.13)  0%, transparent 42%),
-      radial-gradient(ellipse at 96% 4%,  rgba(165,121,59,0.11) 0%, transparent 38%),
-      radial-gradient(ellipse at 2% 54%,  rgba(95,155,115,0.09) 0%, transparent 36%),
-      radial-gradient(ellipse at 98% 58%, rgba(138,122,188,0.09)0%, transparent 36%),
-      radial-gradient(ellipse at 52% 98%, rgba(43,90,102,0.08)  0%, transparent 44%),
-      repeating-linear-gradient(
-        -48deg,
-        transparent 0px, transparent 38px,
-        rgba(43,90,102,0.018) 38px, rgba(43,90,102,0.018) 39px
-      );
+      radial-gradient(ellipse at 4% 6%,   rgba(43,90,102,0.07)  0%, rgba(43,90,102,0)   42%),
+      radial-gradient(ellipse at 96% 4%,  rgba(165,121,59,0.06) 0%, rgba(165,121,59,0)  38%),
+      radial-gradient(ellipse at 2% 54%,  rgba(95,155,115,0.05) 0%, rgba(95,155,115,0)  36%),
+      radial-gradient(ellipse at 98% 58%, rgba(138,122,188,0.05)0%, rgba(138,122,188,0) 36%),
+      radial-gradient(ellipse at 52% 98%, rgba(43,90,102,0.04)  0%, rgba(43,90,102,0)   44%);
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }
@@ -61,9 +69,14 @@
     }
   }
   @media print {
-    html, body { background: none; }
+    html, body { background: none; font-size: 97%; line-height: 1.25; }
     .bg-blobs { display: none !important; }
-    .page { margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
+    .page { max-width: 100%; margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
+    ul.bullets li { margin-bottom: 1.5px; }
+    .role-block { margin: 4px 0 1px 0; }
+    h2.section { margin: 8px 0 3px 0; }
+    .highlight-panel { margin: 7px 0; padding: 6px 10px 4px 10px; }
+    p.body-text { margin: 1px 0 3px 0; }
   }
 
   /* ---- Blob background ---- */
@@ -271,11 +284,7 @@
     margin: 7px 0 2px 0;
   }
   .role-intro {
-    break-inside: avoid;
     break-after: avoid;
-  }
-  .role-block ul.bullets {
-    break-before: avoid;
   }
   .role-header {
     display: flex;
@@ -294,8 +303,9 @@
     margin-bottom: 2.5px;
     padding-left: 2px;
     break-inside: avoid;
-    orphans: 2;
-    widows: 2;
+    page-break-inside: avoid;
+    orphans: 3;
+    widows: 3;
   }
   ul.bullets li::marker { color: var(--accent); }
 
@@ -353,7 +363,7 @@
     <h1 class="name">DEEPANSHU KUMAR</h1>
     <div class="title-line">SOFTWARE ENGINEER &middot; .NET &middot; 5+ YEARS</div>
     <div class="contact-line">
-      <a href="mailto:Deepanshu.Kumar@Outlook.in">Deepanshu.Kumar@Outlook.in</a><span class="sep">|</span>+91 88096 01358<span class="sep">|</span><span style="white-space:nowrap">Portfolio: <a href="https://deepanshu-kumar.dev">deepanshu-kumar.dev</a></span><span class="sep">|</span><a href="https://www.linkedin.com/in/deepanshu-kumar-dev">linkedin.com/in/deepanshu-kumar-dev</a><span class="sep">|</span>Noida, India
+      <a href="mailto:Deepanshu.Kumar@Outlook.in">Deepanshu.Kumar@Outlook.in</a><span class="sep">|</span><span data-nosnippet>+91 88096 01358</span><span class="sep">|</span><span style="white-space:nowrap">Portfolio: <a href="https://deepanshu-kumar.dev">deepanshu-kumar.dev</a></span><span class="sep">|</span><a href="https://www.linkedin.com/in/deepanshu-kumar-dev">linkedin.com/in/deepanshu-kumar-dev</a><span class="sep">|</span>Noida, India
     </div>
   </header>
 
@@ -455,12 +465,12 @@
 
   <h2 class="section">SOFT SKILLS</h2>
   <div class="items-row">
-    <div class="area-item">Analytical Problem-Solving</div>
-    <div class="area-item">Cross-Functional Collaboration</div>
-    <div class="area-item">Clear Technical Communication</div>
-    <div class="area-item">Ownership &amp; Accountability</div>
+    <div class="area-item">Initiative &amp; Ownership</div>
+    <div class="area-item">Cross-Team Collaboration</div>
     <div class="area-item">Adaptability</div>
-    <div class="area-item">Time Management</div>
+    <div class="area-item">Consistent Delivery</div>
+    <div class="area-item">Analytical Problem-Solving</div>
+    <div class="area-item">Clear Communication</div>
   </div>
 
   <h2 class="section">EDUCATION</h2>

@@ -140,8 +140,14 @@ Grafana, Datadog, SonarQube, Snyk, Swagger/OpenAPI, Postman
 ### Testing
 NUnit, SpecFlow, ReqnRoll, Moq, Unit Testing, Integration Testing, BDD
 
+### Frontend & UI
+HTML, CSS, Bootstrap, JavaScript, jQuery (worked on MVC Razor views and frontend workflows),
+DevExpress (component library, Siemens), Vue.js (in progress)
+Note: not a dedicated frontend engineer — frontend work was incidental to backend roles (MVC views, jQuery, Bootstrap at IndiaLends; DevExpress components at Siemens)
+
 ### Tools & Process
-Git, Azure Repos, Bitbucket, TFS, Jira, Scrum, Kanban, MyGet (NuGet feed)
+Git, Azure Repos, Bitbucket, TFS, Azure Boards, Jira, Scrum, Kanban, MyGet (NuGet feed),
+Code Reviews, Root Cause Analysis, Production Troubleshooting, Analytical Thinking
 
 ---
 

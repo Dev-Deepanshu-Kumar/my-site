@@ -55,11 +55,13 @@
       "Domain-Driven Design", "Clean Architecture", "CQRS", "MediatR",
       "Entity Framework", "EF Core", "Dapper", "LINQ", "T-SQL",
       "SQL Server", "PostgreSQL", "Redis",
-      "Azure", "Azure Functions", "Azure Service Bus", "Azure DevOps",
+      "Azure", "Azure Functions", "Azure Service Bus", "Azure DevOps", "Azure Boards",
       "AWS Secrets Manager", "Docker",
-      "OIDC", "OAuth2", "JWT", "Auth0",
+      "OIDC", "OAuth2", "JWT", "Auth0", "VAPT Remediation",
       "NUnit", "SpecFlow", "ReqnRoll", "Moq", "BDD",
-      "Grafana", "Datadog", "SonarQube", "Snyk"
+      "Grafana", "Datadog", "SonarQube", "Snyk",
+      "HTML", "CSS", "Bootstrap", "jQuery", "DevExpress",
+      "Scrum", "Kanban", "Jira", "Root Cause Analysis", "Production Troubleshooting"
     ],
     "hasOccupation": [
       {
@@ -629,6 +631,19 @@
       </div>
 
       <div class="skill-category reveal reveal-d1">
+        <div class="skill-category-title">Frontend &amp; UI</div>
+        <div class="skill-tags">
+          <span class="tag tag-blue">HTML</span>
+          <span class="tag tag-blue">CSS</span>
+          <span class="tag tag-blue">Bootstrap</span>
+          <span class="tag tag-blue">JavaScript</span>
+          <span class="tag tag-blue">jQuery</span>
+          <span class="tag tag-blue">DevExpress</span>
+          <span class="tag tag-blue">Vue.js (in progress)</span>
+        </div>
+      </div>
+
+      <div class="skill-category reveal reveal-d2">
         <div class="skill-category-title">Tools &amp; Workflow</div>
         <div class="skill-tags">
           <span class="tag tag-blue">Git</span>
@@ -639,9 +654,20 @@
           <span class="tag tag-blue">Postman</span>
           <span class="tag tag-blue">GitHub Copilot</span>
           <span class="tag tag-blue">Claude Code</span>
-          <span class="tag tag-blue">Jira</span>
-          <span class="tag tag-blue">Scrum</span>
-          <span class="tag tag-blue">Kanban</span>
+        </div>
+      </div>
+
+      <div class="skill-category reveal reveal-d1">
+        <div class="skill-category-title">Agile, PM &amp; Problem Solving</div>
+        <div class="skill-tags">
+          <span class="tag tag-gold">Azure Boards</span>
+          <span class="tag tag-gold">Jira</span>
+          <span class="tag tag-gold">Scrum</span>
+          <span class="tag tag-gold">Kanban</span>
+          <span class="tag tag-gold">Code Reviews</span>
+          <span class="tag tag-gold">Analytical Thinking</span>
+          <span class="tag tag-gold">Root Cause Analysis</span>
+          <span class="tag tag-gold">Production Troubleshooting</span>
         </div>
       </div>
 
@@ -687,8 +713,8 @@
             <div class="exp-bullets-wrapper">
               <ul class="exp-bullets">
                 <li>Contributed to modernising a 170-project, multi-tenant ASP.NET MVC enterprise SaaS platform serving 2,500+ organisations, developing modular .NET/.NET Core services and RESTful APIs applying DDD and Clean Architecture principles.</li>
-                <li>Contributed to building backend APIs for an enterprise dashboard as an independently deployable satellite service (Strangler Fig pattern), enabling independent feature releases from the monolithic application and supporting gradual microservices-oriented modernisation.</li>
-                <li>Contributed to dashboard performance improvements including replacing Entity Framework-based data access with Dapper + SQL stored procedures, lazy loading, paginated APIs, and independently loaded widgets.</li>
+                <li>Designed and implemented backend APIs for an enterprise dashboard as an independently deployable satellite service (Strangler Fig pattern), enabling independent feature releases from the monolithic application while improving deployment flexibility and supporting gradual microservices-oriented modernisation.</li>
+                <li>Optimised dashboard performance by replacing Entity Framework-based data access with Dapper and SQL stored procedures, introducing lazy loading, paginated APIs, and independently loaded widgets to improve application responsiveness and scalability.</li>
                 <li>Developed core components of a Planning &amp; Scheduling (P&amp;S) microservice as part of a cross-functional team, covering technician assignment, scheduling, and labour-entry capabilities as an independently deployable service applying DDD aggregate patterns; designed as a reusable capability for adoption across multiple enterprise products.</li>
                 <li>Built a reusable .NET Standard shared library (internal NuGet via MyGet) integrating AWS Secrets Manager, Redis caching, and resiliency patterns (retry, circuit-breaker) for secure region-aware database credential resolution as part of the Windows/IIS-to-Linux-container migration.</li>
                 <li>Implemented secure .NET 8 Minimal APIs protected through a custom cookie authentication scheme that delegates session validation to a centralised auth service, integrating with an enterprise ecosystem based on OIDC, Auth0, and JWT.</li>
