@@ -45,10 +45,10 @@
   color: var(--color-muted);
 }
 
-/* ── Particles — tinted dark so visible on cream ── */
+/* ── Particles — dark enough to show on large bright monitors ── */
 [data-theme="light"] #particle-canvas {
-  opacity: 0.45;
-  filter: hue-rotate(10deg) saturate(0.65) brightness(0.5);
+  opacity: 0.7;
+  filter: hue-rotate(10deg) saturate(0.8) brightness(0.38);
 }
 
 /* ── Hardcoded #fff text — comprehensive override ── */
@@ -71,10 +71,10 @@
   -webkit-text-fill-color: var(--color-text) !important;
 }
 
-/* Section headings — warm dark amber-brown, not pure black */
+/* Section headings — visible warm teal-brown, distinct from black on bright screens */
 [data-theme="light"] .section-heading {
-  color: #3d2010;
-  -webkit-text-fill-color: #3d2010;
+  color: #1c4a52;
+  -webkit-text-fill-color: #1c4a52;
 }
 
 /* Stat numbers — keep teal→gold gradient */
@@ -186,14 +186,19 @@
 [data-theme="light"] .timer-divider {
   background: linear-gradient(to right, rgba(160, 120, 60, 0.2), transparent);
 }
-/* timer numbers — warm teal-to-amber instead of cyan-to-gold */
+/* timer numbers — solid rich teal, strong contrast on cream */
 [data-theme="light"] .timer-value {
-  background: linear-gradient(135deg, #1a7a96, #b8720a);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: #1a7a96;
+  color: #1a7a96;
 }
-[data-theme="light"] .timer-unit-label { color: var(--color-dim); }
+[data-theme="light"] .timer-unit-label { color: #b8720a; }
+[data-theme="light"] .timer-total-row .timer-value {
+  -webkit-text-fill-color: #b8720a;
+  color: #b8720a;
+}
 
 /* ── Story panel ── */
 [data-theme="light"] .story-panel {
