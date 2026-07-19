@@ -2023,5 +2023,242 @@
       .exp-header      { flex-direction: column; gap: 8px; }
 
       .section-heading { font-size: 24px; }
+      .recog-cards     { grid-template-columns: 1fr; }
     }
+
+/* ── Recognitions section ───────────────────────────────────────── */
+.recog-section {
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(122,143,166,0.15);
+}
+
+.recog-heading {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: 16px;
+}
+.recog-sub {
+  font-weight: 400;
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.recog-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.recog-card {
+  background: rgba(122,143,166,0.05);
+  border: 1px solid rgba(122,143,166,0.12);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.2s;
+}
+.recog-card:hover { border-color: rgba(232,170,74,0.25); }
+
+.recog-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.recog-points {
+  font-size: 11px;
+  font-weight: 700;
+  background: rgba(232,170,74,0.12);
+  border: 1px solid rgba(232,170,74,0.25);
+  color: var(--color-gold);
+  border-radius: 10px;
+  padding: 2px 8px;
+  white-space: nowrap;
+}
+.recog-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.recog-quote {
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--color-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+.recog-by {
+  font-size: 11px;
+  color: rgba(122,143,166,0.6);
+  font-weight: 500;
+}
+
+/* relationship tags */
+.recog-rel {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  border-radius: 8px;
+  padding: 2px 7px;
+  white-space: nowrap;
+  margin-left: auto;  /* push to right edge of meta row */
+}
+.recog-rel--manager {
+  background: rgba(30,203,225,0.08);
+  border: 1px solid rgba(30,203,225,0.2);
+  color: var(--color-cyan);
+}
+.recog-rel--senior {
+  background: rgba(232,170,74,0.08);
+  border: 1px solid rgba(232,170,74,0.2);
+  color: var(--color-gold);
+}
+.recog-rel--team {
+  background: rgba(91,212,160,0.08);
+  border: 1px solid rgba(91,212,160,0.2);
+  color: #5bd4a0;
+}
+.recog-rel--peer {
+  background: rgba(122,143,166,0.08);
+  border: 1px solid rgba(122,143,166,0.2);
+  color: var(--color-muted);
+}
+
+/* ── "Don't believe me?" proof button ──────────────────────────── */
+.proof-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 16px;
+  background: transparent;
+  border: 1px dashed rgba(122,143,166,0.3);
+  border-radius: 20px;
+  color: rgba(122,143,166,0.6);
+  font-size: 12px;
+  font-style: italic;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  margin-bottom: 4px;
+}
+.proof-btn:hover {
+  border-color: rgba(30,203,225,0.4);
+  color: var(--color-cyan);
+  background: rgba(30,203,225,0.04);
+  font-style: normal;
+}
+.proof-btn-arrow {
+  display: inline-block;
+  transition: transform 0.25s;
+}
+.proof-btn--open .proof-btn-arrow  { transform: rotate(90deg); }
+.proof-btn--open .proof-btn-text::after { content: " (told you)"; }
+
+/* ── Awards strip (inside Siemens exp card) ─────────────────────── */
+.awards-strip {
+  /* collapsed by default — 3 CSS props do the work, no height:0 jank */
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.3s ease, opacity 0.3s ease;
+  margin-top: 0;
+}
+.awards-strip--open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: 16px;
+}
+/* inner wrapper needed for grid-template-rows collapse trick */
+.awards-strip > * { overflow: hidden; }
+
+.awards-strip-heading {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: rgba(122,143,166,0.5);
+  margin-bottom: 14px;
+  padding-top: 4px;
+}
+
+.awards-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(122,143,166,0.2) transparent;
+}
+.awards-scroll::-webkit-scrollbar        { height: 4px; }
+.awards-scroll::-webkit-scrollbar-track  { background: transparent; }
+.awards-scroll::-webkit-scrollbar-thumb  { background: rgba(122,143,166,0.2); border-radius: 4px; }
+
+.award-thumb {
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+/* Uniform card: fixed viewport, dark bg, image letterboxed inside */
+.award-thumb img {
+  width: 200px;
+  height: 260px;
+  object-fit: contain;
+  background: #1e2333;           /* matches award platform dark bg */
+  border-radius: 12px;
+  border: 1px solid rgba(122,143,166,0.15);
+  display: block;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  cursor: zoom-in;
+}
+.award-thumb img:hover {
+  transform: scale(1.03);
+  border-color: rgba(30,203,225,0.35);
+  box-shadow: 0 8px 28px rgba(30,203,225,0.1);
+}
+
+.award-thumb figcaption {
+  font-size: 11px;
+  color: var(--color-muted);
+  text-align: center;
+  letter-spacing: 0.2px;
+  width: 200px;
+}
+
+/* lightbox overlay for award images */
+.award-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+  animation: fadeIn 0.15s ease;
+}
+
+.award-lightbox img {
+  max-width: min(480px, 92vw);
+  max-height: 90vh;
+  border-radius: 14px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+}
+
+@keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
 

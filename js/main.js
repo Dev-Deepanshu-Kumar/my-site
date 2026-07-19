@@ -248,9 +248,104 @@
       cardElement.classList.toggle('exp-card--expanded');
     }
 
+    /* ── Award image lightbox ──────────────────────────────────────
+       Clicking any .award-thumb img opens a centred overlay.
+       Clicking the overlay (or pressing Escape) closes it.
+       Stops propagation so the exp-card toggle doesn't also fire.
+    ──────────────────────────────────────────────────────────────── */
+    document.addEventListener('click', function(e) {
+      const img = e.target.closest('.award-thumb img');
+      if (!img) return;
+      e.stopPropagation();
+
+      const overlay = document.createElement('div');
+      overlay.className = 'award-lightbox';
+
+      const big = document.createElement('img');
+      big.src = img.src;
+      big.alt = img.alt;
+      overlay.appendChild(big);
+
+      const close = () => overlay.remove();
+      overlay.addEventListener('click', close);
+      document.addEventListener('keydown', function onKey(ev) {
+        if (ev.key === 'Escape') { close(); document.removeEventListener('keydown', onKey); }
+      });
+
+      document.body.appendChild(overlay);
+    });
+
     function flipCard(wrapperElement) {
       wrapperElement.classList.toggle('flipped');
     }
+
+    /* ── Recognitions — data-driven from data/recognitions.json ───────
+       To add, edit, or remove a recognition:
+         1. Go to your GitHub repo
+         2. Open data/recognitions.json
+         3. Click the pencil (edit) icon
+         4. Add / change / delete an entry in the JSON array
+         5. Click "Commit changes" — site updates automatically
+
+       Fields per entry:
+         points      — e.g. "+10 pts" or "Recognition"
+         title       — short award name shown as card heading
+         relation    — label shown in the badge e.g. "Direct Manager"
+         relationType— controls badge colour: "manager" | "senior" | "team" | "peer"
+         quote       — the recognition text (no surrounding quotes needed)
+         by          — "Name, Role"
+         company     — shown below the name
+         screenshot  — path to image file e.g. "images/awards/myfile.png"
+                       leave as "" or omit to skip showing a screenshot
+    ─────────────────────────────────────────────────────────────────── */
+    async function loadRecognitions() {
+      const cardsEl  = document.getElementById('recog-cards');
+      const scrollEl = document.getElementById('awards-scroll');
+      if (!cardsEl || !scrollEl) return;
+
+      let items;
+      try {
+        const res = await fetch('data/recognitions.json');
+        if (!res.ok) throw new Error('fetch failed');
+        items = await res.json();
+      } catch (_) {
+        cardsEl.innerHTML = '<p style="color:var(--color-muted);font-size:13px;">Recognitions unavailable.</p>';
+        return;
+      }
+
+      // render text cards
+      cardsEl.innerHTML = items.map(r => `
+        <div class="recog-card">
+          <div class="recog-card-meta">
+            <span class="recog-points">${r.points}</span>
+            <span class="recog-label">${r.title}</span>
+            <span class="recog-rel recog-rel--${r.relationType}">${r.relation}</span>
+          </div>
+          <p class="recog-quote">"${r.quote}"</p>
+          <div class="recog-by">— ${r.by}${r.company ? ' · ' + r.company : ''}</div>
+        </div>
+      `).join('');
+
+      // render screenshot strip — only entries that have a screenshot
+      const withScreenshot = items.filter(r => r.screenshot);
+      if (withScreenshot.length === 0) {
+        // hide the proof button if no screenshots at all
+        const btn = document.querySelector('.proof-btn');
+        if (btn) btn.style.display = 'none';
+      } else {
+        scrollEl.innerHTML = withScreenshot.map(r => `
+          <figure class="award-thumb">
+            <img
+              src="${r.screenshot}"
+              alt="Recognition screenshot: ${r.title} — ${r.by}"
+              loading="lazy">
+            <figcaption>${r.title}</figcaption>
+          </figure>
+        `).join('');
+      }
+    }
+
+    loadRecognitions();
 
 
     // Update start/end dates here when employment changes.
