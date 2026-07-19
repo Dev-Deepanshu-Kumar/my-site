@@ -366,8 +366,8 @@
 
 /* ── Validator inputs — warm tinted with visible depth ── */
 [data-theme="light"] .validator-input {
-  background: #fdfaf0;
-  border-color: rgba(160, 120, 60, 0.3);
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(160, 120, 60, 0.22);
   color: var(--color-text);
   -webkit-text-fill-color: var(--color-text);
   box-shadow: inset 0 1px 4px rgba(80,50,10,0.06);
