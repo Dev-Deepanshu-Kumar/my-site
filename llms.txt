@@ -101,14 +101,15 @@ for a major enterprise client. Recognised by senior engineering and product lead
 - **Cost reduction:** Designed a PAN name-matching algorithm validated against 30,000+
   historical records; reduced third-party API verification calls significantly, cutting
   operational costs without accuracy loss.
-- **Platform scale:** Contributed to modernising a 170-project, multi-tenant ASP.NET MVC
-  enterprise platform serving 2,500+ organisations.
+- **Enterprise platform modernisation:** Designed and developed modular .NET/.NET Core services
+  and RESTful APIs as part of modernising a 170-project, multi-tenant ASP.NET MVC enterprise SaaS
+  platform serving 2,500+ organisations, applying DDD and Clean Architecture across backend services,
+  shared platform libraries, and database layers.
+- **Cost reduction via smarts:** Designed a confidence-based PAN name-matching approach validated
+  against 30K+ historical records, cutting unnecessary third-party verification API calls.
 - **Reusable infrastructure:** Built a .NET Standard shared library (internal NuGet) integrating
   AWS Secrets Manager, Redis caching, and resiliency patterns — adopted across the platform
   as part of a Windows/IIS-to-Linux-container migration.
-- **Independent service delivery:** Contributed to two independently deployable microservices
-  (enterprise dashboard satellite, Planning & Scheduling service) using Strangler Fig pattern
-  and DDD aggregates.
 - **Release ownership:** Served as Release Representative on multiple production releases
   for a 2,500+ org enterprise platform (Jenkins, TeamCity, Datadog, Grafana, Snyk, SonarQube).
 
