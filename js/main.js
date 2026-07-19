@@ -385,7 +385,7 @@
       const icon  = btn && btn.querySelector('.toggle-icon');
       const label = btn && btn.querySelector('.toggle-label');
       if (icon)  icon.textContent  = theme === 'light' ? '☀️' : '🌙';
-      if (label) label.textContent = theme === 'light' ? 'Dark' : 'Light';
+      if (label) label.textContent = theme === 'light' ? 'Light' : 'Dark';
       btn && btn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
     }
 
