@@ -300,13 +300,16 @@
         card.classList.add('exp-card--expanded');
       }
 
-      // step 2 — scroll card into view
-      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // step 2 — scroll to recognitions heading once card expansion starts
+      const recogSection = card.querySelector('.recog-section');
+      (recogSection || card).scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       // step 3 — open recognitions strip after card animation settles
       setTimeout(() => {
         proof.classList.add('awards-strip--open');
         if (proofBtn) proofBtn.classList.add('proof-btn--open');
+        // re-scroll to recog section after bullets have expanded and pushed it down
+        if (recogSection) recogSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
         // step 4 — auto-collapse after 4 s unless user clicked inside
         let userInteracted = false;
