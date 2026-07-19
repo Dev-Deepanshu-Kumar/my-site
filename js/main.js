@@ -366,6 +366,27 @@
     loadRecognitions();
 
 
+    // ── Theme toggle — persists in localStorage ──────────────────
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      const btn   = document.getElementById('theme-toggle');
+      const icon  = btn && btn.querySelector('.toggle-icon');
+      const label = btn && btn.querySelector('.toggle-label');
+      if (icon)  icon.textContent  = theme === 'light' ? '☀️' : '🌙';
+      if (label) label.textContent = theme === 'light' ? 'Dark' : 'Light';
+      btn && btn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
+    }
+
+    function toggleTheme() {
+      const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      localStorage.setItem('theme', next);
+      applyTheme(next);
+    }
+
+    // apply saved preference on load (default: dark)
+    applyTheme(localStorage.getItem('theme') || 'dark');
+
+
     // Update start/end dates here when employment changes.
     // month is 0-indexed: Jan=0, Dec=11. end: null means still active.
     const CAREER_PERIODS = [
