@@ -147,6 +147,10 @@
   border-top-color: rgba(160, 120, 60, 0.15);
   color: var(--color-dim);
 }
+[data-theme="light"] #site-footer p:last-child {
+  color: var(--color-muted) !important;
+  opacity: 0.75;
+}
 [data-theme="light"] #site-footer a { color: var(--color-accent); }
 [data-theme="light"] .footer-name {
   background: linear-gradient(135deg, #1a7a96, #b8720a);
