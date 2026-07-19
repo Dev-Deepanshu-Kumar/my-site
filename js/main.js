@@ -1438,6 +1438,7 @@
       const btns = [
         document.getElementById('resume-dl-btn'),
         document.getElementById('nav-resume-dl-btn'),
+        document.getElementById('nav-resume-dl-btn-mobile'),
       ].filter(Boolean);
 
       btns.forEach(btn => {
