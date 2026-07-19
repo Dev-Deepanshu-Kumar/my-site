@@ -6,8 +6,8 @@
 
 [data-theme="light"] {
   --color-bg:           #fdf6e3;
-  --color-bg-card:      rgba(255, 251, 240, 0.92);
-  --color-border:       rgba(160, 120, 60, 0.2);
+  --color-bg-card:      rgba(255, 251, 240, 0.95);
+  --color-border:       rgba(160, 120, 60, 0.18);
   --color-accent:       #1a7a96;
   --color-accent-light: #0fa8c8;
   --color-gold:         #b8720a;
@@ -26,10 +26,10 @@
 /* ── Navbar ── */
 [data-theme="light"] #navbar {
   background: rgba(253, 246, 227, 0.94);
-  border-bottom-color: rgba(160, 120, 60, 0.2);
+  border-bottom-color: rgba(160, 120, 60, 0.15);
 }
 [data-theme="light"] #navbar.scrolled {
-  box-shadow: 0 4px 24px rgba(80, 50, 10, 0.1);
+  box-shadow: 0 4px 24px rgba(80, 50, 10, 0.08);
 }
 [data-theme="light"] .nav-links a {
   color: var(--color-muted);
@@ -45,34 +45,39 @@
   color: var(--color-muted);
 }
 
-/* ── Particles — darker tones, higher opacity so they show on cream ── */
+/* ── Particles — tinted dark so visible on cream ── */
 [data-theme="light"] #particle-canvas {
-  opacity: 0.5;
-  filter: hue-rotate(15deg) saturate(0.7) brightness(0.55);
+  opacity: 0.45;
+  filter: hue-rotate(10deg) saturate(0.65) brightness(0.5);
 }
 
-/* ── Hardcoded #fff text overrides ── */
+/* ── Hardcoded #fff text — comprehensive override ── */
 [data-theme="light"] .highlight-title,
+[data-theme="light"] .highlight-body,
 [data-theme="light"] .exp-title,
+[data-theme="light"] .exp-company,
+[data-theme="light"] .exp-company:hover,
 [data-theme="light"] .edu-degree,
-[data-theme="light"] .flip-back-title,
 [data-theme="light"] .rec-name,
 [data-theme="light"] .resume-title,
-[data-theme="light"] .footer-name,
 [data-theme="light"] .skill-category-title,
-[data-theme="light"] .exp-company:hover,
-[data-theme="light"] .story-heading {
-  color: var(--color-text);
-  -webkit-text-fill-color: var(--color-text);
+[data-theme="light"] .story-heading,
+[data-theme="light"] .section-subtext,
+[data-theme="light"] .timer-period-label,
+[data-theme="light"] .timer-total-label,
+[data-theme="light"] .recog-label,
+[data-theme="light"] .soft-skill-name {
+  color: var(--color-text) !important;
+  -webkit-text-fill-color: var(--color-text) !important;
 }
 
-/* Section headings — deep warm ink, more presence than body text */
+/* Section headings — deep warm ink */
 [data-theme="light"] .section-heading {
   color: #1a1008;
   -webkit-text-fill-color: #1a1008;
 }
 
-/* Stat numbers — keep gradient, just ensure it renders */
+/* Stat numbers — keep teal→gold gradient */
 [data-theme="light"] .stat-number {
   background: linear-gradient(135deg, var(--color-accent-light), var(--color-gold));
   -webkit-background-clip: text;
@@ -80,21 +85,7 @@
   background-clip: text;
 }
 
-/* recog-label — use text not white */
-[data-theme="light"] .recog-label {
-  color: #1a1008;
-  -webkit-text-fill-color: #1a1008;
-}
-
-/* hero name keeps gradient — just darken it */
-[data-theme="light"] .hero-name-text {
-  background: linear-gradient(135deg, #1a7a96, #b8720a);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* section heading <span> accent colour */
+/* Section heading accent span */
 [data-theme="light"] .section-heading span {
   background: linear-gradient(135deg, var(--color-accent-light), var(--color-gold));
   -webkit-background-clip: text;
@@ -102,90 +93,81 @@
   background-clip: text;
 }
 
-/* ── Cards ── */
+/* Hero name gradient — warm teal to amber */
+[data-theme="light"] .hero-name-text {
+  background: linear-gradient(135deg, #1a7a96, #b8720a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .hero-eyebrow { color: var(--color-accent); }
+[data-theme="light"] .hero-summary { color: var(--color-muted); }
+
+/* ── Cards — warm white, barely-there shadow ── */
 [data-theme="light"] .exp-card,
 [data-theme="light"] .highlight-card,
 [data-theme="light"] .stat-card,
 [data-theme="light"] .edu-card,
 [data-theme="light"] .flip-card-front,
-[data-theme="light"] .flip-card-back,
 [data-theme="light"] .soft-skill-card,
 [data-theme="light"] .rec-card,
 [data-theme="light"] .recog-card,
 [data-theme="light"] .validator-card,
 [data-theme="light"] .resume-card,
 [data-theme="light"] .career-timer-card {
-  background: rgba(255, 251, 240, 0.95);
-  border-color: rgba(160, 120, 60, 0.18);
-  box-shadow: 0 2px 16px rgba(80, 50, 10, 0.07);
+  background: rgba(255, 252, 243, 0.97);
+  border-color: rgba(160, 120, 60, 0.14);
+  box-shadow: 0 2px 20px rgba(80, 50, 10, 0.06);
 }
-
 [data-theme="light"] .exp-card:hover,
 [data-theme="light"] .highlight-card:hover {
-  box-shadow: 0 8px 32px rgba(80, 50, 10, 0.12);
+  box-shadow: 0 8px 32px rgba(80, 50, 10, 0.1);
 }
 
-/* ── Exp bullets ── */
-[data-theme="light"] .exp-bullets li {
-  color: var(--color-muted);
+/* Resume card — suppress the dark radial gradient overlay */
+[data-theme="light"] .resume-card::before {
+  background: radial-gradient(ellipse at 20% 50%, rgba(26,122,150,0.04) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 50%, rgba(184,114,10,0.03) 0%, transparent 60%);
 }
-[data-theme="light"] .exp-bullets li::before {
+[data-theme="light"] .resume-subtitle,
+[data-theme="light"] .resume-tag { color: var(--color-muted); }
+[data-theme="light"] .resume-tag {
+  background: rgba(160, 120, 60, 0.07);
+  border-color: rgba(160, 120, 60, 0.18);
+}
+[data-theme="light"] .resume-icon-bg {
+  background: linear-gradient(135deg, rgba(26,122,150,0.1), rgba(184,114,10,0.08));
+  border-color: rgba(26,122,150,0.2);
+}
+
+/* ── Footer — seamless, no box ── */
+[data-theme="light"] #site-footer {
+  background: transparent;
+  border-top-color: rgba(160, 120, 60, 0.15);
+  color: var(--color-dim);
+}
+[data-theme="light"] #site-footer a { color: var(--color-accent); }
+[data-theme="light"] .footer-name {
+  background: linear-gradient(135deg, #1a7a96, #b8720a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Exp card internals ── */
+[data-theme="light"] .exp-bullets li { color: var(--color-muted); }
+[data-theme="light"] .exp-bullets li::before { color: var(--color-accent); }
+[data-theme="light"] .exp-location { color: var(--color-dim); }
+[data-theme="light"] .exp-expand-hint { color: var(--color-dim); }
+[data-theme="light"] .exp-date-badge {
+  background: rgba(26, 122, 150, 0.07);
+  border-color: rgba(26, 122, 150, 0.18);
   color: var(--color-accent);
 }
-
-/* ── Story panel ── */
-[data-theme="light"] .story-panel {
-  background: rgba(250, 244, 228, 0.95);
-  border-color: rgba(160, 120, 60, 0.2);
-}
-[data-theme="light"] .story-beat-text {
-  color: var(--color-muted);
-}
-[data-theme="light"] .story-beat-text strong {
-  color: var(--color-text);
-}
-
-/* ── Tags ── */
-[data-theme="light"] .tag-blue {
-  background: rgba(26, 122, 150, 0.08);
-  border-color: rgba(26, 122, 150, 0.22);
-  color: #0e6a88;
-}
-[data-theme="light"] .tag-gold {
-  background: rgba(184, 114, 10, 0.08);
-  border-color: rgba(184, 114, 10, 0.22);
-  color: #8a5500;
-}
-[data-theme="light"] .tag-green {
-  background: rgba(22, 140, 100, 0.08);
-  border-color: rgba(22, 140, 100, 0.22);
-  color: #0e7a58;
-}
-
-/* ── Section eyebrow ── */
-[data-theme="light"] .section-eyebrow-tag {
-  background: rgba(26, 122, 150, 0.08);
-  border-color: rgba(26, 122, 150, 0.25);
-  color: var(--color-accent);
-}
-
-/* ── Hero eyebrow + summary ── */
-[data-theme="light"] .hero-eyebrow {
-  color: var(--color-accent);
-}
-[data-theme="light"] .hero-summary {
-  color: var(--color-muted);
-}
-
-/* ── Contact pills ── */
-[data-theme="light"] .contact-pill {
-  background: rgba(255, 251, 240, 0.9);
-  border-color: rgba(160, 120, 60, 0.25);
-  color: var(--color-muted);
-}
-[data-theme="light"] .contact-pill:hover {
-  border-color: var(--color-accent);
-  color: var(--color-accent);
+[data-theme="light"] .exp-date-badge--current {
+  background: rgba(26, 122, 150, 0.12);
+  border-color: rgba(26, 122, 150, 0.3);
 }
 
 /* ── Timeline ── */
@@ -195,47 +177,77 @@
 [data-theme="light"] .timeline-dot {
   background: var(--color-accent);
   border-color: var(--color-bg);
-}
-[data-theme="light"] .exp-location {
-  color: var(--color-dim);
-}
-[data-theme="light"] .exp-date-badge {
-  background: rgba(26, 122, 150, 0.08);
-  border-color: rgba(26, 122, 150, 0.2);
-  color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(26,122,150,0.15);
 }
 
 /* ── Career timer ── */
-[data-theme="light"] .career-timer-heading {
+[data-theme="light"] .career-timer-heading { color: var(--color-muted); }
+[data-theme="light"] .timer-period-dates { color: var(--color-dim); }
+[data-theme="light"] .timer-divider {
+  background: linear-gradient(to right, rgba(160, 120, 60, 0.2), transparent);
+}
+
+/* ── Story panel ── */
+[data-theme="light"] .story-panel {
+  background: rgba(250, 244, 228, 0.98);
+  border-color: rgba(160, 120, 60, 0.18);
+}
+[data-theme="light"] .story-beat-text { color: var(--color-muted); }
+[data-theme="light"] .story-beat-text strong { color: var(--color-text); }
+
+/* ── Tags ── */
+[data-theme="light"] .tag-blue {
+  background: rgba(26, 122, 150, 0.07);
+  border-color: rgba(26, 122, 150, 0.2);
+  color: #0e6a88;
+}
+[data-theme="light"] .tag-gold {
+  background: rgba(184, 114, 10, 0.07);
+  border-color: rgba(184, 114, 10, 0.2);
+  color: #8a5500;
+}
+[data-theme="light"] .tag-green {
+  background: rgba(22, 140, 100, 0.07);
+  border-color: rgba(22, 140, 100, 0.2);
+  color: #0e7a58;
+}
+
+/* ── Section eyebrow ── */
+[data-theme="light"] .section-eyebrow-tag {
+  background: rgba(26, 122, 150, 0.07);
+  border-color: rgba(26, 122, 150, 0.22);
+  color: var(--color-accent);
+}
+[data-theme="light"] .section-eyebrow-line {
+  background: linear-gradient(to right, rgba(26,122,150,0.3), transparent);
+}
+
+/* ── Contact pills ── */
+[data-theme="light"] .contact-pill {
+  background: rgba(255, 252, 243, 0.9);
+  border-color: rgba(160, 120, 60, 0.22);
   color: var(--color-muted);
 }
-[data-theme="light"] .timer-period-label {
-  color: var(--color-muted);
-}
-[data-theme="light"] .timer-period-value,
-[data-theme="light"] .timer-total-display {
-  color: var(--color-text);
+[data-theme="light"] .contact-pill:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: rgba(26,122,150,0.05);
 }
 
 /* ── Threshold knob row ── */
 [data-theme="light"] .threshold-row {
-  background: rgba(160, 120, 60, 0.06);
-  border-color: rgba(160, 120, 60, 0.2);
+  background: rgba(160, 120, 60, 0.05);
+  border-color: rgba(160, 120, 60, 0.15);
 }
-[data-theme="light"] .threshold-hint {
-  color: var(--color-muted);
-}
-[data-theme="light"] .knob-val {
-  color: var(--color-accent);
-}
-[data-theme="light"] .knob-sub {
-  color: var(--color-dim);
-}
+[data-theme="light"] .threshold-label { color: var(--color-gold); }
+[data-theme="light"] .threshold-hint { color: var(--color-muted); }
+[data-theme="light"] .knob-val { color: var(--color-accent); }
+[data-theme="light"] .knob-sub { color: var(--color-dim); }
 
-/* ── Validator ── */
+/* ── Validator inputs ── */
 [data-theme="light"] .validator-input {
-  background: #fff8ee;
-  border-color: rgba(160, 120, 60, 0.3);
+  background: #fffdf5;
+  border-color: rgba(160, 120, 60, 0.25);
   color: var(--color-text);
   -webkit-text-fill-color: var(--color-text);
 }
@@ -244,154 +256,168 @@
   opacity: 1;
 }
 [data-theme="light"] .validator-label {
-  color: var(--color-text);
-  opacity: 0.75;
+  color: var(--color-muted);
+  -webkit-text-fill-color: var(--color-muted);
 }
-[data-theme="light"] .validator-note {
-  color: var(--color-dim);
-}
-[data-theme="light"] .validator-vs {
-  color: var(--color-dim);
-}
-
-/* ── Timer — period label hardcoded #fff ── */
-[data-theme="light"] .timer-period-label {
-  color: var(--color-text);
-  -webkit-text-fill-color: var(--color-text);
-}
-[data-theme="light"] .timer-period-dates {
+[data-theme="light"] .validator-vs { color: var(--color-dim); }
+[data-theme="light"] .validator-note { color: var(--color-dim); }
+[data-theme="light"] .story-trigger {
+  border-color: rgba(160,120,60,0.25);
   color: var(--color-muted);
 }
-[data-theme="light"] .timer-total-label {
-  color: var(--color-muted);
-}
-[data-theme="light"] .timer-divider {
-  background: linear-gradient(to right, rgba(160, 120, 60, 0.25), transparent);
-}
 
-/* ── Verdict colours stay semantic — only neutrals need overriding ── */
+/* ── Verdict / score ── */
 [data-theme="light"] .verdict-banner {
-  background: rgba(255, 251, 240, 0.9);
-  border-color: rgba(160, 120, 60, 0.15);
+  background: rgba(255, 252, 243, 0.95);
+  border-color: rgba(160, 120, 60, 0.12);
 }
 [data-theme="light"] .score-gauge-track {
-  background: rgba(160, 120, 60, 0.12);
+  background: rgba(160, 120, 60, 0.1);
 }
+[data-theme="light"] .algo-grid .algo-card {
+  background: rgba(255, 252, 243, 0.9);
+  border-color: rgba(160, 120, 60, 0.12);
+}
+[data-theme="light"] .algo-name { color: var(--color-muted); }
 
 /* ── Recommendations carousel ── */
-[data-theme="light"] .rec-card {
-  background: #fff8ee;
-}
+[data-theme="light"] .rec-card { background: #fffcf3; }
 [data-theme="light"] .rec-body,
 [data-theme="light"] .rec-role,
-[data-theme="light"] .rec-context {
+[data-theme="light"] .rec-context { color: var(--color-muted); }
+[data-theme="light"] .rec-arrow {
+  background: rgba(255,252,243,0.9);
+  border-color: rgba(160,120,60,0.2);
   color: var(--color-muted);
 }
+[data-theme="light"] .rec-arrow:hover {
+  background: rgba(26,122,150,0.08);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+[data-theme="light"] .rec-dot { background: rgba(160,120,60,0.25); }
+[data-theme="light"] .rec-dot.active { background: var(--color-accent); }
 
-/* ── Education flip card back ── */
+/* ── Education ── */
+[data-theme="light"] .edu-inst { color: var(--color-muted); }
+[data-theme="light"] .edu-year-badge {
+  background: rgba(26,122,150,0.07);
+  border-color: rgba(26,122,150,0.18);
+  color: var(--color-accent);
+}
+[data-theme="light"] .flip-hint { color: var(--color-dim); }
 [data-theme="light"] .flip-card-back {
-  background: rgba(26, 122, 150, 0.9);
+  background: rgba(26, 122, 150, 0.92);
 }
 [data-theme="light"] .flip-back-title,
 [data-theme="light"] .flip-back-body,
-[data-theme="light"] .flip-back-close {
-  color: #fff;
-}
+[data-theme="light"] .flip-back-close { color: #fff; -webkit-text-fill-color: #fff; }
 
-/* ── Resume section ── */
-[data-theme="light"] .resume-subtitle,
-[data-theme="light"] .resume-tag {
-  color: var(--color-muted);
+/* ── Soft skills ── */
+[data-theme="light"] .soft-skill-card:hover {
+  border-color: rgba(184,114,10,0.35);
+  background: rgba(184,114,10,0.04);
+  box-shadow: 0 8px 24px rgba(184,114,10,0.08);
 }
-[data-theme="light"] .resume-tag {
-  background: rgba(160, 120, 60, 0.08);
-  border-color: rgba(160, 120, 60, 0.2);
+[data-theme="light"] .soft-skill-proof {
+  color: var(--color-dim);
+  border-color: rgba(160,120,60,0.25);
+}
+[data-theme="light"] .soft-skill-proof:hover,
+[data-theme="light"] .soft-skill-card:hover .soft-skill-proof {
+  color: var(--color-accent);
+  border-color: rgba(26,122,150,0.4);
 }
 
 /* ── Recognitions ── */
-[data-theme="light"] .recog-quote {
-  color: var(--color-muted);
+[data-theme="light"] .recog-heading { color: var(--color-text); }
+[data-theme="light"] .recog-sub { color: var(--color-dim); }
+[data-theme="light"] .recog-points {
+  background: rgba(184,114,10,0.09);
+  border-color: rgba(184,114,10,0.22);
+  color: var(--color-gold);
 }
-[data-theme="light"] .recog-by {
-  color: var(--color-dim);
+[data-theme="light"] .recog-quote { color: var(--color-muted); }
+[data-theme="light"] .recog-by { color: var(--color-dim); }
+[data-theme="light"] .recog-rel--manager {
+  background: rgba(26,122,150,0.07);
+  border-color: rgba(26,122,150,0.2);
+  color: var(--color-accent);
 }
-[data-theme="light"] .awards-strip-heading {
-  color: var(--color-dim);
+[data-theme="light"] .recog-rel--senior {
+  background: rgba(184,114,10,0.07);
+  border-color: rgba(184,114,10,0.2);
+  color: var(--color-gold);
 }
+[data-theme="light"] .recog-rel--team {
+  background: rgba(22,140,100,0.07);
+  border-color: rgba(22,140,100,0.2);
+  color: #0e7a58;
+}
+[data-theme="light"] .awards-strip-heading { color: var(--color-dim); }
 [data-theme="light"] .proof-btn {
-  border-color: rgba(160, 120, 60, 0.3);
+  border-color: rgba(160,120,60,0.25);
   color: var(--color-dim);
 }
 [data-theme="light"] .proof-btn:hover {
   border-color: var(--color-accent);
   color: var(--color-accent);
-  background: rgba(26, 122, 150, 0.05);
+  background: rgba(26,122,150,0.04);
 }
-
-/* ── Award thumbnails ── */
 [data-theme="light"] .award-thumb img {
-  background: #f5efe0;
-  border-color: rgba(160, 120, 60, 0.2);
+  background: #f7f0e0;
+  border-color: rgba(160,120,60,0.18);
 }
-
-/* ── Footer ── */
-[data-theme="light"] #site-footer {
-  background: rgba(245, 236, 210, 0.8);
-  border-top-color: rgba(160, 120, 60, 0.2);
+[data-theme="light"] .awards-toggle-btn {
+  background: rgba(160,120,60,0.05);
+  border-color: rgba(160,120,60,0.2);
   color: var(--color-muted);
 }
-[data-theme="light"] #site-footer a {
-  color: var(--color-accent);
-}
 
-/* ── Soft skills proof link ── */
-[data-theme="light"] .soft-skill-proof {
-  color: var(--color-dim);
-  border-color: rgba(160, 120, 60, 0.3);
-}
-
-/* ── Theme toggle widget itself ── */
-[data-theme="light"] #theme-toggle {
-  background: rgba(255, 251, 240, 0.95);
-  border-color: rgba(160, 120, 60, 0.3);
-  box-shadow: 0 4px 20px rgba(80, 50, 10, 0.12);
-}
-
-/* ── Theme toggle button — fixed bottom-right pill ── */
+/* ── Theme toggle — warm cream, amber accent ── */
 #theme-toggle {
   position: fixed;
   bottom: 28px;
   right: 28px;
   z-index: 200;
-
   display: flex;
   align-items: center;
   gap: 7px;
   padding: 8px 14px 8px 10px;
-
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
   border-radius: 24px;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-
+  backdrop-filter: blur(14px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   outline: none;
   transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
 }
-
 #theme-toggle:hover {
-  border-color: rgba(30, 203, 225, 0.45);
-  box-shadow: 0 6px 28px rgba(30, 203, 225, 0.12);
   transform: translateY(-2px);
 }
-
 #theme-toggle:focus-visible {
   outline: 2px solid var(--color-accent-light);
   outline-offset: 2px;
 }
 
-/* track */
+/* dark mode hover — cyan glow */
+#theme-toggle:hover {
+  border-color: rgba(30, 203, 225, 0.4);
+  box-shadow: 0 6px 28px rgba(30, 203, 225, 0.1);
+}
+/* light mode hover — amber glow */
+[data-theme="light"] #theme-toggle:hover {
+  border-color: rgba(184, 114, 10, 0.45);
+  box-shadow: 0 6px 28px rgba(184, 114, 10, 0.12);
+}
+[data-theme="light"] #theme-toggle {
+  background: rgba(255, 252, 243, 0.97);
+  border-color: rgba(160, 120, 60, 0.25);
+  box-shadow: 0 4px 20px rgba(80, 50, 10, 0.1);
+}
+
+/* toggle track */
 #theme-toggle .toggle-track {
   position: relative;
   width: 32px;
@@ -399,16 +425,15 @@
   border-radius: 9px;
   background: rgba(122, 143, 166, 0.2);
   border: 1px solid rgba(122, 143, 166, 0.25);
-  transition: background 0.3s;
+  transition: background 0.3s, border-color 0.3s;
   flex-shrink: 0;
 }
-
 [data-theme="light"] #theme-toggle .toggle-track {
-  background: rgba(184, 114, 10, 0.2);
-  border-color: rgba(184, 114, 10, 0.3);
+  background: rgba(184, 114, 10, 0.18);
+  border-color: rgba(184, 114, 10, 0.28);
 }
 
-/* thumb */
+/* toggle thumb */
 #theme-toggle .toggle-thumb {
   position: absolute;
   top: 2px;
@@ -419,7 +444,6 @@
   background: var(--color-muted);
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s;
 }
-
 [data-theme="light"] #theme-toggle .toggle-thumb {
   transform: translateX(14px);
   background: var(--color-gold);
@@ -434,7 +458,6 @@
   transition: color 0.25s;
   user-select: none;
 }
-
 #theme-toggle:hover .toggle-label { color: var(--color-text); }
 
 #theme-toggle .toggle-icon {
@@ -444,9 +467,5 @@
 }
 
 @media (max-width: 480px) {
-  #theme-toggle {
-    bottom: 18px;
-    right: 16px;
-    padding: 7px 11px 7px 9px;
-  }
+  #theme-toggle { bottom: 18px; right: 16px; padding: 7px 11px 7px 9px; }
 }

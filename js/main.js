@@ -245,7 +245,16 @@
 
 
     function toggleExpCard(cardElement) {
+      const isExpanding = !cardElement.classList.contains('exp-card--expanded');
       cardElement.classList.toggle('exp-card--expanded');
+
+      // collapse proof strip + button state when card closes
+      if (!isExpanding) {
+        const proof    = cardElement.querySelector('.awards-strip');
+        const proofBtn = cardElement.querySelector('.proof-btn');
+        if (proof)    proof.classList.remove('awards-strip--open');
+        if (proofBtn) proofBtn.classList.remove('proof-btn--open');
+      }
     }
 
     /* ── Award image lightbox ──────────────────────────────────────
