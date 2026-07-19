@@ -279,6 +279,50 @@
       wrapperElement.classList.toggle('flipped');
     }
 
+    /* ── openRecognitions ─────────────────────────────────────────
+       Called by "Proven → Award" links in soft skills.
+       1. Expands the Siemens exp card (if not already open)
+       2. Scrolls the card into view
+       3. Opens the recognitions strip with a short delay (so the
+          card expansion animation finishes first)
+       4. Auto-collapses recognitions after 4 s if the user hasn't
+          interacted with them — just a teaser, not a hard lock
+    ─────────────────────────────────────────────────────────────── */
+    function openRecognitions() {
+      const card       = document.getElementById('siemens-exp-card');
+      const proof      = document.getElementById('awards-proof');
+      const proofBtn   = document.querySelector('.proof-btn');
+      if (!card || !proof) return;
+
+      // step 1 — expand exp card if collapsed
+      if (!card.classList.contains('exp-card--expanded')) {
+        card.classList.add('exp-card--expanded');
+      }
+
+      // step 2 — scroll card into view
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      // step 3 — open recognitions strip after card animation settles
+      setTimeout(() => {
+        proof.classList.add('awards-strip--open');
+        if (proofBtn) proofBtn.classList.add('proof-btn--open');
+
+        // step 4 — auto-collapse after 4 s unless user clicked inside
+        let userInteracted = false;
+        const onInteract = () => { userInteracted = true; };
+        proof.addEventListener('click', onInteract, { once: true });
+
+        setTimeout(() => {
+          if (!userInteracted) {
+            proof.classList.remove('awards-strip--open');
+            if (proofBtn) proofBtn.classList.remove('proof-btn--open');
+          }
+          proof.removeEventListener('click', onInteract);
+        }, 4000);
+
+      }, 450);
+    }
+
     /* ── Recognitions — data-driven from data/recognitions.json ───────
        To add, edit, or remove a recognition:
          1. Go to your GitHub repo

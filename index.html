@@ -654,7 +654,7 @@
         <div class="timeline-item reveal">
           <div class="timeline-dot timeline-dot--current"></div>
 
-          <div class="exp-card" onclick="toggleExpCard(this)">
+          <div class="exp-card" id="siemens-exp-card" onclick="toggleExpCard(this)">
             <div class="exp-header">
               <div>
                 <div class="exp-title">Software Engineer</div>
@@ -828,19 +828,19 @@
         <div class="soft-skill-card reveal reveal-d2">
           <span class="soft-skill-icon">🤝</span>
           <span class="soft-skill-name">Cross-Team Collaboration</span>
-          <a class="soft-skill-proof" href="#section-experience" title="Recognised by another team for helping with a time-sensitive, complex cross-team task outside own scope">Proven → Award</a>
+          <a class="soft-skill-proof" href="#section-experience" onclick="event.preventDefault(); openRecognitions()" title="Recognised by another team for helping with a time-sensitive, complex cross-team task outside own scope">Proven → Award</a>
         </div>
 
         <div class="soft-skill-card reveal reveal-d3">
           <span class="soft-skill-icon">🔄</span>
           <span class="soft-skill-name">Adaptability</span>
-          <a class="soft-skill-proof" href="#section-experience" title="Manager recognition: showed great flexibility and adaptability in quickly understanding complex cross-team work">Proven → Award</a>
+          <a class="soft-skill-proof" href="#section-experience" onclick="event.preventDefault(); openRecognitions()" title="Manager recognition: showed great flexibility and adaptability in quickly understanding complex cross-team work">Proven → Award</a>
         </div>
 
         <div class="soft-skill-card reveal reveal-d1">
           <span class="soft-skill-icon">🎯</span>
           <span class="soft-skill-name">Consistent Delivery</span>
-          <a class="soft-skill-proof" href="#section-experience" title="Sprint Star for 2 consecutive sprints — recognised for great progress on tasks and contributing to team goals">Proven → Sprint Star ×2</a>
+          <a class="soft-skill-proof" href="#section-experience" onclick="event.preventDefault(); openRecognitions()" title="Sprint Star for 2 consecutive sprints — recognised for great progress on tasks and contributing to team goals">Proven → Sprint Star ×2</a>
         </div>
 
         <div class="soft-skill-card reveal reveal-d2">
