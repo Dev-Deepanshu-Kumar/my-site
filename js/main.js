@@ -1220,6 +1220,17 @@
         'Jira'               : 'Sprint planning, bug tracking, and release management across all roles',
         'Scrum'              : '2-week sprints, daily standups, sprint reviews and retrospectives',
         'Kanban'             : 'Maintenance & Reliability initiative ran as a continuous Kanban flow',
+        'Azure Boards'       : 'Work item tracking, sprint boards, and backlog management at IndiaLends',
+        'Code Reviews'       : 'Regular PR reviewer and reviewee — feedback on architecture, naming, test coverage',
+        'Analytical Thinking': 'Identifying root causes over symptoms — PAN matching problem was found and solved this way',
+        'Root Cause Analysis': 'Diagnosed production defects across Work Orders, Dashboard, and Purchasing at Siemens',
+        'Production Troubleshooting': 'On-call-style defect resolution using Datadog, Grafana, and log analysis',
+        'HTML'               : 'MVC Razor views at IndiaLends — markup for form-heavy application screens',
+        'CSS'                : 'Styling for MVC Razor views and Bootstrap overrides; not a dedicated UI engineer',
+        'Bootstrap'          : 'Used in ASP.NET MVC Razor views at IndiaLends for responsive layout and components',
+        'jQuery'             : 'Heavy use at IndiaLends — DOM manipulation, AJAX calls, form validation, UI interactions',
+        'DevExpress'         : 'Component library used at Siemens for data grids, charts, and complex UI widgets in MVC',
+        'Vue.js (in progress)': 'Learning Vue 3 Composition API — personal study, not yet in production',
       };
 
       const tip = document.createElement('div');
