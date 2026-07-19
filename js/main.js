@@ -120,31 +120,34 @@
         }
         return arr;
       })([
-        'C# · .NET · ASP.NET Core',
-        'Enterprise SaaS · 5+ Years',
-        'Clean Architecture · DDD',
-        'REST APIs · Microservices',
-        'I read the error logs, not just the tickets.',
-        'Async by default. Thoughtful by choice.',
-        'From monolith to microservices — one PR at a time.',
-        'I care about the why, not just the what.',
-        'Coffee-driven development. Deadline-aware.',
-        'Building things that scale.',
-        'The boring parts matter most.',
-        'Readable code is a feature.',
-        'Good APIs are invisible. Bad ones haunt you.',
-        'I write the ticket, build the thing, and close the loop.',
-        'Complexity is easy. Simplicity takes work.',
-        'The best fix is the one nobody notices.',
-        'I ask why before I ask how.',
-        'Legacy code is just future code with more stories.',
-        'Soft skills ship features. Hard skills fix them.',
-        'Code reviews are love letters to your future self.',
-        'Learning every day. Shipping every day.',
-        'Always learning. Always building.',
-        'New problem every day. New solution every day.',
-        'Still curious. Still building.',
-      ]);
+  'C# · .NET · ASP.NET Core',
+  'Enterprise SaaS · 5+ Years',
+  'Backend Engineer · Problem Solver',
+  'Enterprise Software · Real Users',
+  'REST APIs · Microservices',
+  'API-first Development',
+  'SOLID Principles in Practice',
+  'Business Logic over Boilerplate',
+
+  'From monolith to microservices — one PR at a time.',
+  'Learning modern architecture without forgetting solid fundamentals.',
+
+  'I care about the why, not just the what.',
+  'I ask why before I ask how.',
+  'Understanding the problem before writing the solution.',
+  'I read the error logs, not just the tickets.',
+  "If it's flaky, I'll find out why.",
+
+  'Async by default. Thoughtful by choice.',
+  'Good APIs are invisible. Bad ones haunt you.',
+  'The best fix is the one nobody notices.',
+  'Build it right. Then build it fast.',
+
+  'I care as much about maintainability as functionality.',
+  "I don't chase clever code. I chase clear code.",
+  "I like software that's easy to change.",
+  'I fix causes, not symptoms.'
+]);
 
       const el = document.getElementById('typed-text');
       let phraseIndex = 0;
