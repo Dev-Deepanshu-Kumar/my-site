@@ -209,6 +209,11 @@
   background: rgba(250, 244, 228, 0.98);
   border-color: rgba(160, 120, 60, 0.18);
 }
+[data-theme="light"] .story-inner {
+  background: rgba(240, 232, 210, 0.85);
+  border-color: rgba(160, 120, 60, 0.18);
+}
+[data-theme="light"] .story-inner::-webkit-scrollbar-thumb { background: rgba(160,120,60,0.3); }
 [data-theme="light"] .story-beat-text { color: var(--color-muted); }
 [data-theme="light"] .story-beat-text strong { color: var(--color-text); }
 

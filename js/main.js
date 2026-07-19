@@ -347,7 +347,6 @@
       cardsEl.innerHTML = items.map(r => `
         <div class="recog-card">
           <div class="recog-card-meta">
-            <span class="recog-points">${r.points}</span>
             <span class="recog-label">${r.title}</span>
             <span class="recog-rel recog-rel--${r.relationType}">${r.relation}</span>
           </div>

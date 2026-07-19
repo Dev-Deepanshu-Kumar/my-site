@@ -22,8 +22,8 @@
   {
     "points": "+10 pts",
     "title": "Cross-Team Collaboration",
-    "relation": "Senior Colleague",
-    "relationType": "senior",
+    "relation": "Direct Manager",
+    "relationType": "manager",
     "quote": "Deepanshu's contribution has been recognized beyond his own team. He took up a time-sensitive, complex task for another team's parts-reorder initiative, showed great flexibility and adaptability in quickly understanding the work, and helped develop and hand over the story seamlessly. Kudos!",
     "by": "Anuj Tandon, Manager Software Engineering",
     "company": "Siemens Asset Management Software",
