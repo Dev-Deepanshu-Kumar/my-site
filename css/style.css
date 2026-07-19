@@ -1249,6 +1249,11 @@
       color: var(--color-accent-light);
     }
 
+    .rec-arrow:focus-visible {
+      outline: 2px solid var(--color-accent-light);
+      outline-offset: 2px;
+    }
+
     .rec-dots {
       display: flex;
       gap: 8px;
