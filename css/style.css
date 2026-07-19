@@ -1099,6 +1099,10 @@
       font-size: 14px;
       color: var(--color-text);
       font-weight: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
     }
 
     .soft-skill-card:hover {
@@ -1107,6 +1111,27 @@
       transform: translateY(-3px);
       box-shadow: 0 10px 30px rgba(232, 170, 74, 0.1);
       color: var(--color-gold-light);
+    }
+
+    .soft-skill-name {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .soft-skill-proof {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      color: rgba(122,143,166,0.5);
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(122,143,166,0.25);
+      transition: color 0.2s, border-color 0.2s;
+      margin-top: 2px;
+    }
+    .soft-skill-proof:hover,
+    .soft-skill-card:hover .soft-skill-proof {
+      color: var(--color-cyan);
+      border-color: rgba(30,203,225,0.4);
     }
 
     .soft-skill-icon { font-size: 26px; margin-bottom: 8px; display: block; }
