@@ -1224,7 +1224,7 @@
         'Code Reviews'       : 'Regular PR reviewer and reviewee — feedback on architecture, naming, test coverage',
         'Analytical Thinking': 'Identifying root causes over symptoms — PAN matching problem was found and solved this way',
         'Root Cause Analysis': 'Diagnosed production defects across Work Orders, Dashboard, and Purchasing at Siemens',
-        'Production Troubleshooting': 'On-call-style defect resolution using Datadog, Grafana, and log analysis',
+        'Production Troubleshooting': 'Diagnosed and resolved customer-reported defects in production as part of the M&R squad — log analysis via Datadog and Grafana, not infra or on-call',
         'HTML'               : 'MVC Razor views at IndiaLends — markup for form-heavy application screens',
         'CSS'                : 'Styling for MVC Razor views and Bootstrap overrides; not a dedicated UI engineer',
         'Bootstrap'          : 'Used in ASP.NET MVC Razor views at IndiaLends for responsive layout and components',
