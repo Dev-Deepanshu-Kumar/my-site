@@ -1596,6 +1596,20 @@
       box-shadow: 0 0 0 3px rgba(224,90,90,0.12);
     }
 
+    .validator-input.input-error {
+      border-color: #e05a5a;
+      box-shadow: 0 0 0 3px rgba(224,90,90,0.15);
+      animation: inputShake 0.35s ease;
+    }
+
+    @keyframes inputShake {
+      0%, 100% { transform: translateX(0); }
+      20%      { transform: translateX(-6px); }
+      40%      { transform: translateX(6px); }
+      60%      { transform: translateX(-4px); }
+      80%      { transform: translateX(4px); }
+    }
+
     /* VS divider */
     .validator-vs {
       font-size: 13px;
@@ -2303,3 +2317,55 @@
 
 @keyframes fadeIn { from { opacity:0 } to { opacity:1 } }
 
+
+/* ── Skill-tag tooltip ── */
+#skill-tip {
+  position: fixed;
+  max-width: 280px;
+  background: rgba(10,14,26,0.97);
+  border: 1px solid rgba(43,156,186,0.4);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #a8bfcc;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 9998;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+
+/* ── Source info tooltip ── */
+#src-tooltip {
+  position: fixed;
+  width: 260px;
+  background: rgba(10,14,26,0.98);
+  border: 1px solid rgba(43,90,102,0.6);
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 12.5px;
+  line-height: 1.65;
+  color: var(--color-muted);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 9999;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
+}
+
+.tip-arrow {
+  position: absolute;
+  bottom: -6px;
+  right: 14px;
+  width: 10px;
+  height: 10px;
+  background: rgba(10,14,26,0.98);
+  border-right: 1px solid rgba(43,90,102,0.6);
+  border-bottom: 1px solid rgba(43,90,102,0.6);
+  transform: rotate(45deg);
+}
+
+#src-tooltip strong {
+  color: #d0dce8;
+}

@@ -936,7 +936,18 @@
     function runValidator() {
       const n1  = document.getElementById('vld-name1').value.trim();
       const n2  = document.getElementById('vld-name2').value.trim();
-      if (!n1 || !n2) return;
+      if (!n1 || !n2) {
+        ['vld-name1', 'vld-name2'].forEach(id => {
+          const el = document.getElementById(id);
+          if (!el.value.trim()) {
+            el.classList.remove('input-error');
+            void el.offsetWidth; // reflow to restart animation
+            el.classList.add('input-error');
+            el.addEventListener('input', () => el.classList.remove('input-error'), { once: true });
+          }
+        });
+        return;
+      }
       const thr = parseInt(document.getElementById('vld-threshold').value, 10);
 
       const btn = document.getElementById('vld-btn');
@@ -1020,28 +1031,12 @@
                     text-transform:uppercase;color:var(--color-accent);margin-bottom:8px;">
           About this code
         </div>
-        The GitHub repo is a <strong style="color:#d0dce8;">portfolio-adapted version</strong>
+        The GitHub repo is a <strong>portfolio-adapted version</strong>
         of the original production system. Core matching algorithms are unchanged.
         The interactive console, config system, and file structure were added
         specifically for this public showcase.
         <div class="tip-arrow"></div>`;
 
-      tip.style.cssText = `
-        position:fixed; width:260px; background:rgba(10,14,26,0.98);
-        border:1px solid rgba(43,90,102,0.6); border-radius:12px;
-        padding:14px 16px; font-size:12.5px; line-height:1.65;
-        color:var(--color-muted); opacity:0; pointer-events:none;
-        transition:opacity 0.2s; z-index:9999;
-        box-shadow:0 12px 40px rgba(0,0,0,0.6);`;
-
-      const style = document.createElement('style');
-      style.textContent = `.tip-arrow {
-        position:absolute; bottom:-6px; right:14px;
-        width:10px; height:10px; background:rgba(10,14,26,0.98);
-        border-right:1px solid rgba(43,90,102,0.6);
-        border-bottom:1px solid rgba(43,90,102,0.6);
-        transform:rotate(45deg); }`;
-      document.head.appendChild(style);
       document.body.appendChild(tip);
 
       function showTip() {
@@ -1070,6 +1065,8 @@
       btn.addEventListener('mouseleave', () => { if (!pinned) hideTip(); });
       btn.addEventListener('click', () => { pinned = !pinned; pinned ? showTip() : hideTip(); });
       document.addEventListener('click', e => { if (pinned && e.target !== btn) { pinned = false; hideTip(); } });
+      // Reposition on scroll so pinned tooltip tracks the button
+      window.addEventListener('scroll', () => { if (pinned) showTip(); }, { passive: true });
     }
 
 
@@ -1235,17 +1232,6 @@
 
       const tip = document.createElement('div');
       tip.id = 'skill-tip';
-      tip.style.cssText = `
-        position: fixed; max-width: 280px;
-        background: rgba(10,14,26,0.97);
-        border: 1px solid rgba(43,156,186,0.4);
-        border-radius: 10px; padding: 10px 14px;
-        font-size: 12px; line-height: 1.6; color: #a8bfcc;
-        pointer-events: none; opacity: 0;
-        transition: opacity 0.15s ease;
-        z-index: 9998;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-      `;
       document.body.appendChild(tip);
 
       function positionTip(e) {
@@ -1265,7 +1251,6 @@
       document.querySelectorAll('.skill-tags .tag').forEach(tag => {
         const story = STORIES[tag.textContent.trim()];
         if (!story) return;
-        tag.style.cursor = 'help';
         tag.addEventListener('mouseenter', e => { tip.textContent = story; tip.style.opacity = '1'; positionTip(e); });
         tag.addEventListener('mousemove',  positionTip);
         tag.addEventListener('mouseleave', () => { tip.style.opacity = '0'; });
