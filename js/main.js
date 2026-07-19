@@ -279,15 +279,7 @@
       wrapperElement.classList.toggle('flipped');
     }
 
-    /* ── openRecognitions ─────────────────────────────────────────
-       Called by "Proven → Award" links in soft skills.
-       1. Expands the Siemens exp card (if not already open)
-       2. Scrolls the card into view
-       3. Opens the recognitions strip with a short delay (so the
-          card expansion animation finishes first)
-       4. Auto-collapses recognitions after 4 s if the user hasn't
-          interacted with them — just a teaser, not a hard lock
-    ─────────────────────────────────────────────────────────────── */
+    // Expands Siemens card, scrolls to it, opens recognitions strip, auto-collapses after 4s on no interaction
     function openRecognitions() {
       const card       = document.getElementById('siemens-exp-card');
       const proof      = document.getElementById('awards-proof');
@@ -323,25 +315,7 @@
       }, 450);
     }
 
-    /* ── Recognitions — data-driven from data/recognitions.json ───────
-       To add, edit, or remove a recognition:
-         1. Go to your GitHub repo
-         2. Open data/recognitions.json
-         3. Click the pencil (edit) icon
-         4. Add / change / delete an entry in the JSON array
-         5. Click "Commit changes" — site updates automatically
-
-       Fields per entry:
-         points      — e.g. "+10 pts" or "Recognition"
-         title       — short award name shown as card heading
-         relation    — label shown in the badge e.g. "Direct Manager"
-         relationType— controls badge colour: "manager" | "senior" | "team" | "peer"
-         quote       — the recognition text (no surrounding quotes needed)
-         by          — "Name, Role"
-         company     — shown below the name
-         screenshot  — path to image file e.g. "images/awards/myfile.png"
-                       leave as "" or omit to skip showing a screenshot
-    ─────────────────────────────────────────────────────────────────── */
+    // Renders recognition cards and screenshot strip from data/recognitions.json
     async function loadRecognitions() {
       const cardsEl  = document.getElementById('recog-cards');
       const scrollEl = document.getElementById('awards-scroll');
