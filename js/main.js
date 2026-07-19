@@ -774,9 +774,10 @@
       svg.setAttribute('viewBox', '0 0 72 72');
       svg.classList.add('knob-svg');
 
+      const isLight = () => document.documentElement.getAttribute('data-theme') === 'light';
+
       const trackPath = document.createElementNS(NS, 'path');
       trackPath.setAttribute('fill', 'none');
-      trackPath.setAttribute('stroke', 'rgba(255,255,255,0.07)');
       trackPath.setAttribute('stroke-width', '4');
       trackPath.setAttribute('stroke-linecap', 'round');
 
@@ -799,8 +800,7 @@
 
       const body = document.createElementNS(NS, 'circle');
       body.setAttribute('cx', '36'); body.setAttribute('cy', '36'); body.setAttribute('r', '22');
-      body.setAttribute('fill', 'rgba(20,29,48,0.95)');
-      body.setAttribute('stroke', 'rgba(43,90,102,0.5)'); body.setAttribute('stroke-width', '1.5');
+      body.setAttribute('stroke-width', '1.5');
 
       const dot = document.createElementNS(NS, 'circle');
       dot.setAttribute('r', '3');
@@ -845,6 +845,13 @@
         return `M${s.x.toFixed(3)},${s.y.toFixed(3)} A${r},${r},0,${large},1,${e.x.toFixed(3)},${e.y.toFixed(3)}`;
       }
 
+      function applyKnobTheme() {
+        const light = isLight();
+        trackPath.setAttribute('stroke', light ? 'rgba(160,120,60,0.18)' : 'rgba(255,255,255,0.07)');
+        body.setAttribute('fill',   light ? 'rgba(255,251,240,0.97)' : 'rgba(20,29,48,0.95)');
+        body.setAttribute('stroke', light ? 'rgba(160,120,60,0.4)'   : 'rgba(43,90,102,0.5)');
+      }
+
       function render(val) {
         const t       = (val - MIN) / (MAX - MIN);
         const endDeg  = START_DEG + t * ARC_DEG;
@@ -861,7 +868,12 @@
         hidden.value      = val;
 
         glowCircle.setAttribute('stroke', `rgba(43,156,186,${(t * 0.35).toFixed(2)})`);
+        applyKnobTheme();
       }
+
+      // re-render knob when theme toggles
+      const knobThemeObserver = new MutationObserver(() => render(currentVal));
+      knobThemeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
 
       render(DEFAULT);
 

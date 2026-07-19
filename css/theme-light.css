@@ -59,15 +59,31 @@
 [data-theme="light"] .rec-name,
 [data-theme="light"] .resume-title,
 [data-theme="light"] .footer-name,
-[data-theme="light"] .stat-number,
-[data-theme="light"] .section-heading,
-[data-theme="light"] .hero-name-text,
 [data-theme="light"] .skill-category-title,
-[data-theme="light"] .recog-label,
 [data-theme="light"] .exp-company:hover,
 [data-theme="light"] .story-heading {
   color: var(--color-text);
   -webkit-text-fill-color: var(--color-text);
+}
+
+/* Section headings — deep warm ink, more presence than body text */
+[data-theme="light"] .section-heading {
+  color: #1a1008;
+  -webkit-text-fill-color: #1a1008;
+}
+
+/* Stat numbers — keep gradient, just ensure it renders */
+[data-theme="light"] .stat-number {
+  background: linear-gradient(135deg, var(--color-accent-light), var(--color-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* recog-label — use text not white */
+[data-theme="light"] .recog-label {
+  color: #1a1008;
+  -webkit-text-fill-color: #1a1008;
 }
 
 /* hero name keeps gradient — just darken it */
@@ -201,20 +217,56 @@
   color: var(--color-text);
 }
 
+/* ── Threshold knob row ── */
+[data-theme="light"] .threshold-row {
+  background: rgba(160, 120, 60, 0.06);
+  border-color: rgba(160, 120, 60, 0.2);
+}
+[data-theme="light"] .threshold-hint {
+  color: var(--color-muted);
+}
+[data-theme="light"] .knob-val {
+  color: var(--color-accent);
+}
+[data-theme="light"] .knob-sub {
+  color: var(--color-dim);
+}
+
 /* ── Validator ── */
 [data-theme="light"] .validator-input {
   background: #fff8ee;
   border-color: rgba(160, 120, 60, 0.3);
   color: var(--color-text);
+  -webkit-text-fill-color: var(--color-text);
 }
 [data-theme="light"] .validator-input::placeholder {
   color: var(--color-dim);
+  opacity: 1;
 }
 [data-theme="light"] .validator-label {
-  color: var(--color-muted);
+  color: var(--color-text);
+  opacity: 0.75;
 }
 [data-theme="light"] .validator-note {
   color: var(--color-dim);
+}
+[data-theme="light"] .validator-vs {
+  color: var(--color-dim);
+}
+
+/* ── Timer — period label hardcoded #fff ── */
+[data-theme="light"] .timer-period-label {
+  color: var(--color-text);
+  -webkit-text-fill-color: var(--color-text);
+}
+[data-theme="light"] .timer-period-dates {
+  color: var(--color-muted);
+}
+[data-theme="light"] .timer-total-label {
+  color: var(--color-muted);
+}
+[data-theme="light"] .timer-divider {
+  background: linear-gradient(to right, rgba(160, 120, 60, 0.25), transparent);
 }
 
 /* ── Verdict colours stay semantic — only neutrals need overriding ── */

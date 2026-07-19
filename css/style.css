@@ -692,7 +692,7 @@
     .timer-divider {
       height: 1px;
       background: linear-gradient(to right, var(--color-border), transparent);
-      margin: 2px 0;
+      margin: 14px 0;
     }
 
     /* Total bar at the bottom */
