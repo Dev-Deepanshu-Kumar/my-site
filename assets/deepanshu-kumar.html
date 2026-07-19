@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Deepanshu Kumar - Resume</title>
+<style>
+  @page { size: A4; margin: 8mm 9mm; }
+
+  :root{
+    --ink:#1C2B33;
+    --slate:#4B5C64;
+    --accent:#2B5A66;
+    --accent-deep:#1C3E47;
+    --gold:#A5793B;
+    --rule:#D9DFE0;
+    --paper:#FFFFFF;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0; padding: 0;
+    background: linear-gradient(170deg, #E4F1F1 0%, #EDF6F6 35%, #F3F9F9 70%, #F8FBFB 100%);
+    color: var(--ink);
+    font-family: Arial, Helvetica, "Segoe UI", sans-serif;
+    font-size: 9.7pt;
+    line-height: 1.30;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page {
+    max-width: 7.55in;
+    margin: 0 auto;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    border-bottom: 2.5px solid var(--accent-deep);
+    padding-bottom: 7px;
+    margin-bottom: 9px;
+    position: relative;
+  }
+  .corner-accent {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 0 72px 95px 0;
+    border-color: transparent var(--accent-deep) transparent transparent;
+    opacity: 0.08;
+  }
+
+  .highlight-panel {
+    background: linear-gradient(120deg, #D9EDED 0%, #EEF7F7 55%, #FAFDFD 100%);
+    border: 1px solid #C8E1E1;
+    border-radius: 6px;
+    padding: 8px 12px 6px 12px;
+    margin: 10px 0;
+  }
+  .highlight-panel .section {
+    border-bottom-color: #C3DEDE;
+  }
+
+  li.li-key {
+    list-style: none;
+    position: relative;
+    padding-left: 6px;
+  }
+  li.li-key::before {
+    content: "\25C6";
+    color: var(--gold);
+    position: absolute;
+    left: -13px;
+    top: 0.5px;
+    font-size: 10.5pt;
+    line-height: 1;
+  }
+  h1.name {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 27pt;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: var(--accent-deep);
+    margin: 0 0 2px 0;
+  }
+  .title-line {
+    font-size: 10.5pt;
+    color: var(--gold);
+    font-weight: bold;
+    letter-spacing: 0.3px;
+    margin-bottom: 4px;
+  }
+  .skills-line {
+    font-size: 8.3pt;
+    color: var(--slate);
+    font-style: italic;
+    margin-bottom: 4px;
+  }
+  .contact-line {
+    font-size: 8.3pt;
+    color: var(--ink);
+  }
+  .contact-line span.sep { color: var(--rule); margin: 0 5px; }
+  .contact-line a { white-space: nowrap; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ---------- Section headings ---------- */
+  h2.section {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 13pt;
+    color: var(--accent-deep);
+    letter-spacing: 0.6px;
+    margin: 11px 0 4px 0;
+    padding-bottom: 2px;
+    border-bottom: 1px solid var(--rule);
+    break-after: avoid;
+    break-inside: avoid;
+  }
+
+  p.body-text { margin: 2px 0 4px 0; color: var(--ink); orphans: 3; widows: 3; }
+
+  /* ---------- Skills grid ---------- */
+  .skills-grid {
+    columns: 2;
+    column-gap: 20px;
+  }
+  .skill-row {
+    font-size: 9pt;
+    break-inside: avoid;
+    margin-bottom: 3px;
+  }
+  .skill-label {
+    font-weight: bold;
+    color: var(--accent);
+  }
+
+  /* ---------- Education ---------- */
+  .edu-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-top: 4px;
+    break-inside: avoid;
+  }
+  .edu-degree { font-weight: bold; font-size: 9.6pt; }
+  .edu-meta { font-size: 8.6pt; color: var(--slate); font-style: italic; }
+  .edu-date { font-size: 8.6pt; color: var(--accent); font-weight: bold; white-space: nowrap; }
+
+  /* ---------- Experience ---------- */
+  .role-block {
+    border-left: 2.5px solid var(--accent);
+    padding-left: 11px;
+    margin: 7px 0 2px 0;
+  }
+  .role-intro {
+    break-inside: avoid;
+    break-after: avoid;
+  }
+  .role-block ul.bullets {
+    break-before: avoid;
+  }
+  .role-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    flex-wrap: wrap;
+  }
+  .role-title { font-weight: bold; font-size: 10.4pt; color: var(--ink); }
+  .role-date { font-weight: bold; font-size: 8.6pt; color: var(--gold); white-space: nowrap; }
+  .role-meta { font-size: 8.6pt; color: var(--slate); font-style: italic; margin: 1px 0 3px 0; }
+  .role-desc { font-size: 9pt; margin: 1px 0 3px 0; }
+
+  ul.bullets { margin: 0 0 2px 0; padding-left: 14px; }
+  ul.bullets li {
+    font-size: 9pt;
+    margin-bottom: 2.5px;
+    padding-left: 2px;
+    break-inside: avoid;
+    orphans: 2;
+    widows: 2;
+  }
+  ul.bullets li::marker { color: var(--accent); }
+
+  .areas-line { font-size: 9pt; color: var(--ink); }
+  .areas-line .divider { color: var(--gold); margin: 0 6px; }
+
+  .areas-grid {
+    columns: 2;
+    column-gap: 20px;
+  }
+  .area-item {
+    font-size: 9pt;
+    color: var(--ink);
+    padding-left: 12px;
+    position: relative;
+    break-inside: avoid;
+    margin-bottom: 3px;
+  }
+  .area-item::before {
+    content: "\25B8";
+    color: var(--gold);
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  .items-row {
+    columns: 3;
+    column-gap: 18px;
+  }
+
+  footer.print-note {
+    text-align: center;
+    font-size: 8pt;
+    color: var(--slate);
+    margin-top: 14px;
+  }
+  @media print {
+    footer.print-note { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <div class="corner-accent"></div>
+    <h1 class="name">DEEPANSHU KUMAR</h1>
+    <div class="title-line">SOFTWARE ENGINEER &middot; .NET &middot; 5+ YEARS</div>
+    <div class="contact-line">
+      <a href="mailto:Deepanshu.Kumar@Outlook.in">Deepanshu.Kumar@Outlook.in</a><span class="sep">|</span>+91 88096 01358<span class="sep">|</span>Portfolio: <a href="https://deepanshu-kumar.dev">deepanshu-kumar.dev</a><span class="sep">|</span><a href="https://www.linkedin.com/in/deepanshu-kumar-dev">linkedin.com/in/deepanshu-kumar-dev</a><span class="sep">|</span>Noida, India
+    </div>
+  </header>
+
+  <h2 class="section">PROFESSIONAL SUMMARY</h2>
+  <p class="body-text">Backend Software Engineer with 5+ years of experience developing enterprise SaaS and FinTech applications, primarily using C#, .NET, ASP.NET Core, and SQL Server. Experienced in designing RESTful APIs, building distributed backend services, contributing to the modernization of large-scale legacy applications, and developing backend services for cloud-based enterprise platforms within globally distributed Agile product teams.</p>
+
+  <h2 class="section">CORE SKILLS</h2>
+  <div class="skills-grid">
+    <div class="skill-row"><span class="skill-label">Languages &amp; Data Access:</span> C#, SQL, JavaScript, Entity Framework, EF Core, Dapper, LINQ, T-SQL</div>
+    <div class="skill-row"><span class="skill-label">Backend &amp; Architecture:</span> ASP.NET Core, .NET Core, REST APIs, Azure Functions, CQRS/MediatR, DDD, BDD, Resiliency Patterns, Microservices</div>
+    <div class="skill-row"><span class="skill-label">Cloud &amp; Messaging:</span> Azure App Service, Service Bus, Blob Storage, AWS Secrets Manager, Redis, Message Queues</div>
+    <div class="skill-row"><span class="skill-label">Auth &amp; Security:</span> OIDC/OAuth2, JWT, Auth0, VAPT Remediation</div>
+    <div class="skill-row"><span class="skill-label">DevOps, Observability &amp; Testing:</span> Azure DevOps, TFS, Jenkins, TeamCity, Docker, SonarQube, Snyk, Grafana, Datadog, NUnit, SpecFlow, ReqNRoll, Moq</div>
+    <div class="skill-row"><span class="skill-label">Frontend / UI:</span> HTML, CSS, Bootstrap, JavaScript, jQuery, DevExpress, Vue.js (in progress)</div>
+    <div class="skill-row"><span class="skill-label">Tools:</span> Git, Azure Repos, Bitbucket, MyGet, Swagger/OpenAPI, Postman, GitHub Copilot, Claude Code</div>
+    <div class="skill-row"><span class="skill-label">Agile, PM &amp; Problem Solving:</span> Azure Boards, Jira, Scrum, Kanban, Code Reviews, Analytical Thinking, Root Cause Analysis, Production Troubleshooting</div>
+  </div>
+
+  <div class="highlight-panel">
+  <h2 class="section" style="margin-top:0;">KEY HIGHLIGHTS</h2>
+  <ul class="bullets">
+    <li>Contributed to modernizing a 170-project, multi-tenant enterprise SaaS platform serving 2,500+ tenant organizations.</li>
+    <li>Reduced third-party verification costs by designing a validated, confidence-based PAN name-matching approach tested against 30K+ historical records.</li>
+    <li>Developed core components of a reusable Planning &amp; Scheduling microservice as part of a cross-functional team, designed for adoption across multiple enterprise products.</li>
+    <li>Served as Release Representative across multiple production releases and contributed to a dedicated Maintenance &amp; Reliability squad resolving customer-reported production issues.</li>
+  </ul>
+  </div>
+
+  <h2 class="section">PROFESSIONAL EXPERIENCE</h2>
+
+  <div class="role-block">
+    <div class="role-intro">
+    <div class="role-header">
+      <span class="role-title">Software Engineer &middot; Siemens, Asset Management Software</span>
+      <span class="role-date">Jan 2024 – Present</span>
+    </div>
+    <div class="role-meta">Formerly Brightly Software | Noida, India | Enterprise CMMS Platform</div>
+    </div>
+    <ul class="bullets">
+      <li class="li-key">Contributing to the modernization of a 170-project, multi-tenant ASP.NET MVC enterprise SaaS platform serving 2,500+ tenant organizations by developing modular .NET/.NET Core services and RESTful APIs, applying Domain-Driven Design (DDD) and Clean Architecture principles.</li>
+      <li>Designed and implemented backend APIs for an enterprise dashboard as an independently deployable satellite service (Strangler Fig pattern) alongside the core platform, enabling independent feature releases from the monolithic application while improving deployment flexibility and supporting gradual, microservices-oriented platform modernization.</li>
+      <li>Optimized dashboard performance by replacing Entity Framework-based data access with Dapper and SQL stored procedures, introducing lazy loading, paginated APIs, and independently loaded widgets to improve application responsiveness and scalability.</li>
+      <li class="li-key">Developed core components of a Planning &amp; Scheduling (P&amp;S) microservice as part of a cross-functional team, covering technician assignment, scheduling, and labor-entry capabilities as an independently deployable service applying DDD aggregate patterns; designed as a reusable capability for adoption across multiple enterprise products.</li>
+      <li>Built a reusable .NET Standard shared library (internal NuGet via MyGet) integrating AWS Secrets Manager, Redis caching, and resiliency patterns (retry, circuit-breaker) to enable secure, region-aware database credential resolution as part of the platform's Windows/IIS-to-Linux-container migration effort; containerized development workflows using Docker.</li>
+      <li>Implemented secure .NET 8 Minimal APIs protected through a custom cookie authentication scheme that delegates session validation to a centralized authentication service, integrating with an enterprise authentication ecosystem based on OIDC, Auth0, and JWT.</li>
+      <li>Developed BDD-driven unit and integration tests using NUnit, SpecFlow/ReqnRoll, and Moq, improving regression coverage and increasing confidence in production releases.</li>
+      <li>Served as a Release Representative across multiple production releases, supporting deployment readiness, rollback validation, and production monitoring using Jenkins, TeamCity, Datadog, Grafana, SonarQube, and Snyk.</li>
+      <li>Contributed to a dedicated Maintenance &amp; Reliability squad, diagnosing and resolving customer-reported defects across Work Orders, Dashboard, Inventory, and Purchasing modules to improve product stability.</li>
+    </ul>
+  </div>
+
+  <div class="role-block">
+    <div class="role-intro">
+    <div class="role-header">
+      <span class="role-title">Software Engineer &middot; IndiaLends (GC Web Ventures Pvt Ltd)</span>
+      <span class="role-date">Apr 2022 – Dec 2023</span>
+    </div>
+    <div class="role-meta">Gurugram, India | FinTech Digital Lending</div>
+    <p class="role-desc">Worked on IndiaLends, a consumer-facing FinTech platform enabling users to discover, apply for, and track loan and credit-card applications through bank and NBFC integrations.</p>
+    </div>
+    <ul class="bullets">
+      <li class="li-key">Identified an opportunity to reduce third-party PAN verification costs and proposed a local PAN holder name-validation approach using weighted string-similarity algorithms. Designed and implemented the solution, validated it against 30K+ historical records, and collaborated with Architecture and Risk Management teams to productionize a confidence-based fallback strategy, reducing unnecessary API calls and associated operational costs.
+        <div class="role-meta" style="margin-top:2px;">Live demo: <a href="https://deepanshu-kumar.dev">deepanshu-kumar.dev</a> &nbsp;|&nbsp; Source: <a href="https://github.com/Dev-Deepanshu-Kumar/IndianFuzzyNameMatcher">github.com/Dev-Deepanshu-Kumar/IndianFuzzyNameMatcher</a></div>
+      </li>
+      <li>Developed backend APIs and business workflows for loan and credit-card application processing; contributed frontend functionality using jQuery / JavaScript.</li>
+      <li>Built Azure Function-based components (HTTP, Queue, Blob, Timer triggers) for webhook integrations, async document-processing, scheduled reporting, and event-driven financial workflows using Azure Service Bus.</li>
+      <li>Integrated backend services with external banking and NBFC partner APIs via JSON/XML-based integrations for application-processing and data-exchange.</li>
+      <li>Resolved security vulnerabilities from VAPT assessments to improve platform security posture.</li>
+      <li>Managed version control via Azure Repos and legacy TFS, along with deployments, UAT publishing, and monitoring through Azure DevOps.</li>
+    </ul>
+  </div>
+
+  <div class="role-block">
+    <div class="role-intro">
+    <div class="role-header">
+      <span class="role-title">Career Sabbatical &middot; Independent Study &amp; Upskilling</span>
+      <span class="role-date">Jan 2021 – Mar 2022</span>
+    </div>
+    <p class="role-desc">Took a planned career break during the COVID-19 pandemic, amid industry-wide uncertainty, to focus on personal priorities and reassess long-term career direction, before returning to full-time software engineering roles.</p>
+    </div>
+  </div>
+
+  <div class="role-block">
+    <div class="role-intro">
+    <div class="role-header">
+      <span class="role-title">Software Development Engineer I &middot; Telebu Communications LLP</span>
+      <span class="role-date">Dec 2019 – Dec 2020</span>
+    </div>
+    <div class="role-meta">Hyderabad, India | Healthcare Platform</div>
+    <p class="role-desc">Worked on Tabiib, a healthcare web platform for doctor discovery, appointment booking, and clinic management.</p>
+    </div>
+    <ul class="bullets">
+      <li>Implemented backend APIs supporting doctor search, appointment scheduling, and healthcare management operations.</li>
+      <li>Developed dashboard and reporting backend for appointment visibility, booking analytics, subscription tracking, and Tabiib Plus feature workflows including data aggregation.</li>
+      <li>Implemented data aggregation and reporting views for operational and business insights across healthcare workflows.</li>
+      <li>Collaborated with senior engineers to deliver features within Agile environments.</li>
+    </ul>
+  </div>
+
+  <h2 class="section">SOFT SKILLS</h2>
+  <div class="items-row">
+    <div class="area-item">Analytical Problem-Solving</div>
+    <div class="area-item">Cross-Functional Collaboration</div>
+    <div class="area-item">Clear Technical Communication</div>
+    <div class="area-item">Ownership &amp; Accountability</div>
+    <div class="area-item">Adaptability</div>
+    <div class="area-item">Time Management</div>
+  </div>
+
+  <h2 class="section">EDUCATION</h2>
+  <div class="edu-row">
+    <div><span class="edu-degree">MCA - Master of Computer Applications</span><br><span class="edu-meta">L.N. Mishra Institute, Patna | Magadh University</span></div>
+    <div class="edu-date">2016 – 2019</div>
+  </div>
+  <div class="edu-row">
+    <div><span class="edu-degree">B.Sc. Information Technology</span><br><span class="edu-meta">NIIT Boring Road, Patna | Kuvempu University</span></div>
+    <div class="edu-date">2013 – 2016</div>
+  </div>
+
+  <h2 class="section">PROFESSIONAL COURSES</h2>
+  <div class="edu-row">
+    <div><span class="edu-degree">GNIIT - Software Engineering</span><br><span class="edu-meta">NIIT, New Delhi</span></div>
+    <div class="edu-date">2017 | Excellent</div>
+  </div>
+
+  <footer class="print-note">Open in a browser → Print (Ctrl/Cmd+P) → Save as PDF. Margins are pre-set for A4.</footer>
+
+</div>
+</body>
+</html>
