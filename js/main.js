@@ -389,10 +389,56 @@
       btn && btn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
     }
 
+    // Create overlay element once, reuse every toggle
+    const _themeOverlay = document.createElement('div');
+    _themeOverlay.id = 'theme-ripple';
+    document.body.appendChild(_themeOverlay);
+
     function toggleTheme() {
       const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-      localStorage.setItem('theme', next);
-      applyTheme(next);
+
+      // Respect prefers-reduced-motion — skip animation
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        localStorage.setItem('theme', next);
+        applyTheme(next);
+        return;
+      }
+
+      // Position ripple origin at the toggle button centre
+      const btn  = document.getElementById('theme-toggle');
+      const rect = btn ? btn.getBoundingClientRect() : { left: window.innerWidth - 60, top: window.innerHeight - 60, width: 0, height: 0 };
+      const ox   = rect.left + rect.width  / 2;
+      const oy   = rect.top  + rect.height / 2;
+
+      // Incoming theme background colour
+      const incomingBg = next === 'light' ? '#fdf6e3' : '#0a0e1a';
+
+      _themeOverlay.style.cssText = `
+        position: fixed; inset: 0; z-index: 99999; pointer-events: none;
+        background: ${incomingBg};
+        clip-path: circle(0px at ${ox}px ${oy}px);
+        transition: clip-path 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+      `;
+
+      // Trigger expand — rAF ensures the initial state is painted first
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const maxR = Math.ceil(Math.hypot(Math.max(ox, window.innerWidth - ox), Math.max(oy, window.innerHeight - oy)));
+          _themeOverlay.style.clipPath = `circle(${maxR}px at ${ox}px ${oy}px)`;
+        });
+      });
+
+      // Swap theme at halfway (~450ms) — user sees nothing mid-swap
+      setTimeout(() => {
+        localStorage.setItem('theme', next);
+        applyTheme(next);
+      }, 450);
+
+      // Collapse overlay back after theme is applied
+      setTimeout(() => {
+        _themeOverlay.style.transition = 'clip-path 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        _themeOverlay.style.clipPath   = `circle(0px at ${ox}px ${oy}px)`;
+      }, 800);
     }
 
     // apply saved preference on load (default: dark)
