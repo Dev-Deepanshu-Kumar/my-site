@@ -1,38 +1,89 @@
 /* ============================================================
-   LIGHT THEME — applied when <html data-theme="light">
-   All dark defaults live in style.css :root.
-   Only delta values here.
+   LIGHT THEME — warm cream palette
+   Applied when <html data-theme="light">.
+   Dark defaults live in style.css :root.
    ============================================================ */
 
 [data-theme="light"] {
-  --color-bg:           #f0f4f8;
-  --color-bg-card:      rgba(255, 255, 255, 0.85);
-  --color-border:       rgba(43, 90, 102, 0.18);
+  --color-bg:           #fdf6e3;
+  --color-bg-card:      rgba(255, 251, 240, 0.92);
+  --color-border:       rgba(160, 120, 60, 0.2);
   --color-accent:       #1a7a96;
   --color-accent-light: #0fa8c8;
-  --color-gold:         #c47f10;
-  --color-gold-light:   #e09920;
-  --color-text:         #1a2330;
-  --color-muted:        #4a6070;
-  --color-dim:          #8a9aaa;
+  --color-gold:         #b8720a;
+  --color-gold-light:   #d08810;
+  --color-text:         #2c1f0e;
+  --color-muted:        #6b5040;
+  --color-dim:          #9a8070;
 }
 
-/* ── Surfaces ── */
+/* ── Base ── */
 [data-theme="light"] body {
   background: var(--color-bg);
+  color: var(--color-text);
 }
 
+/* ── Navbar ── */
 [data-theme="light"] #navbar {
-  background: rgba(240, 244, 248, 0.92);
+  background: rgba(253, 246, 227, 0.94);
+  border-bottom-color: rgba(160, 120, 60, 0.2);
 }
-
 [data-theme="light"] #navbar.scrolled {
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 24px rgba(80, 50, 10, 0.1);
+}
+[data-theme="light"] .nav-links a {
+  color: var(--color-muted);
+}
+[data-theme="light"] .nav-links a:hover {
+  color: var(--color-text);
+}
+[data-theme="light"] #nav-drawer {
+  background: rgba(253, 246, 227, 0.98);
+  border-color: var(--color-border);
+}
+[data-theme="light"] #nav-drawer a {
+  color: var(--color-muted);
 }
 
-[data-theme="light"] #nav-drawer {
-  background: rgba(240, 244, 248, 0.98);
-  border-color: var(--color-border);
+/* ── Particles — darker tones, higher opacity so they show on cream ── */
+[data-theme="light"] #particle-canvas {
+  opacity: 0.5;
+  filter: hue-rotate(15deg) saturate(0.7) brightness(0.55);
+}
+
+/* ── Hardcoded #fff text overrides ── */
+[data-theme="light"] .highlight-title,
+[data-theme="light"] .exp-title,
+[data-theme="light"] .edu-degree,
+[data-theme="light"] .flip-back-title,
+[data-theme="light"] .rec-name,
+[data-theme="light"] .resume-title,
+[data-theme="light"] .footer-name,
+[data-theme="light"] .stat-number,
+[data-theme="light"] .section-heading,
+[data-theme="light"] .hero-name-text,
+[data-theme="light"] .skill-category-title,
+[data-theme="light"] .recog-label,
+[data-theme="light"] .exp-company:hover,
+[data-theme="light"] .story-heading {
+  color: var(--color-text);
+  -webkit-text-fill-color: var(--color-text);
+}
+
+/* hero name keeps gradient — just darken it */
+[data-theme="light"] .hero-name-text {
+  background: linear-gradient(135deg, #1a7a96, #b8720a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* section heading <span> accent colour */
+[data-theme="light"] .section-heading span {
+  background: linear-gradient(135deg, var(--color-accent-light), var(--color-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* ── Cards ── */
@@ -40,72 +91,221 @@
 [data-theme="light"] .highlight-card,
 [data-theme="light"] .stat-card,
 [data-theme="light"] .edu-card,
+[data-theme="light"] .flip-card-front,
+[data-theme="light"] .flip-card-back,
 [data-theme="light"] .soft-skill-card,
 [data-theme="light"] .rec-card,
 [data-theme="light"] .recog-card,
 [data-theme="light"] .validator-card,
-[data-theme="light"] .resume-card {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(43, 90, 102, 0.15);
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+[data-theme="light"] .resume-card,
+[data-theme="light"] .career-timer-card {
+  background: rgba(255, 251, 240, 0.95);
+  border-color: rgba(160, 120, 60, 0.18);
+  box-shadow: 0 2px 16px rgba(80, 50, 10, 0.07);
 }
 
-/* ── Particles: lighter tones ── */
-[data-theme="light"] #particle-canvas {
-  opacity: 0.35;
+[data-theme="light"] .exp-card:hover,
+[data-theme="light"] .highlight-card:hover {
+  box-shadow: 0 8px 32px rgba(80, 50, 10, 0.12);
 }
 
-/* ── Section eyebrow tag ── */
+/* ── Exp bullets ── */
+[data-theme="light"] .exp-bullets li {
+  color: var(--color-muted);
+}
+[data-theme="light"] .exp-bullets li::before {
+  color: var(--color-accent);
+}
+
+/* ── Story panel ── */
+[data-theme="light"] .story-panel {
+  background: rgba(250, 244, 228, 0.95);
+  border-color: rgba(160, 120, 60, 0.2);
+}
+[data-theme="light"] .story-beat-text {
+  color: var(--color-muted);
+}
+[data-theme="light"] .story-beat-text strong {
+  color: var(--color-text);
+}
+
+/* ── Tags ── */
+[data-theme="light"] .tag-blue {
+  background: rgba(26, 122, 150, 0.08);
+  border-color: rgba(26, 122, 150, 0.22);
+  color: #0e6a88;
+}
+[data-theme="light"] .tag-gold {
+  background: rgba(184, 114, 10, 0.08);
+  border-color: rgba(184, 114, 10, 0.22);
+  color: #8a5500;
+}
+[data-theme="light"] .tag-green {
+  background: rgba(22, 140, 100, 0.08);
+  border-color: rgba(22, 140, 100, 0.22);
+  color: #0e7a58;
+}
+
+/* ── Section eyebrow ── */
 [data-theme="light"] .section-eyebrow-tag {
   background: rgba(26, 122, 150, 0.08);
   border-color: rgba(26, 122, 150, 0.25);
   color: var(--color-accent);
 }
 
-/* ── Tags ── */
-[data-theme="light"] .tag-blue {
-  background: rgba(26, 122, 150, 0.08);
-  border-color: rgba(26, 122, 150, 0.2);
-  color: #0e6a88;
+/* ── Hero eyebrow + summary ── */
+[data-theme="light"] .hero-eyebrow {
+  color: var(--color-accent);
 }
-[data-theme="light"] .tag-gold {
-  background: rgba(196, 127, 16, 0.08);
-  border-color: rgba(196, 127, 16, 0.2);
-  color: #a06a08;
-}
-[data-theme="light"] .tag-green {
-  background: rgba(22, 140, 100, 0.08);
-  border-color: rgba(22, 140, 100, 0.2);
-  color: #0e7a58;
+[data-theme="light"] .hero-summary {
+  color: var(--color-muted);
 }
 
-/* ── Timeline dot ── */
+/* ── Contact pills ── */
+[data-theme="light"] .contact-pill {
+  background: rgba(255, 251, 240, 0.9);
+  border-color: rgba(160, 120, 60, 0.25);
+  color: var(--color-muted);
+}
+[data-theme="light"] .contact-pill:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* ── Timeline ── */
 [data-theme="light"] .timeline::before {
   background: linear-gradient(to bottom, var(--color-accent), transparent);
 }
+[data-theme="light"] .timeline-dot {
+  background: var(--color-accent);
+  border-color: var(--color-bg);
+}
+[data-theme="light"] .exp-location {
+  color: var(--color-dim);
+}
+[data-theme="light"] .exp-date-badge {
+  background: rgba(26, 122, 150, 0.08);
+  border-color: rgba(26, 122, 150, 0.2);
+  color: var(--color-accent);
+}
 
-/* ── Validator inputs ── */
+/* ── Career timer ── */
+[data-theme="light"] .career-timer-heading {
+  color: var(--color-muted);
+}
+[data-theme="light"] .timer-period-label {
+  color: var(--color-muted);
+}
+[data-theme="light"] .timer-period-value,
+[data-theme="light"] .timer-total-display {
+  color: var(--color-text);
+}
+
+/* ── Validator ── */
 [data-theme="light"] .validator-input {
-  background: #ffffff;
-  border-color: rgba(43, 90, 102, 0.25);
+  background: #fff8ee;
+  border-color: rgba(160, 120, 60, 0.3);
   color: var(--color-text);
 }
 [data-theme="light"] .validator-input::placeholder {
   color: var(--color-dim);
 }
+[data-theme="light"] .validator-label {
+  color: var(--color-muted);
+}
+[data-theme="light"] .validator-note {
+  color: var(--color-dim);
+}
 
-/* ── Recommendation carousel ── */
+/* ── Verdict colours stay semantic — only neutrals need overriding ── */
+[data-theme="light"] .verdict-banner {
+  background: rgba(255, 251, 240, 0.9);
+  border-color: rgba(160, 120, 60, 0.15);
+}
+[data-theme="light"] .score-gauge-track {
+  background: rgba(160, 120, 60, 0.12);
+}
+
+/* ── Recommendations carousel ── */
 [data-theme="light"] .rec-card {
-  background: #ffffff;
+  background: #fff8ee;
+}
+[data-theme="light"] .rec-body,
+[data-theme="light"] .rec-role,
+[data-theme="light"] .rec-context {
+  color: var(--color-muted);
+}
+
+/* ── Education flip card back ── */
+[data-theme="light"] .flip-card-back {
+  background: rgba(26, 122, 150, 0.9);
+}
+[data-theme="light"] .flip-back-title,
+[data-theme="light"] .flip-back-body,
+[data-theme="light"] .flip-back-close {
+  color: #fff;
+}
+
+/* ── Resume section ── */
+[data-theme="light"] .resume-subtitle,
+[data-theme="light"] .resume-tag {
+  color: var(--color-muted);
+}
+[data-theme="light"] .resume-tag {
+  background: rgba(160, 120, 60, 0.08);
+  border-color: rgba(160, 120, 60, 0.2);
+}
+
+/* ── Recognitions ── */
+[data-theme="light"] .recog-quote {
+  color: var(--color-muted);
+}
+[data-theme="light"] .recog-by {
+  color: var(--color-dim);
+}
+[data-theme="light"] .awards-strip-heading {
+  color: var(--color-dim);
+}
+[data-theme="light"] .proof-btn {
+  border-color: rgba(160, 120, 60, 0.3);
+  color: var(--color-dim);
+}
+[data-theme="light"] .proof-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: rgba(26, 122, 150, 0.05);
+}
+
+/* ── Award thumbnails ── */
+[data-theme="light"] .award-thumb img {
+  background: #f5efe0;
+  border-color: rgba(160, 120, 60, 0.2);
 }
 
 /* ── Footer ── */
 [data-theme="light"] #site-footer {
-  background: rgba(220, 228, 236, 0.6);
-  border-color: var(--color-border);
+  background: rgba(245, 236, 210, 0.8);
+  border-top-color: rgba(160, 120, 60, 0.2);
+  color: var(--color-muted);
+}
+[data-theme="light"] #site-footer a {
+  color: var(--color-accent);
 }
 
-/* ── Theme toggle — fixed bottom-right pill ── */
+/* ── Soft skills proof link ── */
+[data-theme="light"] .soft-skill-proof {
+  color: var(--color-dim);
+  border-color: rgba(160, 120, 60, 0.3);
+}
+
+/* ── Theme toggle widget itself ── */
+[data-theme="light"] #theme-toggle {
+  background: rgba(255, 251, 240, 0.95);
+  border-color: rgba(160, 120, 60, 0.3);
+  box-shadow: 0 4px 20px rgba(80, 50, 10, 0.12);
+}
+
+/* ── Theme toggle button — fixed bottom-right pill ── */
 #theme-toggle {
   position: fixed;
   bottom: 28px;
@@ -134,6 +334,11 @@
   transform: translateY(-2px);
 }
 
+#theme-toggle:focus-visible {
+  outline: 2px solid var(--color-accent-light);
+  outline-offset: 2px;
+}
+
 /* track */
 #theme-toggle .toggle-track {
   position: relative;
@@ -147,8 +352,8 @@
 }
 
 [data-theme="light"] #theme-toggle .toggle-track {
-  background: rgba(196, 127, 16, 0.2);
-  border-color: rgba(196, 127, 16, 0.3);
+  background: rgba(184, 114, 10, 0.2);
+  border-color: rgba(184, 114, 10, 0.3);
 }
 
 /* thumb */
@@ -180,7 +385,6 @@
 
 #theme-toggle:hover .toggle-label { color: var(--color-text); }
 
-/* icon — changes via JS, not CSS content trick, for emoji compat */
 #theme-toggle .toggle-icon {
   font-size: 13px;
   line-height: 1;
