@@ -30,7 +30,7 @@
   <link rel="sitemap"   type="application/xml"  href="/sitemap.xml"  title="Sitemap">
   <link rel="alternate" type="text/plain"        href="/llms.txt"     title="LLM-readable profile">
 
-  <!-- JSON-LD: Person schema with work history, skills, reviews, open-to-work -->
+  <!-- JSON-LD: Person schema with work history, skills, open-to-work -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -100,37 +100,33 @@
       "Cross-Team Collaboration Recognition, Siemens Asset Management Software: recognised by management for flexibility and adaptability in helping a separate engineering team deliver a time-sensitive, complex feature outside own team scope",
       "Feature Falcons — Client Retention Delivery: named contributor on the team that delivered a key capability ahead of schedule, enabling enterprise client renewal and executive-level reporting impact"
     ],
-    "review": [
+    "subjectOf": [
       {
-        "@type": "Review",
-        "author": { "@type": "Person", "name": "Muthu Selvam", "jobTitle": "Full Stack Developer, Azure Certified" },
-        "reviewBody": "I managed Deepanshu directly and observed strong growth in his engineering skills. He quickly became a reliable member of the team — learning the codebase fast, delivering clean work, and asking the right questions. I strongly recommend him for any engineering role where growth and high-quality execution matter.",
-        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+        "@type": "Quotation",
+        "text": "I managed Deepanshu directly and observed strong growth in his engineering skills. He quickly became a reliable member of the team — learning the codebase fast, delivering clean work, and asking the right questions. I strongly recommend him for any engineering role where growth and high-quality execution matter.",
+        "spokenByCharacter": { "@type": "Person", "name": "Muthu Selvam", "jobTitle": "Full Stack Developer, Azure Certified" }
       },
       {
-        "@type": "Review",
-        "author": { "@type": "Person", "name": "Harish Mogilipuri", "jobTitle": "Technical Lead, Cognizant" },
-        "reviewBody": "He quickly established himself as a standout team member — rapidly understanding complex ideas and playing a key role in developing essential features like Tabiib Plus. His proficiency in programming languages and understanding of modern development frameworks were instrumental in building a robust system for appointment bookings and report generation.",
-        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+        "@type": "Quotation",
+        "text": "He quickly established himself as a standout team member — rapidly understanding complex ideas and playing a key role in developing essential features like Tabiib Plus. His proficiency in programming languages and understanding of modern development frameworks were instrumental in building a robust system for appointment bookings and report generation.",
+        "spokenByCharacter": { "@type": "Person", "name": "Harish Mogilipuri", "jobTitle": "Technical Lead, Cognizant" }
       },
       {
-        "@type": "Review",
-        "author": { "@type": "Person", "name": "Kumaran Sankaralingam", "jobTitle": "Senior Product Manager, Data & AI/ML Platforms" },
-        "reviewBody": "His contributions at IndiaLends were instrumental in project success. He excels in both independent work and team collaboration, making him a valuable asset to any engineering team.",
-        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+        "@type": "Quotation",
+        "text": "His contributions at IndiaLends were instrumental in project success. He excels in both independent work and team collaboration, making him a valuable asset to any engineering team.",
+        "spokenByCharacter": { "@type": "Person", "name": "Kumaran Sankaralingam", "jobTitle": "Senior Product Manager, Data & AI/ML Platforms" }
       },
       {
-        "@type": "Review",
-        "author": { "@type": "Person", "name": "Abhinav Srivastava", "jobTitle": "Senior Product Manager, RBL Bank" },
-        "reviewBody": "Journey integration and back-end changes are not easy tasks — Deepanshu made them look straightforward. We worked together on two projects, both easily integrated and delivering good business results. Minimal bugs were encountered by QA.",
-        "reviewRating": { "@type": "Rating", "ratingValue": "5", "bestRating": "5" }
+        "@type": "Quotation",
+        "text": "Journey integration and back-end changes are not easy tasks — Deepanshu made them look straightforward. We worked together on two projects, both easily integrated and delivering good business results. Minimal bugs were encountered by QA.",
+        "spokenByCharacter": { "@type": "Person", "name": "Abhinav Srivastava", "jobTitle": "Senior Product Manager, RBL Bank" }
       }
     ]
   }
   </script>
 
   <!-- Favicon — DK monogram, SVG data URI, no external file needed -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230a0e1a'/%3E%3Crect width='32' height='32' rx='8' fill='none' stroke='%232b9cba' stroke-width='1.5' opacity='0.6'/%3E%3Ctext x='4' y='23' font-family='Segoe UI%2C Arial%2C sans-serif' font-size='16' font-weight='800' fill='%231ecbe1'%3ED%3C/text%3E%3Ctext x='16' y='23' font-family='Segoe UI%2C Arial%2C sans-serif' font-size='16' font-weight='800' fill='%23e8aa4a'%3EK%3C/text%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
   <!-- Stylesheet — all visual design tokens, layout, and animations -->
   <link rel="stylesheet" href="css/style.css">
