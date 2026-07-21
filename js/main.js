@@ -123,6 +123,7 @@
   'C# · .NET · ASP.NET Core',
   'Enterprise SaaS · 5+ Years',
   'Backend Engineer · Problem Solver',
+  'Backend Engineer • .NET • Refactoring Yesterday, Building Tomorrow',
   'Enterprise Software · Real Users',
   'REST APIs · Microservices',
   'API-first Development',
