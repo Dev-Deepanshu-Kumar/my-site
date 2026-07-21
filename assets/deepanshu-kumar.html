@@ -385,13 +385,17 @@
     li.li-key { list-style: square; margin-left: -4px; margin-top: 3px; }
     li.li-key::marker { font-size: 11pt; }
 
-    /* ── Single column in print — eliminates column-break word-space drops ──
-       columns:2 / columns:3 cause Chrome to lose the space glyph when a word
-       breaks at a column boundary (e.g. "EntityFramework" → "Entity\nFramework"
-       extracts as "EntityFramework"). Single column = no breaks = clean spaces. */
-    .skills-grid,
-    .areas-grid,
-    .items-row { columns: 1; }
+    /* ── Column layout in print ────────────────────────────────────────────
+       .skills-grid stays columns:2 — reverting to 1-col added 4 extra rows
+       and pushed the last Siemens bullet to page 2. Within-column line-wrap
+       spaces (EntityFramework, REST APIs,Azure) are a cheap-parser artifact;
+       real ATS tools handle end-of-line spaces correctly.
+
+       .items-row (soft skills, 3-col) collapses to 1-col — only 6 items,
+       no layout impact, and fixes column-boundary merges like
+       "AdaptabilityConsistent Delivery". */
+    .items-row  { columns: 1; }
+    .areas-grid { columns: 1; }
 
     /* ── Print density ── */
     .page            { max-width: 100%; margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
