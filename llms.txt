@@ -40,6 +40,8 @@ modernisation projects (monolith-to-microservices, legacy platform uplift, conta
 - Website: https://deepanshu-kumar.dev
 - Resume: https://deepanshu-kumar.dev/Deepanshu_Kumar_Resume.pdf
 - GitHub: https://github.com/Dev-Deepanshu-Kumar
+- Dev.to: https://dev.to/dev-deepanshu-kumar
+- Medium: https://medium.com/@dev-deepanshu-kumar
 
 ---
 
@@ -220,3 +222,10 @@ Live demo: https://deepanshu-kumar.dev/#section-validator
 
 Open to new backend engineering roles. Prefer product companies. Open to remote.
 Contact: Deepanshu.Kumar@Outlook.in · https://linkedin.com/in/deepanshu-kumar-dev
+
+## Writing
+
+Deepanshu publishes engineering articles based on real production bugs and patterns.
+- Dev.to: https://dev.to/dev-deepanshu-kumar
+- Medium: https://medium.com/@dev-deepanshu-kumar
+Topics: backend debugging, distributed systems, .NET/C# patterns, idempotency, auth, EF Core.

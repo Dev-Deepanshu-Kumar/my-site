@@ -2,13 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://deepanshu-kumar.dev/</loc>
-    <lastmod>2026-07-20</lastmod>
+    <lastmod>2026-07-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://deepanshu-kumar.dev/assets/deepanshu-kumar.html</loc>
-    <lastmod>2026-07-20</lastmod>
+    <lastmod>2026-07-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -19,3 +19,11 @@
     <priority>0.1</priority>
   </url>
 </urlset>
+
+<!--
+  External profiles — not sitemap entries (must be own domain) but
+  tracked here for reference alongside the canonical URLs above.
+
+  Dev.to:  https://dev.to/dev-deepanshu-kumar
+  Medium:  https://medium.com/@dev-deepanshu-kumar
+-->
