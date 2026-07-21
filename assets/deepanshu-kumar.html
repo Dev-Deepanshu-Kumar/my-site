@@ -400,9 +400,19 @@
        anchor hrefs *after* all positioned descendants — putting contact links
        mid-document in the PDF text stream. Collapse to static: no stacking
        context, links serialize in DOM order (right after header text).
-       .corner-accent is display:none in print so position:static is safe. */
+       .corner-accent is display:none in print so position:static is safe.
+
+       Full list of offenders — every position:relative creates a stacking context;
+       Chrome PDF serializes ALL positioned elements after non-positioned siblings:
+         header      → contact links appear mid-document
+         li.li-key   → key bullets appear after regular bullets in same list
+         .area-item  → soft skill items appear after Education/Courses section
+
+       All ::before pseudo-elements are already content:""/display:none in print,
+       so position:relative is only needed to anchor them — safe to drop.         */
     header      { position: static; }
-    .role-block { position: static; }   /* same issue: border-left + bullets w/ links */
+    li.li-key   { position: static; }   /* ::before already display:none in print */
+    .area-item  { position: static; }   /* ::before already content:"" in print   */
   }
 </style>
 </head>
