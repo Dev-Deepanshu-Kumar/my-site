@@ -32,332 +32,377 @@
 }
 </script>
 <style>
+  /*
+   * ── CSS Layer Architecture ────────────────────────────────────────────────────
+   *
+   *  Why layers matter for PDF parsing:
+   *  All purely decorative rules live in @layer decorative. The @media print block
+   *  below can then wipe them with simple content:"" overrides — no hunting through
+   *  interleaved rules. Result: the PDF text stream contains only real resume content,
+   *  not stray Unicode glyphs (◆ ▸) that confuse ATS parsers.
+   *
+   *  Layer priority (later = higher cascade weight):
+   *    reset < theme < decorative < layout < components
+   *
+   *  @media screen / @media print are CONDITIONS applied after layer resolution —
+   *  they live outside @layer and always beat unlayered rules.
+   *
+   *  Requires Chrome 99+ / Firefox 97+ / Safari 15.4+ (caniuse: ~97%).
+   * ─────────────────────────────────────────────────────────────────────────────
+   */
+  @layer reset, theme, decorative, layout, components;
+
+  /* @page is a page-context descriptor — outside the layer cascade per spec */
   @page { size: A4; margin: 12mm 6mm; }
 
-  :root{
-    --ink:#1C2B33;
-    --slate:#4B5C64;
-    --accent:#2B5A66;
-    --accent-deep:#1C3E47;
-    --gold:#A5793B;
-    --rule:#D9DFE0;
-    --paper:#FFFFFF;
+
+  /* ═══════════════════════════ LAYER: reset ══════════════════════════════════ */
+  @layer reset {
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0; padding: 0;
+      color: var(--ink);
+      font-family: Arial, Helvetica, "Segoe UI", sans-serif;
+      font-size: 9.7pt;
+      line-height: 1.30;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
   }
 
-  * { box-sizing: border-box; }
 
-  html, body {
-    margin: 0; padding: 0;
-    color: var(--ink);
-    font-family: Arial, Helvetica, "Segoe UI", sans-serif;
-    font-size: 9.7pt;
-    line-height: 1.30;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+  /* ═══════════════════════════ LAYER: theme ══════════════════════════════════ */
+  @layer theme {
+    :root {
+      --ink:#1C2B33;
+      --slate:#4B5C64;
+      --accent:#2B5A66;
+      --accent-deep:#1C3E47;
+      --gold:#A5793B;
+      --rule:#D9DFE0;
+      --paper:#FFFFFF;
+    }
   }
 
-  /* ---- Page card: gradient blooms — explicit rgba(x,x,x,0) not 'transparent'
-     avoids PDF banding bug in Windows Print to PDF / Chrome Save as PDF ---- */
-  .page {
-    max-width: 7.55in;
-    margin: 0 auto;
-    background-color: #ffffff;
-    background-image:
-      radial-gradient(ellipse at 4% 6%,   rgba(43,90,102,0.07)  0%, rgba(43,90,102,0)   42%),
-      radial-gradient(ellipse at 96% 4%,  rgba(165,121,59,0.06) 0%, rgba(165,121,59,0)  38%),
-      radial-gradient(ellipse at 2% 54%,  rgba(95,155,115,0.05) 0%, rgba(95,155,115,0)  36%),
-      radial-gradient(ellipse at 98% 58%, rgba(138,122,188,0.05)0%, rgba(138,122,188,0) 36%),
-      radial-gradient(ellipse at 52% 98%, rgba(43,90,102,0.04)  0%, rgba(43,90,102,0)   44%);
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+
+  /* ═══════════════════════════ LAYER: decorative ═════════════════════════════
+   *  Everything here is purely visual chrome. Suppressed wholesale in @media
+   *  print so nothing leaks into the PDF text layer.
+   * ════════════════════════════════════════════════════════════════════════════ */
+  @layer decorative {
+
+    /* ── Page card gradient blooms ──────────────────────────────────────────
+       Explicit rgba(x,x,x,0) not 'transparent' — avoids PDF banding bug in
+       Windows Print to PDF / Chrome Save as PDF.                            */
+    .page {
+      background-color: #ffffff;
+      background-image:
+        radial-gradient(ellipse at 4% 6%,   rgba(43,90,102,0.07)  0%, rgba(43,90,102,0)   42%),
+        radial-gradient(ellipse at 96% 4%,  rgba(165,121,59,0.06) 0%, rgba(165,121,59,0)  38%),
+        radial-gradient(ellipse at 2% 54%,  rgba(95,155,115,0.05) 0%, rgba(95,155,115,0)  36%),
+        radial-gradient(ellipse at 98% 58%, rgba(138,122,188,0.05)0%, rgba(138,122,188,0) 36%),
+        radial-gradient(ellipse at 52% 98%, rgba(43,90,102,0.04)  0%, rgba(43,90,102,0)   44%);
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* ── Corner accent triangle ─────────────────────────────────────────── */
+    .corner-accent {
+      position: absolute;
+      top: 0; right: 0;
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 0 72px 95px 0;
+      border-color: transparent var(--accent-deep) transparent transparent;
+      opacity: 0.30;
+    }
+
+    /* ── Animated blob background ───────────────────────────────────────── */
+    .bg-blobs {
+      position: fixed; inset: 0; z-index: -1;
+      pointer-events: none; overflow: hidden;
+      background: #EAF4F4;
+    }
+    .blob { position: absolute; border-radius: 50%; filter: blur(80px); }
+
+    /* teal */
+    .b1 { width:500px; height:400px; top:-130px; left:-90px;
+          background: radial-gradient(circle at 50% 50%, rgba(43,90,102,0.28) 0%, transparent 68%);
+          animation: blobDrift1 38s ease-in-out infinite; }
+    /* amber-gold */
+    .b2 { width:420px; height:340px; top:4%; right:-70px;
+          background: radial-gradient(circle at 50% 50%, rgba(165,121,59,0.20) 0%, transparent 68%);
+          animation: blobDrift2 46s ease-in-out infinite; }
+    /* sage-green */
+    .b3 { width:380px; height:460px; bottom:8%; left:-60px;
+          background: radial-gradient(circle at 50% 50%, rgba(95,155,115,0.19) 0%, transparent 68%);
+          animation: blobDrift3 54s ease-in-out infinite; }
+    /* lavender */
+    .b4 { width:440px; height:310px; bottom:4%; right:-90px;
+          background: radial-gradient(circle at 50% 50%, rgba(138,122,188,0.16) 0%, transparent 68%);
+          animation: blobDrift4 42s ease-in-out infinite; }
+    /* rose */
+    .b5 { width:350px; height:370px; top:38%; left:32%;
+          background: radial-gradient(circle at 50% 50%, rgba(198,122,122,0.15) 0%, transparent 68%);
+          animation: blobDrift5 62s ease-in-out infinite; }
+
+    @keyframes blobDrift1 {
+      0%   { transform: translate(0,0)          scale(1);    }
+      30%  { transform: translate(170px,210px)  scale(1.13); }
+      62%  { transform: translate(80px,420px)   scale(0.91); }
+      100% { transform: translate(0,0)          scale(1);    }
+    }
+    @keyframes blobDrift2 {
+      0%   { transform: translate(0,0)           scale(1);    }
+      35%  { transform: translate(-210px,190px)  scale(1.09); }
+      68%  { transform: translate(-110px,370px)  scale(0.93); }
+      100% { transform: translate(0,0)           scale(1);    }
+    }
+    @keyframes blobDrift3 {
+      0%   { transform: translate(0,0)           scale(1);    }
+      38%  { transform: translate(230px,-160px)  scale(1.11); }
+      72%  { transform: translate(100px,-300px)  scale(0.95); }
+      100% { transform: translate(0,0)           scale(1);    }
+    }
+    @keyframes blobDrift4 {
+      0%   { transform: translate(0,0)            scale(1);    }
+      32%  { transform: translate(-190px,-130px)  scale(1.07); }
+      70%  { transform: translate(-70px,-270px)   scale(0.91); }
+      100% { transform: translate(0,0)            scale(1);    }
+    }
+    @keyframes blobDrift5 {
+      0%   { transform: translate(0,0)            scale(1);    }
+      25%  { transform: translate(110px,-210px)   scale(1.16); }
+      52%  { transform: translate(-160px,-100px)  scale(0.87); }
+      76%  { transform: translate(-90px,160px)    scale(1.09); }
+      100% { transform: translate(0,0)            scale(1);    }
+    }
+
+    /* ── Decorative list markers ─────────────────────────────────────────
+       These live here (not in layout/components) so the @media print block
+       can strip them with a single targeted override, keeping the PDF text
+       stream free of ◆ and ▸ glyphs that confuse ATS parsers.            */
+    li.li-key::before {
+      content: "\25C6";   /* ◆ */
+      color: var(--gold);
+      position: absolute; left: -13px; top: 0.5px;
+      font-size: 10.5pt; line-height: 1;
+    }
+    .area-item::before {
+      content: "\25B8";   /* ▸ */
+      color: var(--gold);
+      position: absolute; left: 0; top: 0;
+    }
+    ul.bullets li::marker { color: var(--accent); }
   }
 
+
+  /* ═══════════════════════════ LAYER: layout ═════════════════════════════════ */
+  @layer layout {
+
+    .page { max-width: 7.55in; margin: 0 auto; }
+
+    /* ---------- Header ---------- */
+    header {
+      border-bottom: 2.5px solid var(--accent-deep);
+      padding-bottom: 7px; margin-bottom: 9px;
+      position: relative;
+    }
+
+    /* ---------- Highlight panel ---------- */
+    .highlight-panel {
+      border: 1px solid #C8E1E1;
+      border-radius: 6px;
+      padding: 8px 12px 6px 12px;
+      margin: 10px 0;
+    }
+    .highlight-panel .section { border-bottom-color: #C3DEDE; }
+
+    /* ---------- Section headings ---------- */
+    h2.section {
+      margin: 11px 0 4px 0;
+      padding-bottom: 2px;
+      border-bottom: 1px solid var(--rule);
+      break-after: avoid; break-inside: avoid;
+    }
+
+    /* ---------- Body text ---------- */
+    p.body-text { margin: 2px 0 4px 0; orphans: 3; widows: 3; }
+
+    /* ---------- Skills grid ---------- */
+    .skills-grid { columns: 2; column-gap: 20px; }
+    .skill-row   { break-inside: avoid; margin-bottom: 3px; }
+
+    /* ---------- Education ---------- */
+    .edu-row {
+      display: flex; justify-content: space-between; align-items: baseline;
+      margin-top: 4px; break-inside: avoid;
+    }
+
+    /* ---------- Experience ---------- */
+    .role-block  { border-left: 2.5px solid var(--accent); padding-left: 11px; margin: 7px 0 2px 0; }
+    /* break-inside + break-after together: Chrome won't orphan the role header
+       from its meta line, AND won't start a page-break inside that intro block. */
+    .role-intro  { break-after: avoid; break-inside: avoid; }
+    .role-header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; }
+
+    /* ---------- Bullets ---------- */
+    ul.bullets   { margin: 0 0 2px 0; padding-left: 14px; }
+    ul.bullets li {
+      margin-bottom: 2.5px; padding-left: 2px;
+      break-inside: avoid; page-break-inside: avoid;
+      orphans: 3; widows: 3;
+    }
+    /* li-key = key achievement bullet.
+       - Screen: ◆ glyph from ::before (decorative layer)
+       - Print/PDF: glyph stripped; distinction via ::marker only — text stays normal weight */
+    li.li-key { list-style: none; position: relative; padding-left: 6px; }
+
+    /* ---------- Soft skills / areas ---------- */
+    .areas-grid  { columns: 2; column-gap: 20px; }
+    .area-item   { padding-left: 12px; position: relative; break-inside: avoid; margin-bottom: 3px; }
+    .items-row   { columns: 3; column-gap: 18px; }
+
+    /* ---------- Footer ---------- */
+    footer.print-note { text-align: center; margin-top: 14px; }
+  }
+
+
+  /* ═══════════════════════════ LAYER: components ════════════════════════════ */
+  @layer components {
+
+    h1.name {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 27pt; font-weight: 700;
+      letter-spacing: 0.5px; color: var(--accent-deep);
+      margin: 0 0 2px 0;
+    }
+    .title-line {
+      font-size: 10.5pt; color: var(--gold);
+      font-weight: bold; letter-spacing: 0.3px;
+      margin-bottom: 4px;
+    }
+    .skills-line {
+      font-size: 8.3pt; color: var(--slate);
+      font-style: italic; margin-bottom: 4px;
+    }
+    .contact-line         { font-size: 8.3pt; color: var(--ink); }
+    .contact-line span.sep { color: var(--rule); margin: 0 5px; }
+    .contact-line a        { white-space: nowrap; }
+
+    h2.section {
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 13pt; color: var(--accent-deep);
+      letter-spacing: 0.6px;
+    }
+
+    p.body-text { color: var(--ink); }
+
+    .skill-row   { font-size: 9pt; }
+    .skill-label { font-weight: bold; color: var(--accent); }
+
+    .edu-degree { font-weight: bold; font-size: 9.6pt; }
+    .edu-meta   { font-size: 8.6pt; color: var(--slate); font-style: italic; }
+    .edu-date   { font-size: 8.6pt; color: var(--accent); font-weight: bold; white-space: nowrap; }
+
+    .role-title    { font-weight: bold; font-size: 10.4pt; color: var(--ink); }
+    .role-date     { font-weight: bold; font-size: 8.6pt; color: var(--gold); white-space: nowrap; }
+    /* Division sits on its own line — distinct from role title and org meta.
+       Keeps "Asset Management Software" as a parseable standalone token. */
+    .role-division { font-weight: bold; font-size: 9pt; color: var(--accent); margin: 1px 0 1px 0; }
+    .role-meta     { font-size: 8.6pt; color: var(--slate); font-style: italic; margin: 1px 0 3px 0; }
+    .role-desc     { font-size: 9pt; margin: 1px 0 3px 0; }
+    /* Grade badge — inline highlight inside .edu-date column */
+    .edu-grade     { display: inline-block; font-size: 7.5pt; font-weight: bold;
+                     color: var(--gold); border: 1px solid var(--gold);
+                     border-radius: 3px; padding: 0 4px; margin-left: 4px;
+                     vertical-align: middle; letter-spacing: 0.2px; }
+
+    ul.bullets li { font-size: 9pt; }
+
+    .highlight-panel { background: linear-gradient(120deg, #D9EDED 0%, #EEF7F7 55%, #FAFDFD 100%); }
+
+    .areas-line         { font-size: 9pt; color: var(--ink); }
+    .areas-line .divider { color: var(--gold); margin: 0 6px; }
+    .area-item          { font-size: 9pt; color: var(--ink); }
+
+    footer.print-note { font-size: 8pt; color: var(--slate); }
+  }
+
+
+  /* ═══════════════════════════ Screen overrides ══════════════════════════════
+   *  Outside @layer — conditions beat all layered rules.
+   * ════════════════════════════════════════════════════════════════════════════ */
   @media screen {
     html, body { background: #EAF4F4; min-height: 100vh; }
     .page {
       box-shadow: 0 4px 32px rgba(28,62,71,0.14), 0 1px 6px rgba(28,62,71,0.07);
-      border-radius: 3px;
-      padding: 8mm 9mm;
+      border-radius: 3px; padding: 8mm 9mm;
       margin: 28px auto 40px auto;
     }
   }
+
+
+  /* ═══════════════════════════ Print overrides — PDF text-layer hygiene ═══════
+   *
+   *  The PDF text stream (what ATS parsers and copy-paste extract) is determined
+   *  by the DOM + what the renderer actually paints as glyphs. Key risks:
+   *
+   *    1. ::before pseudo-elements with Unicode content (◆ \25C6, ▸ \25B8)
+   *       → ATS sees "◆Contributing to modernisation..." — parser noise.
+   *       Fix: content:"" + display:none removes them from the glyph stream.
+   *
+   *    2. Absolutely positioned decorative divs (.corner-accent, .bg-blobs)
+   *       → Even empty, they can create stacking context artifacts in some
+   *         PDF engines. Suppress entirely.
+   *
+   *    3. CSS multi-column (.skills-grid columns:2, .items-row columns:3)
+   *       → Chrome PDF follows DOM order (column 1 top→bottom, then column 2),
+   *         which matches the visual left→right reading of short skill labels.
+   *         No fix needed — DOM order is already semantically correct.
+   *
+   * ════════════════════════════════════════════════════════════════════════════ */
   @media print {
     html, body { background: none; font-size: 85%; line-height: 1.25; }
-    .bg-blobs { display: none !important; }
-    .page { max-width: 100%; margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
-    ul.bullets li { margin-bottom: 1.5px; }
-    .role-block { margin: 4px 0 1px 0; }
-    h2.section { margin: 8px 0 3px 0; }
+
+    /* ── Suppress entire decorative layer from PDF text stream ── */
+    .bg-blobs      { display: none !important; }
+    .corner-accent { display: none; }
+
+    /* Strip Unicode decoration glyphs — they appear verbatim in PDF text layer. */
+    li.li-key::before  { content: ""; display: none; }  /* ◆ → gone */
+    .area-item::before { content: ""; }                  /* ▸ → gone */
+
+    /* Optical trick — hanging outdent + breathing room.
+       All bullets share a consistent left text edge. li-key's ■ marker is
+       nudged 4px into the left margin, breaking that edge. The eye catches
+       any protrusion past a column edge involuntarily — no colour needed.
+       Small margin-top adds a visual "beat" that signals importance.        */
+    li.li-key { list-style: square; margin-left: -4px; margin-top: 3px; }
+    li.li-key::marker { font-size: 11pt; }
+
+    /* ── Print density ── */
+    .page            { max-width: 100%; margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
+    ul.bullets li    { margin-bottom: 1.5px; }
+    .role-block      { margin: 4px 0 1px 0; }
+    h2.section       { margin: 8px 0 3px 0; }
     .highlight-panel { margin: 7px 0; padding: 6px 10px 4px 10px; }
-    p.body-text { margin: 1px 0 3px 0; }
-  }
-
-  /* ---- Blob background ---- */
-  .bg-blobs {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    pointer-events: none;
-    overflow: hidden;
-    background: #EAF4F4;
-  }
-  .blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-  }
-  /* teal */
-  .b1 {
-    width: 500px; height: 400px;
-    background: radial-gradient(circle at 50% 50%, rgba(43,90,102,0.28) 0%, transparent 68%);
-    top: -130px; left: -90px;
-    animation: blobDrift1 38s ease-in-out infinite;
-  }
-  /* amber-gold */
-  .b2 {
-    width: 420px; height: 340px;
-    background: radial-gradient(circle at 50% 50%, rgba(165,121,59,0.20) 0%, transparent 68%);
-    top: 4%; right: -70px;
-    animation: blobDrift2 46s ease-in-out infinite;
-  }
-  /* sage-green */
-  .b3 {
-    width: 380px; height: 460px;
-    background: radial-gradient(circle at 50% 50%, rgba(95,155,115,0.19) 0%, transparent 68%);
-    bottom: 8%; left: -60px;
-    animation: blobDrift3 54s ease-in-out infinite;
-  }
-  /* lavender */
-  .b4 {
-    width: 440px; height: 310px;
-    background: radial-gradient(circle at 50% 50%, rgba(138,122,188,0.16) 0%, transparent 68%);
-    bottom: 4%; right: -90px;
-    animation: blobDrift4 42s ease-in-out infinite;
-  }
-  /* rose */
-  .b5 {
-    width: 350px; height: 370px;
-    background: radial-gradient(circle at 50% 50%, rgba(198,122,122,0.15) 0%, transparent 68%);
-    top: 38%; left: 32%;
-    animation: blobDrift5 62s ease-in-out infinite;
-  }
-
-  @keyframes blobDrift1 {
-    0%   { transform: translate(0,0)      scale(1); }
-    30%  { transform: translate(170px,210px)  scale(1.13); }
-    62%  { transform: translate(80px,420px)   scale(0.91); }
-    100% { transform: translate(0,0)      scale(1); }
-  }
-  @keyframes blobDrift2 {
-    0%   { transform: translate(0,0)       scale(1); }
-    35%  { transform: translate(-210px,190px)  scale(1.09); }
-    68%  { transform: translate(-110px,370px)  scale(0.93); }
-    100% { transform: translate(0,0)       scale(1); }
-  }
-  @keyframes blobDrift3 {
-    0%   { transform: translate(0,0)       scale(1); }
-    38%  { transform: translate(230px,-160px)  scale(1.11); }
-    72%  { transform: translate(100px,-300px)  scale(0.95); }
-    100% { transform: translate(0,0)       scale(1); }
-  }
-  @keyframes blobDrift4 {
-    0%   { transform: translate(0,0)       scale(1); }
-    32%  { transform: translate(-190px,-130px) scale(1.07); }
-    70%  { transform: translate(-70px,-270px)  scale(0.91); }
-    100% { transform: translate(0,0)       scale(1); }
-  }
-  @keyframes blobDrift5 {
-    0%   { transform: translate(0,0)        scale(1); }
-    25%  { transform: translate(110px,-210px)  scale(1.16); }
-    52%  { transform: translate(-160px,-100px) scale(0.87); }
-    76%  { transform: translate(-90px,160px)   scale(1.09); }
-    100% { transform: translate(0,0)        scale(1); }
-  }
-
-  /* ---------- Header ---------- */
-  header {
-    border-bottom: 2.5px solid var(--accent-deep);
-    padding-bottom: 7px;
-    margin-bottom: 9px;
-    position: relative;
-  }
-  .corner-accent {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 0 72px 95px 0;
-    border-color: transparent var(--accent-deep) transparent transparent;
-    opacity: 0.30;
-  }
-
-  .highlight-panel {
-    background: linear-gradient(120deg, #D9EDED 0%, #EEF7F7 55%, #FAFDFD 100%);
-    border: 1px solid #C8E1E1;
-    border-radius: 6px;
-    padding: 8px 12px 6px 12px;
-    margin: 10px 0;
-  }
-  .highlight-panel .section {
-    border-bottom-color: #C3DEDE;
-  }
-
-  li.li-key {
-    list-style: none;
-    position: relative;
-    padding-left: 6px;
-  }
-  li.li-key::before {
-    content: "\25C6";
-    color: var(--gold);
-    position: absolute;
-    left: -13px;
-    top: 0.5px;
-    font-size: 10.5pt;
-    line-height: 1;
-  }
-  h1.name {
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 27pt;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    color: var(--accent-deep);
-    margin: 0 0 2px 0;
-  }
-  .title-line {
-    font-size: 10.5pt;
-    color: var(--gold);
-    font-weight: bold;
-    letter-spacing: 0.3px;
-    margin-bottom: 4px;
-  }
-  .skills-line {
-    font-size: 8.3pt;
-    color: var(--slate);
-    font-style: italic;
-    margin-bottom: 4px;
-  }
-  .contact-line {
-    font-size: 8.3pt;
-    color: var(--ink);
-  }
-  .contact-line span.sep { color: var(--rule); margin: 0 5px; }
-  .contact-line a { white-space: nowrap; }
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-
-  /* ---------- Section headings ---------- */
-  h2.section {
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 13pt;
-    color: var(--accent-deep);
-    letter-spacing: 0.6px;
-    margin: 11px 0 4px 0;
-    padding-bottom: 2px;
-    border-bottom: 1px solid var(--rule);
-    break-after: avoid;
-    break-inside: avoid;
-  }
-
-  p.body-text { margin: 2px 0 4px 0; color: var(--ink); orphans: 3; widows: 3; }
-
-  /* ---------- Skills grid ---------- */
-  .skills-grid {
-    columns: 2;
-    column-gap: 20px;
-  }
-  .skill-row {
-    font-size: 9pt;
-    break-inside: avoid;
-    margin-bottom: 3px;
-  }
-  .skill-label {
-    font-weight: bold;
-    color: var(--accent);
-  }
-
-  /* ---------- Education ---------- */
-  .edu-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-top: 4px;
-    break-inside: avoid;
-  }
-  .edu-degree { font-weight: bold; font-size: 9.6pt; }
-  .edu-meta { font-size: 8.6pt; color: var(--slate); font-style: italic; }
-  .edu-date { font-size: 8.6pt; color: var(--accent); font-weight: bold; white-space: nowrap; }
-
-  /* ---------- Experience ---------- */
-  .role-block {
-    border-left: 2.5px solid var(--accent);
-    padding-left: 11px;
-    margin: 7px 0 2px 0;
-  }
-  .role-intro {
-    break-after: avoid;
-  }
-  .role-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    flex-wrap: wrap;
-  }
-  .role-title { font-weight: bold; font-size: 10.4pt; color: var(--ink); }
-  .role-date { font-weight: bold; font-size: 8.6pt; color: var(--gold); white-space: nowrap; }
-  .role-meta { font-size: 8.6pt; color: var(--slate); font-style: italic; margin: 1px 0 3px 0; }
-  .role-desc { font-size: 9pt; margin: 1px 0 3px 0; }
-
-  ul.bullets { margin: 0 0 2px 0; padding-left: 14px; }
-  ul.bullets li {
-    font-size: 9pt;
-    margin-bottom: 2.5px;
-    padding-left: 2px;
-    break-inside: avoid;
-    page-break-inside: avoid;
-    orphans: 3;
-    widows: 3;
-  }
-  ul.bullets li::marker { color: var(--accent); }
-
-  .areas-line { font-size: 9pt; color: var(--ink); }
-  .areas-line .divider { color: var(--gold); margin: 0 6px; }
-
-  .areas-grid {
-    columns: 2;
-    column-gap: 20px;
-  }
-  .area-item {
-    font-size: 9pt;
-    color: var(--ink);
-    padding-left: 12px;
-    position: relative;
-    break-inside: avoid;
-    margin-bottom: 3px;
-  }
-  .area-item::before {
-    content: "\25B8";
-    color: var(--gold);
-    position: absolute;
-    left: 0;
-    top: 0;
-  }
-
-  .items-row {
-    columns: 3;
-    column-gap: 18px;
-  }
-
-  footer.print-note {
-    text-align: center;
-    font-size: 8pt;
-    color: var(--slate);
-    margin-top: 14px;
-  }
-  @media print {
+    p.body-text      { margin: 1px 0 3px 0; }
     footer.print-note { display: none; }
+
+    /* ── Fix PDF link-ordering bug ──────────────────────────────────────────
+       header has position:relative (needed for .corner-accent on screen).
+       In print, that stacking context causes Chrome to serialize the header's
+       anchor hrefs *after* all positioned descendants — putting contact links
+       mid-document in the PDF text stream. Collapse to static: no stacking
+       context, links serialize in DOM order (right after header text).
+       .corner-accent is display:none in print so position:static is safe. */
+    header      { position: static; }
+    .role-block { position: static; }   /* same issue: border-left + bullets w/ links */
   }
 </style>
 </head>
@@ -372,7 +417,7 @@
 <div class="page">
 
   <header>
-    <div class="corner-accent"></div>
+    <div class="corner-accent" aria-hidden="true"></div>
     <h1 class="name">DEEPANSHU KUMAR</h1>
     <div class="title-line">SOFTWARE ENGINEER &middot; .NET &middot; 5+ YEARS</div>
     <div class="contact-line">
@@ -410,10 +455,11 @@
   <div class="role-block">
     <div class="role-intro">
     <div class="role-header">
-      <span class="role-title">Software Engineer &middot; Siemens, Asset Management Software</span>
+      <span class="role-title">Software Engineer &middot; Siemens</span>
       <span class="role-date">Jan 2024 – Present</span>
     </div>
-    <div class="role-meta">Formerly Brightly Software | Noida, India | Enterprise CMMS Platform</div>
+    <div class="role-division">Asset Management Software</div>
+    <div class="role-meta">Formerly Brightly Software &nbsp;&bull;&nbsp; Noida, India &nbsp;&bull;&nbsp; Enterprise CMMS Platform</div>
     </div>
     <ul class="bullets">
       <li class="li-key">Contributing to the modernization of a 170-project, multi-tenant ASP.NET MVC enterprise SaaS platform serving 2,500+ tenant organizations by developing modular .NET/.NET Core services and RESTful APIs, applying Domain-Driven Design (DDD) and Clean Architecture principles.</li>
@@ -498,8 +544,8 @@
 
   <h2 class="section">PROFESSIONAL COURSES</h2>
   <div class="edu-row">
-    <div><span class="edu-degree">GNIIT - Software Engineering</span><br><span class="edu-meta">NIIT, New Delhi</span></div>
-    <div class="edu-date">2017 | Excellent</div>
+    <div><span class="edu-degree">GNIIT - Software Engineering</span> <span class="edu-grade">Excellent</span><br><span class="edu-meta">NIIT, New Delhi</span></div>
+    <div class="edu-date">2017</div>
   </div>
 
   <footer class="print-note">Best viewed in a browser &mdash; prints cleanly to A4 PDF.</footer>
