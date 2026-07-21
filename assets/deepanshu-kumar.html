@@ -290,9 +290,10 @@
       font-size: 8.3pt; color: var(--slate);
       font-style: italic; margin-bottom: 4px;
     }
-    .contact-line         { font-size: 8.3pt; color: var(--ink); }
-    .contact-line span.sep { color: var(--rule); margin: 0 5px; }
-    .contact-line a        { white-space: nowrap; }
+    .contact-line                    { font-size: 8.3pt; color: var(--ink); }
+    .contact-line span.sep           { color: var(--rule); margin: 0 5px; }
+    .contact-line a                  { white-space: nowrap; }
+    .contact-line span[data-nosnippet] { white-space: nowrap; }
 
     h2.section {
       font-family: Georgia, "Times New Roman", serif;
@@ -389,6 +390,14 @@
        cheap-parser artifacts — real ATS handles line-wrap spaces correctly.
        Collapsing to single column breaks layout with no real ATS benefit. */
 
+    /* ── Strip rasterized backgrounds — PDF bloat + decode-lag fix ──────────
+       .page has 5 radial-gradient() layers with print-color-adjust:exact,
+       so Chrome bakes them as bitmaps (~1MB+ of image data on a text PDF).
+       .highlight-panel has a linear-gradient that survives print similarly.
+       Both replaced by flat colours: .page → white, panel → flat #EEF7F7.   */
+    .page            { background-image: none; }
+    .highlight-panel { background: #EEF7F7; }
+
     /* ── Print density ── */
     .page            { max-width: 100%; margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
     ul.bullets li    { margin-bottom: 1.5px; }
@@ -435,7 +444,7 @@
     <h1 class="name">DEEPANSHU KUMAR</h1>
     <div class="title-line">SOFTWARE ENGINEER &middot; .NET &middot; 5+ YEARS</div>
     <div class="contact-line">
-      <a href="mailto:Deepanshu.Kumar@Outlook.in">Deepanshu.Kumar@Outlook.in</a><span class="sep">|</span><span data-nosnippet>+91 88096 01358</span><span class="sep">|</span><span style="white-space:nowrap">Portfolio: <a href="https://deepanshu-kumar.dev">deepanshu-kumar.dev</a></span><span class="sep">|</span><a href="https://www.linkedin.com/in/deepanshu-kumar-dev">linkedin.com/in/deepanshu-kumar-dev</a><span class="sep">|</span>Noida, India
+      <a href="mailto:Deepanshu.Kumar@Outlook.in">Deepanshu.Kumar@Outlook.in</a><span class="sep">|</span><wbr><span data-nosnippet style="white-space:nowrap">+91 88096 01358</span><span class="sep">|</span><wbr><span style="white-space:nowrap">Portfolio: <a href="https://deepanshu-kumar.dev">deepanshu-kumar.dev</a></span><span class="sep">|</span><wbr><a href="https://www.linkedin.com/in/deepanshu-kumar-dev" style="white-space:nowrap">linkedin.com/in/deepanshu-kumar-dev</a><span class="sep">|</span><wbr><span style="white-space:nowrap">Noida, India</span>
     </div>
   </header>
 
