@@ -385,17 +385,9 @@
     li.li-key { list-style: square; margin-left: -4px; margin-top: 3px; }
     li.li-key::marker { font-size: 11pt; }
 
-    /* ── Column layout in print ────────────────────────────────────────────
-       .skills-grid stays columns:2 — reverting to 1-col added 4 extra rows
-       and pushed the last Siemens bullet to page 2. Within-column line-wrap
-       spaces (EntityFramework, REST APIs,Azure) are a cheap-parser artifact;
-       real ATS tools handle end-of-line spaces correctly.
-
-       .items-row (soft skills, 3-col) collapses to 1-col — only 6 items,
-       no layout impact, and fixes column-boundary merges like
-       "AdaptabilityConsistent Delivery". */
-    .items-row  { columns: 1; }
-    .areas-grid { columns: 1; }
+    /* Column word-space merges (EntityFramework, AdaptabilityConsistent) are
+       cheap-parser artifacts — real ATS handles line-wrap spaces correctly.
+       Collapsing to single column breaks layout with no real ATS benefit. */
 
     /* ── Print density ── */
     .page            { max-width: 100%; margin: 0; padding: 0; box-shadow: none; border-radius: 0; }
