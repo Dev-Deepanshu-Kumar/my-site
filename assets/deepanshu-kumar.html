@@ -561,5 +561,39 @@
   <footer class="print-note">Best viewed in a browser &mdash; prints cleanly to A4 PDF.</footer>
 
 </div>
+
+<script>
+/*
+ * PDF link-annotation fix.
+ *
+ * Chrome builds PDFs by writing all text glyphs first, then appending every
+ * link annotation (href) as a separate object after the page's text stream —
+ * regardless of DOM order, position:static, or stacking context.
+ * Result: all hrefs from a page cluster together mid-document in the text
+ * extraction output (mailto:..., https://... appearing between roles).
+ *
+ * Fix: on beforeprint, strip href from every <a> and store it in data-href.
+ * The visible link text stays in-place in the text stream.
+ * On afterprint, restore.
+ * The @media print { a[href]::after } pattern is NOT used — it appends the
+ * URL as rendered text, which lands in the PDF text stream as a duplicate.
+ */
+(function () {
+  function stripLinks() {
+    document.querySelectorAll('a[href]').forEach(function (a) {
+      a.dataset.href = a.getAttribute('href');
+      a.removeAttribute('href');
+    });
+  }
+  function restoreLinks() {
+    document.querySelectorAll('a[data-href]').forEach(function (a) {
+      a.setAttribute('href', a.dataset.href);
+      delete a.dataset.href;
+    });
+  }
+  window.addEventListener('beforeprint', stripLinks);
+  window.addEventListener('afterprint',  restoreLinks);
+})();
+</script>
 </body>
 </html>
