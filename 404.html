@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 Not Found — deepanshu-kumar.dev</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #0a0e1a;
+      --bg-card:      #141d30;
+      --border:       rgba(43,90,102,0.3);
+      --text:         #e2e8f0;
+      --text-bright:  #f8fafc;
+      --muted:        #7a8fa6;
+      --dim:          #4a5a6a;
+      --accent:       #2b9cba;
+      --accent-light: #1ecbe1;
+      --gold:         #e8aa4a;
+      --red:          #f87171;
+      --font-mono:    'JetBrains Mono', monospace;
+      --font-sans:    'Inter', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%;
+      font-family: var(--font-sans);
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient orbs */
+    .ambient-bg { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.25; animation: float 25s ease-in-out infinite; }
+    .orb-1 { width:400px;height:400px;top:-10%;left:-5%;background:radial-gradient(circle,rgba(43,156,186,0.2),transparent 70%); }
+    .orb-2 { width:300px;height:300px;bottom:10%;right:-5%;background:radial-gradient(circle,rgba(248,113,113,0.15),transparent 70%);animation-delay:-10s;animation-duration:30s; }
+    @keyframes float { 0%,100%{transform:translate(0,0)} 50%{transform:translate(40px,-30px)} }
+
+    /* Layout */
+    .page {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 24px;
+    }
+
+    /* Terminal card */
+    .terminal {
+      width: 100%; max-width: 560px;
+      background: #060a12;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .terminal-bar {
+      display: flex; align-items: center; gap: 6px;
+      padding: 10px 14px;
+      background: rgba(20,29,48,0.9);
+      border-bottom: 1px solid var(--border);
+    }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-red    { background: #ff5f57; }
+    .dot-yellow { background: #febc2e; }
+    .dot-green  { background: #28c840; }
+    .terminal-title {
+      margin-left: 8px; font-family: var(--font-mono);
+      font-size: 11px; color: var(--muted);
+    }
+    .terminal-body { padding: 24px 28px 28px; font-family: var(--font-mono); }
+
+    /* Request line */
+    .req-line { font-size: 13px; color: var(--text); margin-bottom: 20px; }
+    .req-prompt { color: #49cc90; font-weight: 700; margin-right: 8px; }
+    .req-cmd    { color: var(--text-bright); }
+
+    /* Response */
+    .resp-line { font-size: 13px; margin-bottom: 6px; display: flex; gap: 10px; }
+    .resp-arrow { color: var(--dim); }
+    .resp-status { color: var(--red); font-weight: 700; }
+    .resp-key    { color: #7dd3fc; }
+    .resp-str    { color: #fbbf24; }
+    .resp-dim    { color: var(--dim); }
+
+    /* 404 big number */
+    .error-code {
+      font-size: 72px; font-weight: 700;
+      font-family: var(--font-mono);
+      color: var(--red);
+      line-height: 1;
+      margin: 20px 0 4px;
+      letter-spacing: -2px;
+    }
+    .error-msg {
+      font-family: var(--font-mono); font-size: 14px;
+      color: var(--muted); margin-bottom: 24px;
+    }
+
+    /* Actions */
+    .actions {
+      display: flex; flex-direction: column; gap: 8px;
+      margin-top: 20px; padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+    .action-line { font-size: 12px; color: var(--dim); }
+    .action-link {
+      color: var(--accent-light); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .action-link:hover { color: var(--gold); }
+
+    /* Back button */
+    .back-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      margin-top: 24px; padding: 8px 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--text); text-decoration: none;
+      font-family: var(--font-mono); font-size: 12px;
+      transition: all 0.25s;
+    }
+    .back-btn:hover {
+      border-color: var(--accent);
+      box-shadow: 0 0 14px rgba(43,156,186,0.2);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="ambient-bg" aria-hidden="true">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+</div>
+
+<div class="page">
+  <div class="terminal">
+    <div class="terminal-bar">
+      <span class="dot dot-red"></span>
+      <span class="dot dot-yellow"></span>
+      <span class="dot dot-green"></span>
+      <span class="terminal-title">deepanshu-kumar.dev</span>
+    </div>
+    <div class="terminal-body">
+
+      <div class="req-line">
+        <span class="req-prompt">$</span>
+        <span class="req-cmd">curl https://deepanshu-kumar.dev<span id="bad-path"></span></span>
+      </div>
+
+      <div class="resp-line"><span class="resp-arrow">&lt;</span> <span class="resp-status">HTTP/2 404 Not Found</span></div>
+      <div class="resp-line"><span class="resp-arrow">&lt;</span> <span class="resp-key">content-type:</span> <span class="resp-str">application/problem+json</span></div>
+      <div class="resp-line"><span class="resp-arrow">&lt;</span></div>
+      <div class="resp-line"><span class="resp-arrow">&lt;</span> <span class="resp-key">"status":</span> <span style="color:#a78bfa">404</span><span class="resp-dim">,</span></div>
+      <div class="resp-line"><span class="resp-arrow">&lt;</span> <span class="resp-key">"error":</span> <span class="resp-str">"endpoint_not_found"</span><span class="resp-dim">,</span></div>
+      <div class="resp-line"><span class="resp-arrow">&lt;</span> <span class="resp-key">"message":</span> <span class="resp-str">"This route doesn't exist. The engineer does."</span></div>
+
+      <div class="actions">
+        <div class="action-line">// Valid endpoints:</div>
+        <div class="action-line"><a href="/" class="action-link">GET /</a> <span class="resp-dim">— portfolio overview</span></div>
+        <div class="action-line"><a href="/#experience" class="action-link">GET /experience</a> <span class="resp-dim">— work history</span></div>
+        <div class="action-line"><a href="/#recommendations" class="action-link">GET /recommendations</a> <span class="resp-dim">— peer endorsements</span></div>
+        <div class="action-line"><a href="/api/portfolio.json" class="action-link">GET /api/portfolio.json</a> <span class="resp-dim">— machine-readable</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <a href="/" class="back-btn">← GET /</a>
+</div>
+
+<script>
+  // Show the bad path in the curl command
+  const el = document.getElementById('bad-path');
+  if (el) el.textContent = window.location.pathname !== '/' ? window.location.pathname : '/unknown';
+</script>
+
+</body>
+</html>
