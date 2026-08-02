@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Disallow: /.notes/
 
 Sitemap: https://deepanshu-kumar.dev/sitemap.xml
