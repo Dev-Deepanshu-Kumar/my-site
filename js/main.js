@@ -1,1501 +1,1096 @@
+/* ═══════════════════════════════════════════════════════════════════
+   Portfolio v2 — Interactivity
+   ═══════════════════════════════════════════════════════════════════ */
 
-    // ── Toggle: set to false to hide the "Open to new opportunities" badge ──
-    const SHOW_OPEN_TO_WORK = true;
-    const badge = document.getElementById('open-to-work-badge');
-    if (badge) badge.style.display = SHOW_OPEN_TO_WORK ? '' : 'none';
+(function() {
+  'use strict';
 
+  // ── Boot Sequence ─────────────────────────────────────────────────
+  const bootOverlay = document.getElementById('boot-overlay');
+  const bootLines = bootOverlay.querySelectorAll('.boot-line');
 
-    function particleSystem() {
-      const canvas = document.getElementById('particle-canvas');
-      const ctx    = canvas.getContext('2d');
-      let W, H, particles = [];
-      let mouseX = -9999, mouseY = -9999;
+  bootLines.forEach(line => {
+    const delay = parseInt(line.dataset.delay) || 0;
+    setTimeout(() => line.classList.add('show'), delay);
+  });
 
-      const PARTICLE_COUNT     = 80;
-      const LINE_MAX_DIST      = 130;
-      const MOUSE_REPEL_RADIUS = 160;
-
-      function resizeCanvas() {
-        W = canvas.width  = window.innerWidth;
-        H = canvas.height = window.innerHeight;
-      }
-
-      class Particle {
-        constructor(spawnAnywhere) {
-          this.reset(spawnAnywhere);
-        }
-
-        reset(spawnAnywhere) {
-          this.x     = Math.random() * W;
-          this.y     = spawnAnywhere ? Math.random() * H : -10;
-          this.vx    = (Math.random() - 0.5) * 0.35;
-          this.vy    = Math.random() * 0.3 + 0.1;
-          this.r     = Math.random() * 1.5 + 0.5;
-          this.alpha = Math.random() * 0.5 + 0.15;
-          const roll = Math.random();
-          this.color = roll > 0.6 ? '#2b9cba' : roll > 0.3 ? '#e8aa4a' : '#1ecbe1';
-        }
-
-        update() {
-          const dx   = this.x - mouseX;
-          const dy   = this.y - mouseY;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-
-          if (dist < MOUSE_REPEL_RADIUS) {
-            const force = (MOUSE_REPEL_RADIUS - dist) / MOUSE_REPEL_RADIUS * 0.8;
-            this.vx += (dx / dist) * force * 0.05;
-            this.vy += (dy / dist) * force * 0.05;
-          }
-
-          this.vx *= 0.99;
-          this.vy *= 0.99;
-          this.x  += this.vx;
-          this.y  += this.vy;
-
-          if (this.y > H + 10 || this.x < -50 || this.x > W + 50) {
-            this.reset(false);
-          }
-        }
-
-        draw() {
-          ctx.save();
-          ctx.globalAlpha = this.alpha;
-          ctx.fillStyle   = this.color;
-          ctx.beginPath();
-          ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.restore();
-        }
-      }
-
-      function drawConnectingLines() {
-        for (let i = 0; i < particles.length; i++) {
-          for (let j = i + 1; j < particles.length; j++) {
-            const dx   = particles[i].x - particles[j].x;
-            const dy   = particles[i].y - particles[j].y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist < LINE_MAX_DIST) {
-              const alpha = (1 - dist / LINE_MAX_DIST) * 0.12;
-              ctx.save();
-              ctx.globalAlpha = alpha;
-              ctx.strokeStyle = '#2b9cba';
-              ctx.lineWidth   = 0.6;
-              ctx.beginPath();
-              ctx.moveTo(particles[i].x, particles[i].y);
-              ctx.lineTo(particles[j].x, particles[j].y);
-              ctx.stroke();
-              ctx.restore();
-            }
-          }
-        }
-      }
-
-      function animationLoop() {
-        ctx.clearRect(0, 0, W, H);
-        particles.forEach(p => { p.update(); p.draw(); });
-        drawConnectingLines();
-        requestAnimationFrame(animationLoop);
-      }
-
-      window.addEventListener('resize', () => {
-        resizeCanvas();
-        particles = [];
-        for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle(true));
-      });
-      document.addEventListener('mousemove',  e  => { mouseX = e.clientX; mouseY = e.clientY; });
-      document.addEventListener('mouseleave', () => { mouseX = -9999; mouseY = -9999; });
-
-      resizeCanvas();
-      for (let i = 0; i < PARTICLE_COUNT; i++) particles.push(new Particle(true));
-      animationLoop();
-    }
+  // End boot after all lines shown + brief pause
+  setTimeout(() => {
+    bootOverlay.classList.add('done');
+    // Remove from DOM after transition
+    setTimeout(() => bootOverlay.remove(), 600);
+  }, 3200);
 
 
-    function typedTitleEffect() {
-      const phrases = (function shuffle(arr) {
-        for (let i = arr.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-        return arr;
-      })([
-  'C# · .NET · ASP.NET Core',
-  'Enterprise SaaS · 5+ Years',
-  'Backend Engineer · Problem Solver',
-  'Backend Engineer • .NET • Refactoring Yesterday, Building Tomorrow',
-  'Enterprise Software · Real Users',
-  'REST APIs · Microservices',
-  'API-first Development',
-  'SOLID Principles in Practice',
-  'Business Logic over Boilerplate',
+  // ── Hero Terminal Typing ────────────────────────────────────────────
+  const heroCmd = document.getElementById('hero-cmd');
+  const heroResponse = document.getElementById('hero-response');
+  const heroText = 'curl https://deepanshu-kumar.dev';
 
-  'From monolith to microservices — one PR at a time.',
-  'Learning modern architecture without forgetting solid fundamentals.',
+  function typeHero() {
+    let i = 0;
+    const cursor = document.querySelector('.hero-cursor');
 
-  'I care about the why, not just the what.',
-  'I ask why before I ask how.',
-  'Understanding the problem before writing the solution.',
-  'I read the error logs, not just the tickets.',
-  "If it's flaky, I'll find out why.",
-
-  'Async by default. Thoughtful by choice.',
-  'Good APIs are invisible. Bad ones haunt you.',
-  'The best fix is the one nobody notices.',
-  'Build it right. Then build it fast.',
-
-  'I care as much about maintainability as functionality.',
-  "I don't chase clever code. I chase clear code.",
-  "I like software that's easy to change.",
-  'I fix causes, not symptoms.'
-]);
-
-      const el = document.getElementById('typed-text');
-      let phraseIndex = 0;
-      let charIndex   = 0;
-      let isDeleting  = false;
-      let pauseFrames = 0;
-
-      function tick() {
-        const currentPhrase = phrases[phraseIndex];
-
-        if (pauseFrames > 0) {
-          pauseFrames--;
-          setTimeout(tick, 40);
-          return;
-        }
-
-        if (!isDeleting) {
-          el.textContent = currentPhrase.slice(0, charIndex + 1);
-          charIndex++;
-          if (charIndex >= currentPhrase.length) {
-            isDeleting  = true;
-            pauseFrames = 55;
-          }
-          setTimeout(tick, 70);
-        } else {
-          el.textContent = currentPhrase.slice(0, charIndex - 1);
-          charIndex--;
-          if (charIndex <= 0) {
-            isDeleting  = false;
-            phraseIndex = (phraseIndex + 1) % phrases.length;
-            pauseFrames = 12;
-          }
-          setTimeout(tick, 35);
-        }
-      }
-
-      setTimeout(tick, 1000);
-    }
-
-
-    function navBehaviours() {
-      const navbar    = document.getElementById('navbar');
-      const hamburger = document.getElementById('nav-hamburger');
-      const drawer    = document.getElementById('nav-drawer');
-
-      window.addEventListener('scroll', () => {
-        navbar.classList.toggle('scrolled', window.scrollY > 20);
-      });
-
-      hamburger.addEventListener('click', () => {
-        drawer.classList.toggle('open');
-      });
-    }
-
-    function closeDrawer() {
-      document.getElementById('nav-drawer').classList.remove('open');
-    }
-
-
-    function scrollReveal() {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add('visible');
-
-          const statNum = entry.target.querySelector('[data-target]');
-          if (statNum && !statNum.dataset.animated) {
-            statNum.dataset.animated = '1';
-            animateStatNumber(statNum);
-          }
-        });
-      }, { threshold: 0.12 });
-
-      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    }
-
-
-    function animateStatNumber(el) {
-      const target = parseInt(el.dataset.target, 10);
-      const suffix = el.dataset.suffix || '';
-      let startTime = null;
-      const DURATION = 1400;
-
-      function step(timestamp) {
-        if (!startTime) startTime = timestamp;
-        const progress = Math.min((timestamp - startTime) / DURATION, 1);
-        const eased    = 1 - Math.pow(1 - progress, 3);
-
-        el.textContent = Math.floor(eased * target) + (progress < 1 ? '' : suffix);
-        if (progress < 1) requestAnimationFrame(step);
-      }
-
-      requestAnimationFrame(step);
-    }
-
-
-    function toggleExpCard(cardElement) {
-      const isExpanding = !cardElement.classList.contains('exp-card--expanded');
-      cardElement.classList.toggle('exp-card--expanded');
-
-      // collapse proof strip + button state when card closes
-      if (!isExpanding) {
-        const proof    = cardElement.querySelector('.awards-strip');
-        const proofBtn = cardElement.querySelector('.proof-btn');
-        if (proof)    proof.classList.remove('awards-strip--open');
-        if (proofBtn) proofBtn.classList.remove('proof-btn--open');
-      }
-    }
-
-    /* ── Award image lightbox ──────────────────────────────────────
-       Clicking any .award-thumb img opens a centred overlay.
-       Clicking the overlay (or pressing Escape) closes it.
-       Stops propagation so the exp-card toggle doesn't also fire.
-    ──────────────────────────────────────────────────────────────── */
-    document.addEventListener('click', function(e) {
-      const img = e.target.closest('.award-thumb img');
-      if (!img) return;
-      e.stopPropagation();
-
-      const overlay = document.createElement('div');
-      overlay.className = 'award-lightbox';
-
-      const big = document.createElement('img');
-      big.src = img.src;
-      big.alt = img.alt;
-      overlay.appendChild(big);
-
-      const close = () => overlay.remove();
-      overlay.addEventListener('click', close);
-      document.addEventListener('keydown', function onKey(ev) {
-        if (ev.key === 'Escape') { close(); document.removeEventListener('keydown', onKey); }
-      });
-
-      document.body.appendChild(overlay);
-    });
-
-    function flipCard(wrapperElement) {
-      wrapperElement.classList.toggle('flipped');
-    }
-
-    // Expands Siemens card, scrolls to it, opens recognitions strip, auto-collapses after 4s on no interaction
-    function openRecognitions() {
-      const card       = document.getElementById('siemens-exp-card');
-      const proof      = document.getElementById('awards-proof');
-      const proofBtn   = document.querySelector('.proof-btn');
-      if (!card || !proof) return;
-
-      // step 1 — expand exp card if collapsed
-      if (!card.classList.contains('exp-card--expanded')) {
-        card.classList.add('exp-card--expanded');
-      }
-
-      // step 2 — scroll to recognitions heading once card expansion starts
-      const recogSection = card.querySelector('.recog-section');
-      (recogSection || card).scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-      // step 3 — open recognitions strip after card animation settles
-      setTimeout(() => {
-        proof.classList.add('awards-strip--open');
-        if (proofBtn) proofBtn.classList.add('proof-btn--open');
-        // re-scroll to recog section after bullets have expanded and pushed it down
-        if (recogSection) recogSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-        // step 4 — auto-collapse after 4 s unless user clicked inside
-        let userInteracted = false;
-        const onInteract = () => { userInteracted = true; };
-        proof.addEventListener('click', onInteract, { once: true });
-
-        setTimeout(() => {
-          if (!userInteracted) {
-            proof.classList.remove('awards-strip--open');
-            if (proofBtn) proofBtn.classList.remove('proof-btn--open');
-          }
-          proof.removeEventListener('click', onInteract);
-        }, 4000);
-
-      }, 450);
-    }
-
-    // Renders recognition cards and screenshot strip from data/recognitions.json
-    async function loadRecognitions() {
-      const cardsEl  = document.getElementById('recog-cards');
-      const scrollEl = document.getElementById('awards-scroll');
-      if (!cardsEl || !scrollEl) return;
-
-      let items;
-      try {
-        const res = await fetch('data/recognitions.json');
-        if (!res.ok) throw new Error('fetch failed');
-        items = await res.json();
-      } catch (_) {
-        cardsEl.innerHTML = '<p style="color:var(--color-muted);font-size:13px;">Recognitions unavailable.</p>';
-        return;
-      }
-
-      // render text cards
-      cardsEl.innerHTML = items.map(r => `
-        <div class="recog-card">
-          <div class="recog-card-meta">
-            <span class="recog-label">${r.title}</span>
-            <span class="recog-rel recog-rel--${r.relationType}">${r.relation}</span>
-          </div>
-          <p class="recog-quote">"${r.quote}"</p>
-          <div class="recog-by">— ${r.by}${r.company ? ' · ' + r.company : ''}</div>
-        </div>
-      `).join('');
-
-      // render screenshot strip — only entries that have a screenshot
-      const withScreenshot = items.filter(r => r.screenshot);
-      if (withScreenshot.length === 0) {
-        // hide the proof button if no screenshots at all
-        const btn = document.querySelector('.proof-btn');
-        if (btn) btn.style.display = 'none';
+    function typeChar() {
+      if (i < heroText.length) {
+        heroCmd.textContent += heroText[i];
+        i++;
+        setTimeout(typeChar, 35 + Math.random() * 25);
       } else {
-        scrollEl.innerHTML = withScreenshot.map(r => `
-          <figure class="award-thumb">
-            <img
-              src="${r.screenshot}"
-              alt="Recognition screenshot: ${r.title} — ${r.by}"
-              loading="lazy">
-            <figcaption>${r.title}</figcaption>
-          </figure>
-        `).join('');
+        // Done typing — show response lines
+        if (cursor) cursor.style.display = 'none';
+        setTimeout(revealResponse, 300);
       }
     }
 
-    loadRecognitions();
-
-
-    // ── Theme toggle — persists in localStorage ──────────────────
-    function applyTheme(theme) {
-      document.documentElement.setAttribute('data-theme', theme);
-      const btn   = document.getElementById('theme-toggle');
-      const icon  = btn && btn.querySelector('.toggle-icon');
-      const label = btn && btn.querySelector('.toggle-label');
-      if (icon)  icon.textContent  = theme === 'light' ? '☀️' : '🌙';
-      if (label) label.textContent = theme === 'light' ? 'Light' : 'Dark';
-      btn && btn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
-    }
-
-    // Create overlay element once, reuse every toggle
-    const _themeOverlay = document.createElement('div');
-    _themeOverlay.id = 'theme-ripple';
-    document.body.appendChild(_themeOverlay);
-
-    function toggleTheme() {
-      const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-
-      // Respect prefers-reduced-motion — skip animation
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        localStorage.setItem('theme', next);
-        applyTheme(next);
-        return;
-      }
-
-      // Position ripple origin at the toggle button centre
-      const btn  = document.getElementById('theme-toggle');
-      const rect = btn ? btn.getBoundingClientRect() : { left: window.innerWidth - 60, top: window.innerHeight - 60, width: 0, height: 0 };
-      const ox   = rect.left + rect.width  / 2;
-      const oy   = rect.top  + rect.height / 2;
-
-      // Incoming theme background colour
-      const incomingBg = next === 'light' ? '#fdf6e3' : '#0a0e1a';
-
-      _themeOverlay.style.cssText = `
-        position: fixed; inset: 0; z-index: 99999; pointer-events: none;
-        background: ${incomingBg};
-        clip-path: circle(0px at ${ox}px ${oy}px);
-        transition: clip-path 0.9s cubic-bezier(0.4, 0, 0.2, 1);
-      `;
-
-      // Trigger expand — rAF ensures the initial state is painted first
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          const maxR = Math.ceil(Math.hypot(Math.max(ox, window.innerWidth - ox), Math.max(oy, window.innerHeight - oy)));
-          _themeOverlay.style.clipPath = `circle(${maxR}px at ${ox}px ${oy}px)`;
-        });
+    function revealResponse() {
+      const lines = heroResponse.querySelectorAll('.hero-resp-line');
+      lines.forEach((line, idx) => {
+        setTimeout(() => line.classList.add('show'), idx * 150);
       });
-
-      // Swap theme at halfway (~450ms) — user sees nothing mid-swap
-      setTimeout(() => {
-        localStorage.setItem('theme', next);
-        applyTheme(next);
-      }, 450);
-
-      // Collapse overlay back after theme is applied
-      setTimeout(() => {
-        _themeOverlay.style.transition = 'clip-path 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
-        _themeOverlay.style.clipPath   = `circle(0px at ${ox}px ${oy}px)`;
-      }, 800);
     }
 
-    // apply saved preference on load (default: dark)
-    applyTheme(localStorage.getItem('theme') || 'dark');
+    // Start after boot sequence ends
+    setTimeout(typeChar, 3500);
+  }
+  typeHero();
 
 
-    // Update start/end dates here when employment changes.
-    // month is 0-indexed: Jan=0, Dec=11. end: null means still active.
-    const CAREER_PERIODS = [
-      {
-        label: 'Telebu Communications (Tabiib)',
-        start: new Date(2019, 11, 2),
-        end:   new Date(2020, 11, 31),
-      },
-      {
-        label: 'IndiaLends',
-        start: new Date(2022, 3, 18),
-        end:   new Date(2023, 11, 20),
-      },
-      {
-        label: 'Siemens — Asset Management Software',
-        start: new Date(2024, 0, 2),
-        end:   null,
-      },
+  // ── Typed Motto (x-motto header) ─────────────────────────────────
+  function typedMotto() {
+    const phrases = [
+      'C# · .NET · ASP.NET Core',
+      'Backend Engineer · Problem Solver',
+      'REST APIs · Microservices',
+      'From monolith to microservices — one PR at a time.',
+      'I ask why before I ask how.',
+      'Good APIs are invisible. Bad ones haunt you.',
+      'Build it right. Then build it fast.',
+      "I don't chase clever code. I chase clear code.",
+      "I like software that's easy to change.",
+      'I fix causes, not symptoms.',
+      'The best fix is the one nobody notices.',
+      'Async by default. Thoughtful by choice.',
+      'Understanding the problem before writing the solution.',
+      'I care as much about maintainability as functionality.',
+      'If it\'s flaky, I\'ll find out why.',
+      'I read the error logs, not just the tickets.',
     ];
 
-    // Convert a JS Date → Temporal.PlainDate (YYYY-MM-DD, local calendar).
-    function toPlainDate(jsDate) {
-      return Temporal.PlainDate.from({
-        year:  jsDate.getFullYear(),
-        month: jsDate.getMonth() + 1,
-        day:   jsDate.getDate(),
-      });
+    // Shuffle
+    for (let i = phrases.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [phrases[i], phrases[j]] = [phrases[j], phrases[i]];
     }
 
-    // Return calendar-accurate { years, months, days } between two JS Dates using Temporal.
-    // Falls back to the ms-division approach if Temporal is somehow still absent.
-    function calendarDiff(startJsDate, endJsDate) {
-      if (typeof Temporal !== 'undefined') {
-        const start = toPlainDate(startJsDate);
-        const end   = toPlainDate(endJsDate);
-        const dur   = start.until(end, { largestUnit: 'years', smallestUnit: 'days' });
-        return { years: dur.years, months: dur.months, days: dur.days };
-      }
-      // Fallback: calendar-accurate diff using Date arithmetic — no magic constants.
-      // Walks year-by-year and month-by-month using actual month lengths.
-      let y  = startJsDate.getFullYear();
-      let m  = startJsDate.getMonth();   // 0-indexed
-      let d  = startJsDate.getDate();
-      const ey = endJsDate.getFullYear();
-      const em = endJsDate.getMonth();
-      const ed = endJsDate.getDate();
+    const el = document.getElementById('hero-typed');
+    const cursor = document.querySelector('.hero-typed-cursor');
+    if (!el) return;
 
-      let years  = ey - y;
-      let months = em - m;
-      let days   = ed - d;
+    let phraseIdx = 0, charIdx = 0, isDeleting = false, pause = 0;
 
-      // Borrow from months if days went negative.
-      if (days < 0) {
-        months--;
-        // Days remaining = days in the previous month minus shortfall.
-        const prevMonth = new Date(ey, em, 0);  // day 0 = last day of prior month
-        days += prevMonth.getDate();
+    function tick() {
+      if (pause > 0) { pause--; setTimeout(tick, 40); return; }
+
+      const current = phrases[phraseIdx];
+
+      if (!isDeleting) {
+        el.textContent = current.slice(0, charIdx + 1);
+        charIdx++;
+        if (charIdx >= current.length) {
+          isDeleting = true;
+          pause = 50; // pause at full text
+        }
+        setTimeout(tick, 40 + Math.random() * 30);
+      } else {
+        el.textContent = current.slice(0, charIdx - 1);
+        charIdx--;
+        if (charIdx <= 0) {
+          isDeleting = false;
+          phraseIdx = (phraseIdx + 1) % phrases.length;
+          pause = 10;
+        }
+        setTimeout(tick, 25);
       }
-      // Borrow from years if months went negative.
-      if (months < 0) {
-        years--;
-        months += 12;
-      }
-      return { years: Math.max(0, years), months: Math.max(0, months), days: Math.max(0, days) };
     }
 
-    function careerTimer() {
-      const periodsContainer = document.getElementById('timer-periods-container');
-      const totalContainer   = document.getElementById('timer-total-display');
-      const periodsLatestFirst = [...CAREER_PERIODS].reverse();
+    // Start after hero response lines show (~5.5s from page load)
+    setTimeout(tick, 5500);
+  }
+  typedMotto();
 
-      const periodRows = periodsLatestFirst.map((period, i) => {
-        const isActive = period.end === null;
 
-        const row = document.createElement('div');
-        row.innerHTML = `
-          ${ i > 0 ? '<div class="timer-divider"></div>' : '' }
-          <div class="timer-period">
-            <div>
-              <div class="timer-period-label">
-                ${ isActive ? '<span style="color:var(--color-gold)">▶ </span>' : '' }
-                ${ period.label }
-              </div>
-              <div class="timer-period-dates">
-                ${ formatDate(period.start) } → ${ isActive ? 'Present' : formatDate(period.end) }
-              </div>
-            </div>
-            <div class="timer-display" id="timer-period-${ i }"></div>
-          </div>
-        `;
-        periodsContainer.appendChild(row);
-        return document.getElementById(`timer-period-${ i }`);
-      });
+  // ── Scroll Spy + Entrance Animations ─────────────────────────────
 
-      function render() {
-        const now = new Date();
+  const sections = document.querySelectorAll('.endpoint-section');
+  const sidebarLinks = document.querySelectorAll('.sidebar-link[href^="#"]');
 
-        // Compute calendar-accurate years+months+days per period.
-        periodsLatestFirst.forEach((period, i) => {
-          const endDate = period.end === null ? now : period.end;
-          const cal     = calendarDiff(period.start, endDate);
-          // Sub-day precision (hours/min/sec) still needs elapsed ms for the live tick.
-          const elapsedMs = Math.max(0, endDate - period.start);
-          renderUnits(periodRows[i], cal, elapsedMs);
+  // Scroll spy — highlight active sidebar link
+  const spyObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        sidebarLinks.forEach(link => {
+          link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
         });
-
-        // Total: sum all period ms, then use Temporal for calendar units on the
-        // cumulative span (anchored from the earliest start to now).
-        let totalMs = 0;
-        periodsLatestFirst.forEach(period => {
-          const endDate = period.end === null ? now : period.end;
-          totalMs += Math.max(0, endDate - period.start);
-        });
-        // For the cumulative total we don't have a single contiguous span, so
-        // derive calendar units from total ms via a synthetic duration.
-        const totalDur = Temporal
-          ? Temporal.Duration.from({ milliseconds: totalMs }).round({
-              largestUnit: 'years',
-              smallestUnit: 'seconds',
-              relativeTo: Temporal.Now.plainDateISO(),
-            })
-          : null;
-        const totalCal = totalDur
-          ? { years: totalDur.years, months: totalDur.months, days: totalDur.days }
-          : calendarDiff(new Date(Date.now() - totalMs), new Date());
-        renderUnits(totalContainer, totalCal, totalMs);
       }
+    });
+  }, { rootMargin: '-20% 0px -60% 0px', threshold: 0 });
 
-      // Lazy-start: only tick while the widget is visible in the viewport.
-      // IntersectionObserver is universally supported; no polyfill needed.
-      let ticker = null;
-      const observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            render();                             // immediate first paint
-            ticker = setInterval(render, 1000);
-          } else {
-            clearInterval(ticker);
-            ticker = null;
-          }
-        });
-      }, { threshold: 0.1 });
+  sections.forEach(section => spyObserver.observe(section));
 
-      observer.observe(periodsContainer.closest('.career-timer-card') || periodsContainer);
-    }
-
-    // Render calendar units + sub-day live tick into a timer-display element.
-    // cal  = { years, months, days }  — calendar-accurate from Temporal
-    // ms   = raw elapsed milliseconds — for hours/minutes/seconds
-    function renderUnits(container, cal, ms) {
-      const totalSeconds = Math.floor(ms / 1000);
-      const hours        = Math.floor(totalSeconds / 3600) % 24;
-      const minutes      = Math.floor(totalSeconds / 60)   % 60;
-      const seconds      = totalSeconds % 60;
-
-      const units = [
-        { v: cal.years,  l: 'Yrs'  },
-        { v: cal.months, l: 'Mos'  },
-        { v: cal.days,   l: 'Days' },
-        { v: hours,      l: 'Hrs'  },
-        { v: minutes,    l: 'Min'  },
-        { v: seconds,    l: 'Sec'  },
-      ];
-
-      container.innerHTML = units.map(u => `
-        <div class="timer-unit">
-          <span class="timer-value">${ String(u.v).padStart(2, '0') }</span>
-          <span class="timer-unit-label">${ u.l }</span>
-        </div>
-      `).join('');
-    }
-
-    function formatDate(date) {
-      return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    }
-
-
-    // Weighted ensemble matcher — ported from C# production system.
-    // Algorithm names are intentionally obfuscated; implementation details not exposed.
-    const _nv = (function() {
-      const _W     = [0.30, 0.08, 0.20, 0.30, 0.06, 0.06];
-      const _clean = s => s.toUpperCase().replace(/[^A-Z0-9 ]/g, '');
-
-      function _E2(a, b) {
-        if (a === b) return 1;
-        const l1 = a.length, l2 = b.length;
-        if (!l1 || !l2) return 0;
-        const wn = Math.max(Math.floor(Math.max(l1, l2) / 2) - 1, 0);
-        const f1 = new Array(l1).fill(false), f2 = new Array(l2).fill(false);
-        let mc = 0;
-        for (let i = 0; i < l1; i++) {
-          const lo = Math.max(0, i - wn), hi = Math.min(i + wn + 1, l2);
-          for (let j = lo; j < hi; j++) {
-            if (f2[j] || a[i] !== b[j]) continue;
-            f1[i] = f2[j] = true; mc++; break;
-          }
-        }
-        if (!mc) return 0;
-        let t = 0, k = 0;
-        for (let i = 0; i < l1; i++) {
-          if (!f1[i]) continue;
-          while (!f2[k]) k++;
-          if (a[i] !== b[k]) t++;
-          k++;
-        }
-        const jv = (mc / l1 + mc / l2 + (mc - t / 2) / mc) / 3;
-        let p = 0;
-        for (let i = 0; i < Math.min(4, Math.min(l1, l2)); i++) {
-          if (a[i] === b[i]) p++; else break;
-        }
-        return jv + p * 0.1 * (1 - jv);
+  // Entrance animation — sections fade in on scroll
+  const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        revealObserver.unobserve(entry.target); // once only
       }
+    });
+  }, { rootMargin: '0px 0px -80px 0px', threshold: 0.1 });
 
-      function _E4(a, b) {
-        const l1 = a.length, l2 = b.length, d = [];
-        for (let i = 0; i <= l1; i++) {
-          d[i] = [];
-          for (let j = 0; j <= l2; j++) d[i][j] = i ? j ? 0 : i : j;
-        }
-        for (let i = 1; i <= l1; i++) {
-          for (let j = 1; j <= l2; j++) {
-            const c = a[i - 1] === b[j - 1] ? 0 : 1;
-            d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + c);
-            if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1])
-              d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + c);
-          }
-        }
-        return 1 - d[l1][l2] / Math.max(l1, l2, 1);
-      }
-
-      function _E1(a, b, n = 2) {
-        if (a === b) return 1;
-        if (a.length < n || b.length < n) return 0;
-        const g   = s => { const r = []; for (let i = 0; i <= s.length - n; i++) r.push(s.slice(i, i + n)); return r; };
-        const ga  = g(a), gb = g(b), cnt = {};
-        gb.forEach(x => cnt[x] = (cnt[x] || 0) + 1);
-        let sh = 0;
-        ga.forEach(x => { if (cnt[x] > 0) { sh++; cnt[x]--; } });
-        return 2 * sh / (ga.length + gb.length);
-      }
-
-      function _E6(a, b) {
-        if (a === b) return 1;
-        if (a.length < 2 || b.length < 2) return 0;
-        const bv = s => { const v = {}; for (let i = 0; i < s.length - 1; i++) { const k = s.slice(i, i + 2); v[k] = (v[k] || 0) + 1; } return v; };
-        const v1 = bv(a), v2 = bv(b);
-        let dot = 0, m1 = 0, m2 = 0;
-        Object.keys(v1).forEach(k => { dot += v1[k] * (v2[k] || 0); m1 += v1[k] * v1[k]; });
-        Object.keys(v2).forEach(k => { m2 += v2[k] * v2[k]; });
-        return (!m1 || !m2) ? 0 : dot / (Math.sqrt(m1) * Math.sqrt(m2));
-      }
-
-      function _E3(a, b) {
-        const w1 = a.split(' ').filter(Boolean), w2 = b.split(' ').filter(Boolean);
-        if (w1.length > 1 || w2.length > 1) {
-          const s1 = new Set(w1), s2 = new Set(w2);
-          const inter = [...s1].filter(x => s2.has(x)).length;
-          return inter / (s1.size + s2.size - inter);
-        }
-        const g = s => { const r = new Set(); for (let i = 0; i < s.length - 1; i++) r.add(s.slice(i, i + 2)); return r; };
-        const g1 = g(a), g2 = g(b);
-        const inter = [...g1].filter(x => g2.has(x)).length;
-        const union = g1.size + g2.size - inter;
-        return union === 0 ? 0 : inter / union;
-      }
-
-      function _norm(s) {
-        let x = s.toLowerCase();
-        x = x.replace(/ee|ii|ea/g, 'i').replace(/aa/g, 'a').replace(/oo|uu/g, 'u');
-        x = x.replace(/dh/g, 'd').replace(/gh/g, 'g').replace(/kh/g, 'k').replace(/th/g, 't').replace(/bh/g, 'b');
-        x = x.replace(/ph/g, 'f').replace(/w/g, 'v').replace(/z/g, 'j');
-        x = x.replace(/c(?!h)/g, 'k');
-        x = x.replace(/(.)\1+/g, '$1');
-        if (x.length > 3 && x.endsWith('a')) x = x.slice(0, -1);
-        return x;
-      }
-
-      function _E5(a, b) {
-        return (a.length <= 1 || b.length <= 1) ? 0 : _E2(_norm(a), _norm(b));
-      }
-
-      function _san(n) {
-        const va = { 'MD': 'MOHAMMAD', 'MOHD': 'MOHAMMAD', 'KR': 'KUMAR', 'KRI': 'KUMARI', 'PT': 'PANDIT' };
-        const st = ['DR', 'MR', 'MRS', 'JR', 'SR', 'SHRI', 'SMT', 'ADV', 'MS', 'MISS', 'SIR', 'MLA', 'MP'];
-        let w = n.split(' ');
-        if (va[w[0]]) w[0] = va[w[0]];
-        if (va[w[w.length - 1]]) w[w.length - 1] = va[w[w.length - 1]];
-        n = w.join(' ');
-        st.forEach(p => {
-          if (n.startsWith(p + ' ')) n = n.slice(p.length + 1);
-          if (n.endsWith(' ' + p))   n = n.slice(0, -(p.length + 1));
-        });
-        return n.trim();
-      }
-
-      function _dedup(ws) {
-        return ws.reduce((a, w) => (!a.length || a[a.length - 1] !== w) ? (a.push(w), a) : a, []);
-      }
-
-      function* _perms(arr, r) {
-        if (!r) { yield []; return; }
-        for (let i = 0; i < arr.length; i++)
-          for (const p of _perms(arr.filter((_, j) => j !== i), r - 1)) yield [arr[i], ...p];
-      }
-
-      function _abbrevs(nm) {
-        const tk = nm.split(' '), out = new Set();
-        for (let r = 0; r <= tk.length; r++)
-          for (const p of _perms(tk, r)) out.add(p.join(''));
-        return out;
-      }
-
-      function _abbrevPnC(nm) {
-        const tk = nm.split(' '), out = new Set();
-        for (let it = 1; it < tk.length; it++) {
-          for (let i = 0; i <= tk.length - it; i++) {
-            const t = [...tk];
-            for (let j = i; j < i + it; j++) t[j] = tk[j][0] || '';
-            for (const a of _abbrevs(t.join(' '))) out.add(a);
-          }
-        }
-        return out;
-      }
-
-      function _composite(n1, n2) {
-        const a = n1.replace(/ /g, ''), b = n2.replace(/ /g, '');
-        const sc = [_E4(a, b), _E1(a, b), _E5(a, b), _E2(a, b), _E6(a, b), _E3(n1, n2)];
-        return {
-          combined: sc.reduce((s, v, i) => s + v * _W[i], 0),
-          algos: { 'Lens-A': sc[3], 'Lens-B': sc[2], 'Lens-C': sc[1], 'Lens-D': sc[0], 'Lens-E': sc[4], 'Lens-F': sc[5] }
-        };
-      }
-
-      return {
-        score(r1, r2, thr) {
-          const threshold = typeof thr === 'number' ? thr / 100 : 0.72;
-          let n1 = _clean(r1).trim(), n2 = _clean(r2).trim();
-          if (!n1 || !n2) return { match: false, fuzzy: 0, special: false, reason: 'empty', algos: {} };
-          if (n1 === n2)  return { match: true,  fuzzy: 1, special: true,  reason: 'exact',  algos: {} };
-          let s1 = _san(n1), s2 = _san(n2);
-          const w1 = _dedup(s1.split(' ')), w2 = _dedup(s2.split(' '));
-          if (w1.length === w2.length && [...w1].reverse().join('') === w2.join(''))
-            return { match: true, fuzzy: 1, special: true, reason: 'reversed', algos: {} };
-          if (w1.length === 2 && w2.length === 2) {
-            const cm = w1.find(x => w2.includes(x));
-            const hi = [...w1, ...w2].some(x => x.length === 1);
-            if (cm && !hi) {
-              const f = _composite(w1.filter(x => x !== cm).join(''), w2.filter(x => x !== cm).join(''));
-              return { match: f.combined >= threshold, fuzzy: f.combined, special: false, reason: '', algos: f.algos };
-            }
-          }
-          const lg = n1.length >= n2.length ? n1 : n2;
-          const sh = (n1.length >= n2.length ? n2 : n1).replace(/ /g, '');
-          if (_abbrevs(lg).has(sh))    return { match: true, fuzzy: 1, special: true, reason: 'abbreviation', algos: {} };
-          if (_abbrevPnC(lg).has(sh))  return { match: true, fuzzy: 1, special: true, reason: 'abbreviation', algos: {} };
-          const f = _composite(s1, s2);
-          return { match: f.combined >= threshold, fuzzy: f.combined, special: false, reason: '', algos: f.algos };
-        }
-      };
-    })();
+  sections.forEach(section => revealObserver.observe(section));
 
 
-    function toggleStory(btn) {
-      const panel = document.getElementById('story-panel');
-      const open  = panel.classList.toggle('open');
-      btn.innerHTML = open
-        ? '<span>📖</span> Hide story'
-        : '<span>📖</span> The story behind this';
-    }
+  // ── Mobile Drawer ─────────────────────────────────────────────────
+
+  const hamburger = document.getElementById('hamburger');
+  const sidebar = document.getElementById('sidebar');
+  let backdrop = null;
+
+  function createBackdrop() {
+    backdrop = document.createElement('div');
+    backdrop.className = 'sidebar-backdrop';
+    document.body.appendChild(backdrop);
+    backdrop.addEventListener('click', closeDrawer);
+  }
+
+  function openDrawer() {
+    sidebar.classList.add('open');
+    hamburger.classList.add('active');
+    if (!backdrop) createBackdrop();
+    backdrop.classList.add('visible');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeDrawer() {
+    sidebar.classList.remove('open');
+    hamburger.classList.remove('active');
+    if (backdrop) backdrop.classList.remove('visible');
+    document.body.style.overflow = '';
+  }
+
+  hamburger.addEventListener('click', () => {
+    sidebar.classList.contains('open') ? closeDrawer() : openDrawer();
+  });
+
+  // Close drawer when sidebar link clicked (mobile)
+  sidebarLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 900) closeDrawer();
+    });
+  });
 
 
-    function initKnob() {
-      const wrap   = document.getElementById('knob-wrap');
-      const valEl  = document.getElementById('knob-val');
-      const hidden = document.getElementById('vld-threshold');
-      if (!wrap) return;
+  // ── Collapsible JSON Objects ──────────────────────────────────────
 
-      const MIN = 50, MAX = 90, DEFAULT = 72;
-      const ARC_DEG   = 240;
-      const START_DEG = 150;
-      let currentVal  = DEFAULT;
+  window.toggleJson = function(header) {
+    const obj = header.closest('.json-object');
+    obj.classList.toggle('expanded');
+  };
 
-      const NS  = 'http://www.w3.org/2000/svg';
-      const svg = document.createElementNS(NS, 'svg');
-      svg.setAttribute('viewBox', '0 0 72 72');
-      svg.classList.add('knob-svg');
+  window.toggleNestedJson = function(field) {
+    field.classList.toggle('expanded');
+  };
 
-      const isLight = () => document.documentElement.getAttribute('data-theme') === 'light';
-
-      const trackPath = document.createElementNS(NS, 'path');
-      trackPath.setAttribute('fill', 'none');
-      trackPath.setAttribute('stroke-width', '4');
-      trackPath.setAttribute('stroke-linecap', 'round');
-
-      const activePath = document.createElementNS(NS, 'path');
-      activePath.setAttribute('fill', 'none');
-      activePath.setAttribute('stroke', 'url(#knobGrad)');
-      activePath.setAttribute('stroke-width', '4');
-      activePath.setAttribute('stroke-linecap', 'round');
-
-      const defs = document.createElementNS(NS, 'defs');
-      const grad = document.createElementNS(NS, 'linearGradient');
-      grad.setAttribute('id', 'knobGrad');
-      grad.setAttribute('x1', '0%'); grad.setAttribute('y1', '0%');
-      grad.setAttribute('x2', '100%'); grad.setAttribute('y2', '100%');
-      const s1 = document.createElementNS(NS, 'stop');
-      s1.setAttribute('offset', '0%'); s1.setAttribute('stop-color', '#2b9cba');
-      const s2 = document.createElementNS(NS, 'stop');
-      s2.setAttribute('offset', '100%'); s2.setAttribute('stop-color', '#e8aa4a');
-      grad.appendChild(s1); grad.appendChild(s2); defs.appendChild(grad);
-
-      const body = document.createElementNS(NS, 'circle');
-      body.setAttribute('cx', '36'); body.setAttribute('cy', '36'); body.setAttribute('r', '22');
-      body.setAttribute('stroke-width', '1.5');
-
-      const dot = document.createElementNS(NS, 'circle');
-      dot.setAttribute('r', '3');
-      dot.setAttribute('fill', '#1ecbe1');
-
-      const filter = document.createElementNS(NS, 'filter');
-      filter.setAttribute('id', 'knobGlow');
-      const fe = document.createElementNS(NS, 'feGaussianBlur');
-      fe.setAttribute('stdDeviation', '2'); fe.setAttribute('result', 'blur');
-      filter.appendChild(fe);
-      defs.appendChild(filter);
-
-      const glowCircle = document.createElementNS(NS, 'circle');
-      glowCircle.setAttribute('cx', '36'); glowCircle.setAttribute('cy', '36');
-      glowCircle.setAttribute('r', '22');
-      glowCircle.setAttribute('fill', 'none');
-      glowCircle.setAttribute('stroke', 'rgba(43,156,186,0.0)');
-      glowCircle.setAttribute('stroke-width', '8');
-      glowCircle.setAttribute('filter', 'url(#knobGlow)');
-      glowCircle.setAttribute('id', 'knob-glow');
-
-      svg.appendChild(defs);
-      svg.appendChild(trackPath);
-      svg.appendChild(activePath);
-      svg.appendChild(glowCircle);
-      svg.appendChild(body);
-      svg.appendChild(dot);
-      wrap.appendChild(svg);
-
-      function toRad(d) { return d * Math.PI / 180; }
-
-      function polarPoint(cx, cy, r, deg) {
-        const rad = toRad(deg - 90);
-        return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
-      }
-
-      function arcPath(cx, cy, r, startDeg, endDeg) {
-        const s     = polarPoint(cx, cy, r, startDeg);
-        const e     = polarPoint(cx, cy, r, endDeg);
-        const sweep = ((endDeg - startDeg) + 360) % 360;
-        const large = sweep > 180 ? 1 : 0;
-        return `M${s.x.toFixed(3)},${s.y.toFixed(3)} A${r},${r},0,${large},1,${e.x.toFixed(3)},${e.y.toFixed(3)}`;
-      }
-
-      function applyKnobTheme() {
-        const light = isLight();
-        trackPath.setAttribute('stroke', light ? 'rgba(26,122,150,0.18)' : 'rgba(255,255,255,0.07)');
-        body.setAttribute('fill',   light ? '#fdfaf0'                    : 'rgba(20,29,48,0.95)');
-        body.setAttribute('stroke', light ? 'rgba(26,122,150,0.45)'      : 'rgba(43,90,102,0.5)');
-      }
-
-      function render(val) {
-        const t       = (val - MIN) / (MAX - MIN);
-        const endDeg  = START_DEG + t * ARC_DEG;
-        const endFull = START_DEG + ARC_DEG;
-
-        trackPath.setAttribute('d', arcPath(36, 36, 28, START_DEG, endFull));
-        activePath.setAttribute('d', arcPath(36, 36, 28, START_DEG, endDeg));
-
-        const dp = polarPoint(36, 36, 16, endDeg);
-        dot.setAttribute('cx', dp.x.toFixed(3));
-        dot.setAttribute('cy', dp.y.toFixed(3));
-
-        valEl.textContent = val + '%';
-        hidden.value      = val;
-
-        glowCircle.setAttribute('stroke', `rgba(43,156,186,${(t * 0.35).toFixed(2)})`);
-        applyKnobTheme();
-      }
-
-      // re-render knob when theme toggles
-      const knobThemeObserver = new MutationObserver(() => render(currentVal));
-      knobThemeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-
-      render(DEFAULT);
-
-      let dragging = false, lastAngle = null;
-
-      function angleFromCentre(e) {
-        const r  = wrap.getBoundingClientRect();
-        const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-        const px = e.touches ? e.touches[0].clientX : e.clientX;
-        const py = e.touches ? e.touches[0].clientY : e.clientY;
-        return Math.atan2(py - cy, px - cx) * 180 / Math.PI;
-      }
-
-      function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
-
-      function onDragStart(e) { dragging = true; lastAngle = angleFromCentre(e); e.preventDefault(); }
-
-      function onDragMove(e) {
-        if (!dragging) return;
-        const angle = angleFromCentre(e);
-        let delta   = angle - lastAngle;
-        if (delta >  180) delta -= 360;
-        if (delta < -180) delta += 360;
-        lastAngle  = angle;
-        const step = delta * (MAX - MIN) / ARC_DEG;
-        currentVal = clamp(Math.round(currentVal + step), MIN, MAX);
-        render(currentVal);
-        e.preventDefault();
-      }
-
-      function onDragEnd() { dragging = false; lastAngle = null; }
-
-      wrap.addEventListener('mousedown',  onDragStart);
-      wrap.addEventListener('touchstart', onDragStart, { passive: false });
-      window.addEventListener('mousemove',  onDragMove);
-      window.addEventListener('touchmove',  onDragMove, { passive: false });
-      window.addEventListener('mouseup',    onDragEnd);
-      window.addEventListener('touchend',   onDragEnd);
-
-      wrap.addEventListener('wheel', e => {
-        e.preventDefault();
-        currentVal = clamp(currentVal + (e.deltaY < 0 ? 1 : -1), MIN, MAX);
-        render(currentVal);
-      }, { passive: false });
-    }
+  // Auto-expand first role on load
+  const firstCollapsible = document.querySelector('[data-collapsible]');
+  if (firstCollapsible) firstCollapsible.classList.add('expanded');
 
 
-    function runValidator() {
-      const n1  = document.getElementById('vld-name1').value.trim();
-      const n2  = document.getElementById('vld-name2').value.trim();
-      if (!n1 || !n2) {
-        ['vld-name1', 'vld-name2'].forEach(id => {
-          const el = document.getElementById(id);
-          if (!el.value.trim()) {
-            el.classList.remove('input-error');
-            void el.offsetWidth; // reflow to restart animation
-            el.classList.add('input-error');
-            el.addEventListener('input', () => el.classList.remove('input-error'), { once: true });
+  // ── Skill Tab Switching ───────────────────────────────────────────
+  window.switchSkillTab = function(tab, btnEl) {
+    // Toggle panels
+    document.getElementById('skill-panel-technical').style.display = tab === 'technical' ? '' : 'none';
+    document.getElementById('skill-panel-soft').style.display = tab === 'soft' ? '' : 'none';
+    // Toggle active tab button
+    document.querySelectorAll('.skill-tab').forEach(t => t.classList.remove('active'));
+    btnEl.classList.add('active');
+    // HTTP toast
+    showToast(200, `GET /skills/${tab}`);
+    bumpRequest('GET');
+  };
+
+
+  // ── Mobile Bottom Tabs ────────────────────────────────────────────
+  const mobileTabs = document.querySelectorAll('.mobile-tab');
+
+  // Sync mobile tabs with scroll spy + bump animation
+  const mobileTabObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        mobileTabs.forEach(tab => {
+          const isActive = tab.dataset.section === id;
+          const wasActive = tab.classList.contains('active');
+          tab.classList.toggle('active', isActive);
+          // Bump animation when newly activated
+          if (isActive && !wasActive) {
+            tab.classList.add('just-activated');
+            setTimeout(() => tab.classList.remove('just-activated'), 400);
           }
         });
+      }
+    });
+  }, { rootMargin: '-30% 0px -50% 0px', threshold: 0 });
+
+  sections.forEach(section => mobileTabObserver.observe(section));
+
+
+  // ── Scroll Progress Bar ───────────────────────────────────────────
+  const scrollBar = document.getElementById('scroll-progress-bar');
+  if (scrollBar) {
+    window.addEventListener('scroll', () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      scrollBar.style.width = pct + '%';
+    }, { passive: true });
+  }
+
+
+  // ── Request Fly Animation ─────────────────────────────────────────
+  // When clicking sidebar/tab links, fire a "request" visual
+
+  const flyEl = document.getElementById('request-fly');
+
+  function fireRequestFly(fromEl, isPost) {
+    if (!flyEl || !fromEl) return;
+    const rect = fromEl.getBoundingClientRect();
+    flyEl.style.left = rect.left + rect.width / 2 - 20 + 'px';
+    flyEl.style.top = rect.top + 'px';
+    flyEl.textContent = isPost ? 'POST' : 'GET';
+    flyEl.className = 'request-fly active' + (isPost ? ' post-fly' : '');
+
+    // Reset for next use
+    setTimeout(() => { flyEl.className = 'request-fly'; }, 600);
+  }
+
+  // Fire on sidebar link clicks
+  sidebarLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      const isPost = link.textContent.includes('POST');
+      fireRequestFly(link, isPost);
+    });
+  });
+
+  // Fire on mobile tab clicks
+  mobileTabs.forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      const isPost = tab.querySelector('.method-post') !== null;
+      fireRequestFly(tab, isPost);
+    });
+  });
+
+
+  // ── Live Uptime Counter ────────────────────────────────────────────
+  // Career start: Dec 2, 2019
+  const CAREER_START = new Date(2019, 11, 2);
+  // Gap period (excluded): Jan 2021 – Mar 2022 = ~456 days
+  const GAP_DAYS = 456;
+
+  function updateUptime() {
+    const now = new Date();
+    let totalMs = now - CAREER_START;
+    totalMs -= GAP_DAYS * 86400000; // subtract gap
+
+    const totalSecs = Math.floor(totalMs / 1000);
+    const years = Math.floor(totalSecs / (365.25 * 86400));
+    const months = Math.floor((totalSecs % (365.25 * 86400)) / (30.44 * 86400));
+    const days = Math.floor((totalSecs % (30.44 * 86400)) / 86400);
+    const hours = Math.floor((totalSecs % 86400) / 3600);
+    const mins = Math.floor((totalSecs % 3600) / 60);
+    const secs = totalSecs % 60;
+
+    const el = (id) => document.getElementById(id);
+    if (el('uptime-years')) el('uptime-years').textContent = years;
+    if (el('uptime-months')) el('uptime-months').textContent = months;
+    if (el('uptime-days')) el('uptime-days').textContent = days;
+    if (el('uptime-hours')) el('uptime-hours').textContent = hours;
+    if (el('uptime-mins')) el('uptime-mins').textContent = String(mins).padStart(2, '0');
+    if (el('uptime-secs')) el('uptime-secs').textContent = String(secs).padStart(2, '0');
+
+    // Mobile compact uptime with tick
+    const mwUptime = el('mw-uptime');
+    if (mwUptime) {
+      mwUptime.textContent = `${years}y ${months}mo ${days}d`;
+      mwUptime.classList.add('tick');
+      setTimeout(() => mwUptime.classList.remove('tick'), 100);
+    }
+  }
+  updateUptime();
+  setInterval(updateUptime, 1000);
+
+
+  // ── Rate Limit Progress ───────────────────────────────────────────
+  const visitedSections = new Set();
+  const totalEndpoints = 6;
+
+  const rateLimitObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        visitedSections.add(entry.target.id);
+        const count = visitedSections.size;
+        const pct = (count / totalEndpoints * 100) + '%';
+        const fill = document.getElementById('ratelimit-fill');
+        const text = document.getElementById('ratelimit-text');
+        if (fill) fill.style.width = pct;
+        if (text) text.textContent = `${count} / ${totalEndpoints} endpoints explored`;
+        // Mobile widget sync
+        const mwFill = document.getElementById('mw-ratelimit-fill');
+        const mwText = document.getElementById('mw-ratelimit-text');
+        if (mwFill) mwFill.style.width = pct;
+        if (mwText) mwText.textContent = `${count}/${totalEndpoints}`;
+      }
+    });
+  }, { threshold: 0.3 });
+
+  sections.forEach(section => rateLimitObserver.observe(section));
+
+
+  // ── Request Counter ────────────────────────────────────────────────
+  let reqGets = 0, reqPosts = 0;
+
+  function bumpRequest(type) {
+    if (type === 'POST') reqPosts++;
+    else reqGets++;
+    const total = reqGets + reqPosts;
+    const countEl = document.getElementById('req-count');
+    const breakdownEl = document.getElementById('req-breakdown');
+    if (countEl) {
+      countEl.textContent = total;
+      countEl.classList.add('bump');
+      setTimeout(() => countEl.classList.remove('bump'), 150);
+    }
+    if (breakdownEl) breakdownEl.textContent = `${reqGets} GET · ${reqPosts} POST`;
+    // Mobile widget sync
+    const mwReq = document.getElementById('mw-requests');
+    if (mwReq) mwReq.textContent = total;
+  }
+
+  // Hook into existing interactions
+  // Scroll → GET, Validator run → POST, Skill click → GET
+  const reqScrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !entry.target.dataset.reqCounted) {
+        entry.target.dataset.reqCounted = 'true';
+        bumpRequest('GET');
+      }
+    });
+  }, { threshold: 0.5 });
+  sections.forEach(s => reqScrollObserver.observe(s));
+
+
+  // ── HTTP Status Toasts ────────────────────────────────────────────
+  const httpToast = document.getElementById('http-toast');
+  let toastTimer = null;
+
+  function showToast(status, message) {
+    if (!httpToast) return;
+    const cls = status < 300 ? '--200' : status < 400 ? '--301' : '--404';
+    httpToast.innerHTML = `<span class="toast-status toast-status${cls}">${status}</span>${message}`;
+    httpToast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => httpToast.classList.remove('show'), 2500);
+  }
+
+  // Show 200 when scrolling into a section
+  const toastObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !entry.target.dataset.toasted) {
+        entry.target.dataset.toasted = 'true';
+        const path = entry.target.id === 'overview' ? '/' : '/' + entry.target.id;
+        showToast(200, `GET ${path}`);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  sections.forEach(section => toastObserver.observe(section));
+
+
+  // ── Skill Terminal (man page) ─────────────────────────────────────
+  const SKILL_DATA = {
+    "C#": { synopsis: "Primary language · 5+ years daily", usage: "All backend services, APIs, shared libraries, Azure Functions", where: "Siemens, IndiaLends, Telebu", see: "ASP.NET Core, .NET Core, LINQ" },
+    "SQL": { synopsis: "Query language for relational databases", usage: "Stored procedures, query optimization, migrations, reporting", where: "All companies — SQL Server primary", see: "T-SQL, Dapper, EF Core" },
+    "JavaScript": { synopsis: "Frontend & scripting", usage: "jQuery UI components, Azure Function triggers, this portfolio", where: "IndiaLends (frontend), Siemens (DevExpress)", see: "jQuery, Vue.js" },
+    "ASP.NET Core": { synopsis: "Web framework for .NET", usage: "REST APIs, Minimal APIs, MVC endpoints, middleware pipelines", where: "Siemens (dashboard satellite, P&S microservice)", see: "Minimal APIs, REST, OIDC" },
+    ".NET Core": { synopsis: "Cross-platform runtime", usage: "All new services since 2022, shared libraries, container targets", where: "Siemens, IndiaLends", see: "ASP.NET Core, Docker" },
+    "Minimal APIs": { synopsis: ".NET 8 lightweight API pattern", usage: "Dashboard satellite service, P&S microservice endpoints", where: "Siemens — new services", see: "ASP.NET Core, REST" },
+    "REST": { synopsis: "API design pattern", usage: "All service interfaces — resource-oriented, versioned, documented", where: "All companies", see: "Swagger/OpenAPI, JSON" },
+    "CQRS / MediatR": { synopsis: "Command/Query separation + mediator", usage: "P&S microservice — separate read/write models", where: "Siemens", see: "DDD, Clean Architecture" },
+    "DDD": { synopsis: "Domain-Driven Design", usage: "Aggregate design, bounded contexts, ubiquitous language in P&S service", where: "Siemens (P&S microservice)", see: "Clean Architecture, CQRS" },
+    "Clean Architecture": { synopsis: "Layered dependency inversion", usage: "Service structure: Domain → Application → Infrastructure → API", where: "Siemens — all new services", see: "DDD, CQRS / MediatR" },
+    "Microservices": { synopsis: "Independently deployable services", usage: "Dashboard satellite (Strangler Fig), P&S service, credential service", where: "Siemens — platform modernisation", see: "Docker, REST, DDD" },
+    "BDD": { synopsis: "Behaviour-Driven Development", usage: "SpecFlow/ReqnRoll scenarios, Given-When-Then test structure", where: "Siemens — all new services", see: "NUnit, SpecFlow, Moq" },
+    "Azure Functions": { synopsis: "Serverless compute", usage: "HTTP triggers (webhooks), Queue/Blob/Timer triggers for async workflows", where: "IndiaLends — document processing, scheduled reports", see: "Service Bus, Blob Storage" },
+    "Entity Framework": { synopsis: "ORM for .NET (EF6 legacy)", usage: "Existing monolith data access layer — 170+ project codebase", where: "Siemens (legacy platform)", see: "EF Core, Dapper, LINQ" },
+    "EF Core": { synopsis: "Modern ORM for .NET Core", usage: "New service data layers, migrations, code-first models", where: "Siemens (new services)", see: "Dapper, LINQ, PostgreSQL" },
+    "Dapper": { synopsis: "Micro-ORM — raw SQL performance", usage: "Replaced EF for dashboard — 3x faster queries via stored procs", where: "Siemens (dashboard optimization)", see: "T-SQL, SQL Server" },
+    "LINQ": { synopsis: "Language-integrated query", usage: "Collection transformations, EF queries, data pipeline operations", where: "All companies", see: "EF Core, C#" },
+    "T-SQL": { synopsis: "SQL Server dialect", usage: "Stored procedures, views, performance tuning, index optimization", where: "Siemens, IndiaLends", see: "SQL Server, Dapper" },
+    "SQL Server": { synopsis: "Primary relational database", usage: "Multi-tenant schemas, stored procs, maintenance jobs, Always On AG", where: "Siemens, IndiaLends", see: "T-SQL, Dapper, EF Core" },
+    "PostgreSQL": { synopsis: "Open-source relational DB", usage: "New microservice data stores, container-friendly deployments", where: "Siemens (new services)", see: "EF Core, Docker" },
+    "Redis": { synopsis: "In-memory cache / data store", usage: "Session caching, credential caching (shared library), distributed lock", where: "Siemens (shared NuGet library)", see: "AWS Secrets Manager, Resiliency" },
+    "Azure App Service": { synopsis: "PaaS web hosting", usage: "Production deployment target for monolith and satellites", where: "Siemens, IndiaLends", see: "Docker, Azure DevOps" },
+    "Service Bus": { synopsis: "Enterprise message broker", usage: "Async event-driven workflows, decoupled service communication", where: "IndiaLends (financial workflows)", see: "Azure Functions, Queue triggers" },
+    "Blob Storage": { synopsis: "Azure object storage", usage: "Document storage, report generation output, file upload handling", where: "IndiaLends", see: "Azure Functions" },
+    "AWS Secrets Manager": { synopsis: "Cloud secret management", usage: "Secure DB credential resolution, region-aware rotation in shared library", where: "Siemens (container migration)", see: "Redis, Resiliency Patterns" },
+    "Docker": { synopsis: "Container runtime", usage: "Local dev environments, Linux container targets for platform migration", where: "Siemens (Windows→Linux migration)", see: "Microservices, .NET Core" },
+    "OIDC / OAuth2": { synopsis: "Auth protocol standards", usage: "Enterprise SSO integration, token validation middleware", where: "Siemens (Auth0 ecosystem)", see: "JWT, Auth0, Cookie Auth" },
+    "JWT": { synopsis: "JSON Web Tokens", usage: "API authentication, claims-based authorization, token refresh flows", where: "Siemens, IndiaLends", see: "OIDC, Auth0" },
+    "Auth0": { synopsis: "Identity platform", usage: "Centralised auth service, tenant isolation, session management", where: "Siemens", see: "OIDC, JWT" },
+    "VAPT Remediation": { synopsis: "Vulnerability & Penetration Testing fixes", usage: "Remediated findings from security assessments — XSS, CSRF, injection", where: "IndiaLends", see: "Auth, Security" },
+    "Azure DevOps": { synopsis: "CI/CD + project management", usage: "Build pipelines, release gates, Azure Repos, work items", where: "IndiaLends, Siemens (boards)", see: "Jenkins, TeamCity" },
+    "Jenkins": { synopsis: "CI/CD automation server", usage: "Production release pipelines, automated testing gates", where: "Siemens", see: "TeamCity, SonarQube" },
+    "TeamCity": { synopsis: "JetBrains CI/CD", usage: "Build configurations, NuGet package publishing to MyGet", where: "Siemens", see: "Jenkins, MyGet" },
+    "SonarQube": { synopsis: "Static code analysis", usage: "Code quality gates — coverage, duplication, complexity, vulnerabilities", where: "Siemens (CI pipeline)", see: "Snyk, Jenkins" },
+    "Snyk": { synopsis: "Dependency vulnerability scanning", usage: "NuGet package security, container image scanning in CI", where: "Siemens", see: "SonarQube, Docker" },
+    "Grafana": { synopsis: "Observability dashboards", usage: "Production monitoring — API latency, error rates, resource usage", where: "Siemens (production)", see: "Datadog" },
+    "Datadog": { synopsis: "APM & monitoring platform", usage: "Distributed tracing, log aggregation, alerting on production issues", where: "Siemens", see: "Grafana" },
+    "NUnit": { synopsis: "Unit testing framework", usage: "All unit + integration tests, parameterized test cases", where: "Siemens", see: "Moq, SpecFlow" },
+    "SpecFlow": { synopsis: "BDD framework for .NET", usage: "Given-When-Then feature files, stakeholder-readable test specs", where: "Siemens", see: "ReqnRoll, NUnit" },
+    "ReqnRoll": { synopsis: "SpecFlow successor (OSS)", usage: "Migration from SpecFlow, new BDD scenarios post-2024", where: "Siemens (new services)", see: "SpecFlow, NUnit" },
+    "Moq": { synopsis: "Mocking framework", usage: "Dependency isolation in unit tests, verify interactions", where: "Siemens", see: "NUnit, BDD" },
+  };
+
+  document.querySelectorAll('.skill-tag').forEach(tag => {
+    tag.style.cursor = 'pointer';
+    tag.addEventListener('click', () => {
+      // Deselect all, select this
+      document.querySelectorAll('.skill-tag.selected').forEach(t => t.classList.remove('selected'));
+      tag.classList.add('selected');
+      bumpRequest('GET');
+      const name = tag.textContent.trim();
+      const data = SKILL_DATA[name];
+      const terminal = document.getElementById('skill-terminal');
+      const title = document.getElementById('skill-terminal-title');
+      const body = document.getElementById('skill-terminal-body');
+
+      if (!data) {
+        title.textContent = `$ man ${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+        body.innerHTML = `<span class="man-dim">No manual entry for ${name}</span>`;
+        terminal.classList.add('active');
         return;
       }
-      const thr = parseInt(document.getElementById('vld-threshold').value, 10);
 
-      const btn = document.getElementById('vld-btn');
-      btn.disabled = true;
-      setTimeout(() => btn.disabled = false, 600);
+      title.textContent = `$ man ${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
+      body.innerHTML = `
+        <div class="man-section">
+          <div class="man-heading">NAME</div>
+          <div class="man-content">${name}</div>
+        </div>
+        <div class="man-section">
+          <div class="man-heading">SYNOPSIS</div>
+          <div class="man-content">${data.synopsis}</div>
+        </div>
+        <div class="man-section">
+          <div class="man-heading">USAGE</div>
+          <div class="man-content man-content--gold">${data.usage}</div>
+        </div>
+        <div class="man-section">
+          <div class="man-heading">WHERE</div>
+          <div class="man-content man-content--green">${data.where}</div>
+        </div>
+        <div class="man-section">
+          <div class="man-heading">SEE ALSO</div>
+          <div class="man-content man-ref">${data.see}</div>
+        </div>
+      `;
+      terminal.classList.add('active');
+      terminal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  });
 
-      const res = _nv.score(n1, n2, thr);
 
-      ['vld-name1', 'vld-name2'].forEach(id => {
-        const el = document.getElementById(id);
-        el.classList.remove('input-match', 'input-nomatch');
-        el.classList.add(res.match ? 'input-match' : 'input-nomatch');
-      });
+  // ── Console Easter Egg ────────────────────────────────────────────
+  console.log('%c' + `
+  ╔═══════════════════════════════════════════════════════════╗
+  ║                                                           ║
+  ║   Hey! You opened DevTools. I like you already.           ║
+  ║                                                           ║
+  ║   🔧  Deepanshu Kumar                                     ║
+  ║   💼  Backend Engineer · .NET · 5+ years                  ║
+  ║   📍  Noida, India                                        ║
+  ║                                                           ║
+  ║   If you're hiring:                                       ║
+  ║   → deepanshu.kumar@outlook.in                            ║
+  ║   → linkedin.com/in/deepanshu-kumar-dev                   ║
+  ║                                                           ║
+  ║   This site: Zero dependencies. Vanilla JS. No framework. ║
+  ║   Because sometimes the best architecture is the simplest. ║
+  ║                                                           ║
+  ╚═══════════════════════════════════════════════════════════╝
+  `, 'color: #1ecbe1; font-family: monospace; font-size: 11px;');
 
-      document.getElementById('vld-verdict').className = 'verdict-banner ' + (res.match ? 'match' : 'nomatch');
-      document.getElementById('vld-icon').textContent  = res.match ? '✅' : '❌';
-      document.getElementById('vld-verdict-title').textContent = res.match ? 'Names Match' : 'Names Do Not Match';
+  console.log('%cGET /hire-me → 200 OK', 'color: #49cc90; font-weight: bold; font-size: 14px;');
 
-      let sub = '';
-      if (res.special) {
-        const lbl = { exact: 'Exact match', reversed: 'Name parts in reversed order', abbreviation: 'One name is an abbreviation of the other' };
-        sub = lbl[res.reason] || 'Deterministic match';
-      } else {
-        sub = `Composite score: ${Math.round(res.fuzzy * 100)}% (threshold ${thr}%)`;
-      }
-      document.getElementById('vld-verdict-sub').textContent = sub;
 
-      const rrow = document.getElementById('vld-reason-row');
-      if (res.special) { rrow.style.display = 'block'; rrow.innerHTML = `<span class="match-reason-chip">⚡ ${sub}</span>`; }
-      else rrow.style.display = 'none';
+  // ── PAN Name Validator (Simplified for prototype) ─────────────────
+  // Full weighted ensemble algorithm — Jaro-Winkler + Damerau-Levenshtein
+  // + Dice/Sorensen + token sort
 
-      const pct   = Math.round(res.fuzzy * 100);
-      const gfill = document.getElementById('vld-gauge-combined');
-      const gval  = document.getElementById('vld-gauge-combined-val');
-      gfill.className    = 'score-gauge-fill ' + (pct >= thr ? 'high' : pct >= thr * 0.75 ? 'medium' : 'low');
-      gval.textContent   = pct + '%';
-      gval.style.color   = pct >= thr ? '#5bd4a0' : pct >= (thr * 0.75) ? 'var(--color-gold-light)' : '#e07a7a';
-      setTimeout(() => gfill.style.width = Math.min(pct, 100) + '%', 50);
+  window.runValidator = function() {
+    const rawName1 = document.getElementById('vld-name1').value.trim();
+    const rawName2 = document.getElementById('vld-name2').value.trim();
+    const threshold = parseInt(document.getElementById('vld-threshold').value) || 72;
+    const animate = document.getElementById('vld-animate').checked;
+    const resultEl = document.getElementById('vld-result');
+    const statusEl = document.getElementById('vld-status');
+    const bodyEl = document.getElementById('vld-response-body');
+    const traceEl = document.getElementById('pipeline-trace');
+    const traceBody = document.getElementById('trace-body');
+    const elapsedEl = document.getElementById('trace-elapsed');
+    const btn = document.getElementById('vld-btn');
 
-      const track = gfill.parentElement;
-      let marker  = track.querySelector('.thr-marker');
-      if (!marker) {
-        marker = document.createElement('div');
-        marker.className   = 'thr-marker';
-        marker.style.cssText = 'position:absolute;top:0;bottom:0;width:2px;background:rgba(232,170,74,0.7);border-radius:1px;';
-        track.style.position = 'relative';
-        track.appendChild(marker);
-      }
-      marker.style.left = Math.min(thr, 100) + '%';
+    bumpRequest('POST');
 
-      const grid = document.getElementById('vld-algo-grid');
-      grid.innerHTML = '';
-      Object.entries(res.algos).forEach(([name, val]) => {
-        const p    = Math.round(val * 100);
-        const card = document.createElement('div');
-        card.className = 'algo-card';
-        card.innerHTML = `<div class="algo-name">${name}</div>
-          <div class="algo-bar-track"><div class="algo-bar-fill" style="width:0%" data-pct="${p}"></div></div>
-          <div class="algo-score-val">${p}%</div>`;
-        grid.appendChild(card);
-      });
-      setTimeout(() => grid.querySelectorAll('.algo-bar-fill').forEach(el => { el.style.width = Math.min(+el.dataset.pct, 100) + '%'; }), 80);
-
-      document.getElementById('vld-result').classList.add('visible');
+    if (!rawName1 || !rawName2) {
+      resultEl.style.display = 'block';
+      traceEl.style.display = 'none';
+      statusEl.textContent = '400 Bad Request';
+      statusEl.style.color = '#f87171';
+      bodyEl.textContent = JSON.stringify({ error: "Both fields required", status: 400 }, null, 2);
+      return;
     }
 
-    ['vld-name1', 'vld-name2'].forEach(id => {
-      document.getElementById(id)?.addEventListener('keydown', e => { if (e.key === 'Enter') runValidator(); });
+    const name1 = rawName1.toUpperCase();
+    const name2 = rawName2.toUpperCase();
+
+    // Strip titles
+    const TITLES = /^(DR|MR|MRS|MS|SHRI|SMT|PROF)\.?\s+/i;
+    const afterTitle1 = name1.replace(TITLES, '');
+    const afterTitle2 = name2.replace(TITLES, '');
+    const titlesFound = name1 !== afterTitle1 || name2 !== afterTitle2;
+
+    // Expand common prefixes/suffixes
+    const EXPANSIONS = {
+      'MD': 'MOHAMMAD', 'MOHD': 'MOHAMMAD', 'MHD': 'MOHAMMAD',
+      'PT': 'PANDIT', 'PD': 'PANDIT',
+      'KR': 'KUMAR', 'KMR': 'KUMAR',
+      'CH': 'CHANDRA', 'CHDR': 'CHANDRA',
+      'SK': 'SHEIKH', 'SH': 'SHEIKH',
+      'SM': 'SAMAN', 'SRI': 'SHRI',
+      'RAM': 'RAMA', 'DEV': 'DEVI',
+      'JR': 'JUNIOR', 'SR': 'SENIOR',
+    };
+
+    function expandAbbrevs(name) {
+      const tokens = name.split(/\s+/);
+      const expanded = tokens.map(t => EXPANSIONS[t] || t);
+      return expanded.join(' ');
+    }
+
+    const expanded1 = expandAbbrevs(afterTitle1);
+    const expanded2 = expandAbbrevs(afterTitle2);
+    const expansionsApplied = expanded1 !== afterTitle1 || expanded2 !== afterTitle2;
+    const stripped1 = expanded1;
+    const stripped2 = expanded2;
+
+    // Fast paths
+    const isExact = stripped1 === stripped2;
+    const tokens1 = stripped1.split(/\s+/).filter(Boolean);
+    const tokens2 = stripped2.split(/\s+/).filter(Boolean);
+    const isReversed = !isExact && tokens1.slice().reverse().join(' ') === tokens2.join(' ');
+
+    // Abbreviation check — recursive permutation approach (matches original repo)
+    // Generates all permutations of tokens + partial-initial variants, checks if
+    // the shorter name (no spaces) exists in that set.
+
+    function* _perms(arr, r) {
+      if (!r) { yield []; return; }
+      for (let i = 0; i < arr.length; i++)
+        for (const p of _perms(arr.filter((_, j) => j !== i), r - 1)) yield [arr[i], ...p];
+    }
+
+    function _abbrevs(nm) {
+      const tk = nm.split(' '), out = new Set();
+      for (let r = 0; r <= tk.length; r++)
+        for (const p of _perms(tk, r)) out.add(p.join(''));
+      return out;
+    }
+
+    function _abbrevPnC(nm) {
+      const tk = nm.split(' '), out = new Set();
+      // it <= tk.length: allows replacing ALL tokens with initials (e.g. "DK" from "DEEPANSHU KUMAR")
+      for (let it = 1; it <= tk.length; it++) {
+        for (let i = 0; i <= tk.length - it; i++) {
+          const t = [...tk];
+          for (let j = i; j < i + it; j++) t[j] = tk[j][0] || '';
+          for (const a of _abbrevs(t.join(' '))) out.add(a);
+        }
+      }
+      return out;
+    }
+
+    const longer = stripped1.length >= stripped2.length ? stripped1 : stripped2;
+    const shorter = (stripped1.length >= stripped2.length ? stripped2 : stripped1).replace(/ /g, '');
+    const abbrevSet = _abbrevs(longer);
+    const abbrevPnCSet = _abbrevPnC(longer);
+    const hasAbbrev = abbrevSet.has(shorter) || abbrevPnCSet.has(shorter);
+    // Collect a sample of generated abbreviations for the trace display (filter empty strings)
+    const abbrevSamples = [...new Set([...abbrevSet, ...abbrevPnCSet])].filter(a => a.length > 0).slice(0, 12);
+
+    // Generate phonetic variations (Indian names)
+    function getVariations(name) {
+      const vars = [name];
+      const rules = [
+        [/PH/g, 'F'], [/EE/g, 'I'], [/OO/g, 'U'],
+        [/TH/g, 'T'], [/DH/g, 'D'], [/SH/g, 'S'],
+        [/GH/g, 'G'], [/KH/g, 'K'], [/BH/g, 'B'],
+        [/AA/g, 'A'], [/EE/g, 'I'], [/Y$/g, 'I'],
+        [/W/g, 'V'], [/Z/g, 'J'],
+      ];
+      rules.forEach(([pat, rep]) => {
+        const v = name.replace(pat, rep);
+        if (v !== name && !vars.includes(v)) vars.push(v);
+      });
+      return vars;
+    }
+    const variations1 = getVariations(stripped1);
+    const variations2 = getVariations(stripped2);
+
+    // Find which variation pairs are closest
+    let bestVarPair = null;
+    let bestVarScore = 0;
+    variations1.forEach(v1 => {
+      variations2.forEach(v2 => {
+        const s = jaroWinkler(v1, v2);
+        if (s > bestVarScore) { bestVarScore = s; bestVarPair = [v1, v2]; }
+      });
     });
 
+    // Calculate scores
+    const jw = jaroWinkler(stripped1, stripped2);
+    const dl = 1 - (damerauLevenshtein(stripped1, stripped2) / Math.max(stripped1.length, stripped2.length));
+    const dice = diceCoefficient(stripped1, stripped2);
+    const tokenSort = tokenSortRatio(stripped1, stripped2);
+    const composite = Math.round((jw * 0.35 + dl * 0.25 + dice * 0.20 + tokenSort * 0.20) * 100);
+    const isMatch = composite >= threshold;
+    const band = Math.abs(composite - threshold) <= 5;
 
-    function initSourceTooltip() {
-      const btn = document.getElementById('src-info-btn');
-      if (!btn) return;
+    const finalResult = {
+      match: isMatch,
+      composite_score: composite,
+      threshold: threshold,
+      verdict: isMatch ? "MATCH" : (band ? "REVIEW_BAND" : "REJECT"),
+      fallback_required: band,
+      algorithms: {
+        jaro_winkler: { score: Math.round(jw * 100), weight: 0.35 },
+        damerau_levenshtein: { score: Math.round(dl * 100), weight: 0.25 },
+        dice_coefficient: { score: Math.round(dice * 100), weight: 0.20 },
+        token_sort: { score: Math.round(tokenSort * 100), weight: 0.20 }
+      },
+      input: { name_on_pan: stripped1, name_provided: stripped2 }
+    };
 
-      // Appended to body so it escapes any overflow:hidden ancestor
-      const tip = document.createElement('div');
-      tip.id = 'src-tooltip';
-      tip.innerHTML = `
-        <div style="font-size:11px;font-weight:700;letter-spacing:1px;
-                    text-transform:uppercase;color:var(--color-accent);margin-bottom:8px;">
-          About this code
+    function showResult() {
+      statusEl.textContent = '200 OK';
+      statusEl.style.color = 'var(--method-get)';
+      resultEl.style.display = 'block';
+      bodyEl.textContent = JSON.stringify(finalResult, null, 2);
+      btn.disabled = false;
+      btn.textContent = 'Send Request';
+      // Scroll to the response
+      setTimeout(() => {
+        resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }, 100);
+    }
+
+    // Quick mode
+    if (!animate) {
+      traceEl.style.display = 'none';
+      showResult();
+      return;
+    }
+
+    // ── Animated trace mode ───────────────────────────────────────
+    btn.disabled = true;
+    btn.textContent = 'Processing...';
+    resultEl.style.display = 'none';
+    traceEl.style.display = 'block';
+    traceBody.innerHTML = '';
+
+    let elapsed = 0;
+    const timer = setInterval(() => {
+      elapsed += 50;
+      if (elapsedEl) elapsedEl.textContent = elapsed + 'ms';
+    }, 50);
+
+    // Build trace steps as an array of {delay, html}
+    const trace = [];
+    let delay = 0;
+    const STEP = 350;
+
+    // Step 1: Normalize
+    delay += STEP;
+    trace.push({ delay, html: `
+      <div class="trace-step">
+        <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">Normalize — uppercase, trim whitespace</span></div>
+        <div class="trace-data trace-data--highlight">
+          <span class="trace-dim">pan →</span> <span class="trace-val">"${name1}"</span><br>
+          <span class="trace-dim">provided →</span> <span class="trace-val">"${name2}"</span>
         </div>
-        The GitHub repo is a <strong>portfolio-adapted version</strong>
-        of the original production system. Core matching algorithms are unchanged.
-        The interactive console, config system, and file structure were added
-        specifically for this public showcase.
-        <div class="tip-arrow"></div>`;
+      </div>
+    `});
 
-      document.body.appendChild(tip);
+    // Step 2: Strip titles (only show if titles found)
+    if (titlesFound) {
+      delay += STEP;
+      trace.push({ delay, html: `
+        <div class="trace-step">
+          <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">Strip titles — Dr., Mr., Shri, Smt.</span></div>
+          <div class="trace-data trace-data--highlight">
+            <span class="trace-dim">cleaned →</span> <span class="trace-val">"${afterTitle1}"</span> vs <span class="trace-val">"${afterTitle2}"</span>
+          </div>
+        </div>
+      `});
+    }
 
-      function showTip() {
-        const r   = btn.getBoundingClientRect();
-        const tipW = 260;
-        let left   = r.right - tipW;
-        if (left < 8) left = 8;
-        tip.style.left         = left + 'px';
-        tip.style.top          = (r.top - tip.offsetHeight - 10) + 'px';
-        tip.style.opacity      = '1';
-        tip.style.pointerEvents = 'auto';
-        btn.style.borderColor  = 'var(--color-accent)';
-        btn.style.color        = 'var(--color-accent-light)';
-        requestAnimationFrame(() => { tip.style.top = (r.top - tip.offsetHeight - 10) + 'px'; });
+    // Step 2b: Expand abbreviations (Md→Mohammad, Kr→Kumar, etc.)
+    if (expansionsApplied) {
+      delay += STEP;
+      trace.push({ delay, html: `
+        <div class="trace-step">
+          <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">Expand prefixes/suffixes — Md, Kr, Pt, Ch, Sk</span></div>
+          <div class="trace-data trace-data--highlight">
+            ${afterTitle1 !== expanded1 ? `<span class="trace-dim">"${afterTitle1}" →</span> <span class="trace-val">"${expanded1}"</span><br>` : ''}
+            ${afterTitle2 !== expanded2 ? `<span class="trace-dim">"${afterTitle2}" →</span> <span class="trace-val">"${expanded2}"</span>` : ''}
+            ${afterTitle1 === expanded1 && afterTitle2 !== expanded2 ? '' : afterTitle1 !== expanded1 && afterTitle2 === expanded2 ? '' : ''}
+          </div>
+        </div>
+      `});
+    } else {
+      delay += STEP;
+      trace.push({ delay, html: `
+        <div class="trace-step">
+          <div class="trace-label"><span class="trace-icon trace-icon--skip"></span><span class="trace-action">Expand prefixes/suffixes — <span class="trace-dim">none found</span></span></div>
+        </div>
+      `});
+    }
+
+    // Step 3: Exact match check
+    delay += STEP;
+    if (isExact) {
+      trace.push({ delay, html: `
+        <div class="trace-step">
+          <div class="trace-label"><span class="trace-icon trace-icon--hit"></span><span class="trace-action">Fast-path: Exact match — <span class="trace-green">HIT!</span></span></div>
+          <div class="trace-data trace-data--green">
+            <span class="trace-green">✓ Names are identical. Short-circuit → 100% match</span>
+          </div>
+        </div>
+      `});
+      // Short circuit — show result after this
+      runTrace(trace, traceBody, () => { clearInterval(timer); finalResult.composite_score = 100; finalResult.match = true; finalResult.verdict = "MATCH"; showResult(); });
+      return;
+    } else {
+      trace.push({ delay, html: `
+        <div class="trace-step">
+          <div class="trace-label"><span class="trace-icon trace-icon--skip"></span><span class="trace-action">Fast-path: Exact match — <span class="trace-dim">no hit</span></span></div>
+        </div>
+      `});
+    }
+
+    // Step 4: Reversed order
+    delay += STEP;
+    if (isReversed) {
+      trace.push({ delay, html: `
+        <div class="trace-step">
+          <div class="trace-label"><span class="trace-icon trace-icon--hit"></span><span class="trace-action">Fast-path: Reversed word order — <span class="trace-green">HIT!</span></span></div>
+          <div class="trace-data trace-data--green">
+            <span class="trace-dim">"${tokens1.join(' ')}"</span> = <span class="trace-dim">"${tokens2.join(' ')}"</span> reversed<br>
+            <span class="trace-green">✓ Match confirmed via word reorder</span>
+          </div>
+        </div>
+      `});
+      runTrace(trace, traceBody, () => { clearInterval(timer); finalResult.composite_score = 98; finalResult.match = true; finalResult.verdict = "MATCH"; showResult(); });
+      return;
+    } else {
+      trace.push({ delay, html: `
+        <div class="trace-step">
+          <div class="trace-label"><span class="trace-icon trace-icon--skip"></span><span class="trace-action">Fast-path: Reversed word order — <span class="trace-dim">no hit</span></span></div>
+        </div>
+      `});
+    }
+
+    // Step 5: Abbreviation (recursive permutation)
+    delay += STEP;
+    const abbrevDisplay = abbrevSamples.map((a, i) =>
+      `<span class="trace-var${a === shorter ? ' trace-var--match' : ''}" style="animation-delay:${i * 60}ms">${a}</span>`
+    ).join('');
+
+    trace.push({ delay, html: `
+      <div class="trace-step">
+        <div class="trace-label"><span class="trace-icon ${hasAbbrev ? 'trace-icon--hit' : 'trace-icon--skip'}"></span><span class="trace-action">Fast-path: Abbreviation (recursive permutations) — <span class="${hasAbbrev ? 'trace-green' : 'trace-dim'}">${hasAbbrev ? 'HIT!' : 'no hit'}</span></span></div>
+        <div class="trace-data ${hasAbbrev ? 'trace-data--green' : ''}">
+          <span class="trace-dim">Generated from "${longer}":</span>
+          <div class="trace-variations">${abbrevDisplay}</div>
+          <div style="margin-top:6px;">
+            <span class="trace-dim">Looking for:</span> <span class="trace-hl">"${shorter}"</span>
+            ${hasAbbrev ? '<span class="trace-green" style="margin-left:8px;">✓ Found in set!</span>' : '<span class="trace-dim" style="margin-left:8px;">— not in set</span>'}
+          </div>
+        </div>
+      </div>
+    `});
+
+    // Step 6: Phonetic variations
+    delay += STEP;
+    const phoneticIsExact = Math.round(bestVarScore * 100) === 100;
+    const varHtml = variations1.length > 1 || variations2.length > 1
+      ? `<div class="trace-data ${phoneticIsExact ? 'trace-data--green' : 'trace-data--highlight'}">
+          <span class="trace-dim">Variations of "${stripped1}":</span>
+          <div class="trace-variations" id="trace-vars">
+            ${variations1.map((v, i) => `<span class="trace-var${bestVarPair && v === bestVarPair[0] ? ' trace-var--match' : ''}" style="animation-delay:${i * 80}ms">${v}</span>`).join('')}
+          </div>
+          <span class="trace-dim" style="margin-top:6px;display:block;">Variations of "${stripped2}":</span>
+          <div class="trace-variations">
+            ${variations2.map((v, i) => `<span class="trace-var${bestVarPair && v === bestVarPair[1] ? ' trace-var--match' : ''}" style="animation-delay:${(i + variations1.length) * 80}ms">${v}</span>`).join('')}
+          </div>
+          ${bestVarPair ? `<div style="margin-top:6px;"><span class="trace-dim">Best phonetic pair:</span> <span class="trace-hl">"${bestVarPair[0]}"</span> ↔ <span class="trace-hl">"${bestVarPair[1]}"</span> <span class="${phoneticIsExact ? 'trace-green' : 'trace-gold'}">${Math.round(bestVarScore * 100)}%</span></div>` : ''}
+          ${phoneticIsExact ? '<div style="margin-top:6px;"><span class="trace-green">✓ Phonetic variation is exact match — short-circuit!</span></div>' : ''}
+        </div>` : '';
+
+    trace.push({ delay, html: `
+      <div class="trace-step">
+        <div class="trace-label"><span class="trace-icon ${phoneticIsExact ? 'trace-icon--hit' : 'trace-icon--done'}"></span><span class="trace-action">Generating phonetic variations (Indian name rules)${phoneticIsExact ? ' — <span class="trace-green">HIT!</span>' : ''}</span></div>
+        ${varHtml}
+      </div>
+    `});
+
+    // Short-circuit if phonetic match is 100%
+    if (phoneticIsExact) {
+      finalResult.composite_score = 100;
+      finalResult.match = true;
+      finalResult.verdict = "MATCH";
+      finalResult.reason = "phonetic_exact";
+      runTrace(trace, traceBody, () => { clearInterval(timer); showResult(); });
+      return;
+    }
+
+    // Step 7-10: Algorithm scores with bars
+    const algos = [
+      { name: 'Jaro-Winkler', desc: 'prefix-weighted char similarity', score: Math.round(jw * 100), weight: '35%' },
+      { name: 'Damerau-Levenshtein', desc: 'edit distance (normalized)', score: Math.round(dl * 100), weight: '25%' },
+      { name: 'Dice Coefficient', desc: 'bigram overlap', score: Math.round(dice * 100), weight: '20%' },
+      { name: 'Token Sort', desc: 'order-independent comparison', score: Math.round(tokenSort * 100), weight: '20%' },
+    ];
+
+    algos.forEach(algo => {
+      delay += STEP;
+      const barColor = algo.score >= threshold ? 'trace-bar-fill--green' : (algo.score >= threshold - 10 ? '' : 'trace-bar-fill--gold');
+      trace.push({ delay, html: `
+        <div class="trace-step">
+          <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">${algo.name} <span class="trace-dim">(${algo.desc})</span></span></div>
+          <div class="trace-data">
+            <div class="trace-score-bar">
+              <div class="trace-bar-track"><div class="trace-bar-fill ${barColor}" style="width:${algo.score}%"></div></div>
+              <span class="trace-bar-val">${algo.score}%</span>
+              <span class="trace-dim">× ${algo.weight}</span>
+            </div>
+          </div>
+        </div>
+      `});
+    });
+
+    // Step 11: Composite
+    delay += STEP;
+    const verdictColor = isMatch ? 'trace-green' : (band ? 'trace-gold' : 'trace-red');
+    const verdictText = isMatch ? '✓ MATCH' : (band ? '⚠ REVIEW BAND (fallback to API)' : '✗ REJECT');
+    trace.push({ delay, html: `
+      <div class="trace-step">
+        <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">Weighted composite score</span></div>
+        <div class="trace-data trace-data--${isMatch ? 'green' : (band ? 'gold' : 'red')}">
+          <div class="trace-score-bar">
+            <div class="trace-bar-track"><div class="trace-bar-fill ${isMatch ? 'trace-bar-fill--green' : ''}" style="width:${composite}%"></div></div>
+            <span class="trace-bar-val" style="font-size:14px;">${composite}%</span>
+            <span class="trace-dim">threshold: ${threshold}%</span>
+          </div>
+          <div style="margin-top:8px;font-size:13px;"><span class="${verdictColor}">${verdictText}</span></div>
+        </div>
+      </div>
+    `});
+
+    // Run the trace
+    runTrace(trace, traceBody, () => { clearInterval(timer); showResult(); });
+  };
+
+  function runTrace(steps, container, onDone) {
+    steps.forEach((step, i) => {
+      setTimeout(() => {
+        container.insertAdjacentHTML('beforeend', step.html);
+        // Auto-scroll to bottom
+        container.scrollTop = container.scrollHeight;
+        // Trigger bar fill animation (bars start at 0 width via CSS)
+        const bars = container.querySelectorAll('.trace-bar-fill');
+        bars.forEach(b => { const w = b.style.width; b.style.width = '0'; requestAnimationFrame(() => b.style.width = w); });
+        // If last step, call onDone
+        if (i === steps.length - 1) setTimeout(onDone, 500);
+      }, step.delay);
+    });
+  }
+
+  // ── Algorithm implementations ────────────────────────────────────
+
+  function jaroWinkler(s1, s2) {
+    if (s1 === s2) return 1;
+    const len1 = s1.length, len2 = s2.length;
+    const maxDist = Math.floor(Math.max(len1, len2) / 2) - 1;
+    const match1 = new Array(len1).fill(false);
+    const match2 = new Array(len2).fill(false);
+    let matches = 0, transpositions = 0;
+
+    for (let i = 0; i < len1; i++) {
+      const start = Math.max(0, i - maxDist);
+      const end = Math.min(i + maxDist + 1, len2);
+      for (let j = start; j < end; j++) {
+        if (match2[j] || s1[i] !== s2[j]) continue;
+        match1[i] = match2[j] = true;
+        matches++;
+        break;
       }
+    }
+    if (matches === 0) return 0;
 
-      function hideTip() {
-        tip.style.opacity       = '0';
-        tip.style.pointerEvents = 'none';
-        btn.style.borderColor   = 'rgba(122,143,166,0.35)';
-        btn.style.color         = 'var(--color-muted)';
-      }
-
-      let pinned = false;
-      btn.addEventListener('mouseenter', showTip);
-      btn.addEventListener('mouseleave', () => { if (!pinned) hideTip(); });
-      btn.addEventListener('click', () => { pinned = !pinned; pinned ? showTip() : hideTip(); });
-      document.addEventListener('click', e => { if (pinned && e.target !== btn) { pinned = false; hideTip(); } });
-      // Reposition on scroll so pinned tooltip tracks the button
-      window.addEventListener('scroll', () => { if (pinned) showTip(); }, { passive: true });
+    let k = 0;
+    for (let i = 0; i < len1; i++) {
+      if (!match1[i]) continue;
+      while (!match2[k]) k++;
+      if (s1[i] !== s2[k]) transpositions++;
+      k++;
     }
 
-
-    (function() {
-      const el = document.getElementById('resume-updated');
-      if (!el) return;
-      const now = new Date();
-      el.textContent = 'Updated ' + now.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
-    })();
-
-
-    function scrollProgressBar() {
-      const bar = document.createElement('div');
-      bar.id = 'scroll-progress';
-      bar.style.cssText = `
-        position: fixed; top: 0; left: 0; height: 3px; width: 0%;
-        background: linear-gradient(90deg, #2b9cba, #1ecbe1, #e8aa4a);
-        z-index: 10000; transition: width 0.1s linear;
-        border-radius: 0 2px 2px 0;
-        box-shadow: 0 0 8px rgba(30,203,225,0.5);
-      `;
-      document.body.appendChild(bar);
-
-      window.addEventListener('scroll', () => {
-        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const pct       = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
-        bar.style.width = Math.min(pct, 100) + '%';
-      }, { passive: true });
+    const jaro = (matches / len1 + matches / len2 + (matches - transpositions / 2) / matches) / 3;
+    let prefix = 0;
+    for (let i = 0; i < Math.min(4, Math.min(len1, len2)); i++) {
+      if (s1[i] === s2[i]) prefix++;
+      else break;
     }
+    return jaro + prefix * 0.1 * (1 - jaro);
+  }
 
+  function damerauLevenshtein(s1, s2) {
+    const len1 = s1.length, len2 = s2.length;
+    const d = Array.from({length: len1 + 1}, () => new Array(len2 + 1).fill(0));
+    for (let i = 0; i <= len1; i++) d[i][0] = i;
+    for (let j = 0; j <= len2; j++) d[0][j] = j;
 
-    function cardTilt() {
-      const TILT_MAX = 8;
-      const selectors = ['.highlight-card', '.stat-card', '.edu-card', '.soft-skill-card'];
-
-      document.querySelectorAll(selectors.join(',')).forEach(card => {
-        card.style.transformStyle = 'preserve-3d';
-        card.style.transition     = 'transform 0.1s ease, box-shadow 0.2s ease';
-        card.style.willChange     = 'transform';
-
-        card.addEventListener('mousemove', e => {
-          const rect = card.getBoundingClientRect();
-          const dx   = (e.clientX - (rect.left + rect.width  / 2)) / (rect.width  / 2);
-          const dy   = (e.clientY - (rect.top  + rect.height / 2)) / (rect.height / 2);
-          card.style.transform = `perspective(600px) rotateX(${(-dy * TILT_MAX).toFixed(2)}deg) rotateY(${(dx * TILT_MAX).toFixed(2)}deg) scale(1.03)`;
-          card.style.boxShadow = `0 16px 40px rgba(30,203,225,0.15), 0 0 0 1px rgba(30,203,225,0.12)`;
-        });
-
-        card.addEventListener('mouseleave', () => {
-          card.style.transform = 'perspective(600px) rotateX(0deg) rotateY(0deg) scale(1)';
-          card.style.boxShadow = '';
-        });
-      });
-    }
-
-
-    // Picks the last section whose top has crossed 40% of viewport height.
-    // Clears all highlights at true page bottom.
-    function activeNavHighlight() {
-      const sectionIds = ['section-validator', 'section-about', 'section-skills', 'section-experience', 'section-recommendations', 'section-education'];
-      const navLinks   = document.querySelectorAll('.nav-links a');
-
-      function update() {
-        const triggerY   = window.innerHeight * 0.4;
-        const pageBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 10;
-        let activeId     = null;
-
-        if (!pageBottom) {
-          sectionIds.forEach(id => {
-            const el = document.getElementById(id);
-            if (el && el.getBoundingClientRect().top <= triggerY) activeId = id;
-          });
+    for (let i = 1; i <= len1; i++) {
+      for (let j = 1; j <= len2; j++) {
+        const cost = s1[i-1] === s2[j-1] ? 0 : 1;
+        d[i][j] = Math.min(
+          d[i-1][j] + 1,
+          d[i][j-1] + 1,
+          d[i-1][j-1] + cost
+        );
+        if (i > 1 && j > 1 && s1[i-1] === s2[j-2] && s1[i-2] === s2[j-1]) {
+          d[i][j] = Math.min(d[i][j], d[i-2][j-2] + cost);
         }
-
-        navLinks.forEach(link => {
-          const matches      = activeId && link.getAttribute('href') === '#' + activeId;
-          link.style.color   = matches ? 'var(--color-accent-light, #1ecbe1)' : '';
-          link.style.fontWeight = matches ? '700' : '';
-        });
       }
+    }
+    return d[len1][len2];
+  }
 
-      window.addEventListener('scroll', update, { passive: true });
-      update();
+  function diceCoefficient(s1, s2) {
+    if (s1.length < 2 || s2.length < 2) return 0;
+    const bigrams1 = new Set();
+    const bigrams2 = new Set();
+    for (let i = 0; i < s1.length - 1; i++) bigrams1.add(s1.slice(i, i + 2));
+    for (let i = 0; i < s2.length - 1; i++) bigrams2.add(s2.slice(i, i + 2));
+    let intersection = 0;
+    bigrams1.forEach(b => { if (bigrams2.has(b)) intersection++; });
+    return (2 * intersection) / (bigrams1.size + bigrams2.size);
+  }
+
+  function tokenSortRatio(s1, s2) {
+    const sorted1 = s1.split(/\s+/).sort().join(' ');
+    const sorted2 = s2.split(/\s+/).sort().join(' ');
+    return jaroWinkler(sorted1, sorted2);
+  }
+
+  // ── Lightbox ──────────────────────────────────────────────────────
+  const lightbox    = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const lightboxClose = document.getElementById('lightbox-close');
+
+  function openLightbox(src, alt) {
+    lightboxImg.src = src;
+    lightboxImg.alt = alt || '';
+    lightbox.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeLightbox() {
+    lightbox.classList.remove('open');
+    document.body.style.overflow = '';
+    // clear src after transition so old image doesn't flash on reopen
+    setTimeout(() => { lightboxImg.src = ''; }, 260);
+  }
+
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+  // delegate: any img with data-zoomable OR inside .rec-proof-img / .recog-screenshot-item
+  document.addEventListener('click', e => {
+    const img = e.target.closest('img.rec-proof-img, .recog-screenshot-item img');
+    if (img) openLightbox(img.src, img.alt);
+  });
+
+  // ── Open Siemens recognition from soft-skills ────────────────────
+  window.openExperienceRecognition = function(e) {
+    e.preventDefault();
+
+    // Find the Siemens json-object (first one in #experience)
+    const experienceSection = document.getElementById('experience');
+    const siemensBlock = experienceSection.querySelector('.json-object');
+
+    // Expand Siemens block if not already open
+    if (!siemensBlock.classList.contains('expanded')) {
+      siemensBlock.classList.add('expanded');
     }
 
+    // Find the recognition nested field inside it
+    const recogField = siemensBlock.querySelector('.json-field--collapsible');
 
-    function skillTagTooltips() {
-      const STORIES = {
-        'C#'                 : 'Primary language across all 3 roles — APIs, services, background workers',
-        'SQL'                : 'T-SQL stored procs, query optimisation, schema migrations across all roles',
-        'JavaScript'         : 'Frontend logic at IndiaLends + interactive elements on this portfolio',
-        'ASP.NET Core'       : 'Built Minimal APIs, middleware, and custom auth schemes across multiple services',
-        '.NET Core'          : 'Target framework for all greenfield services since IndiaLends',
-        'Minimal APIs'       : 'Used for dashboard satellite service — lightweight, no controller overhead',
-        'REST APIs'          : 'Designed and consumed REST contracts across all three companies',
-        'CQRS / MediatR'     : 'Used across most feature work — clean separation of commands and queries via MediatR pipeline',
-        'Domain-Driven Design': 'P&S microservice modelled around DDD aggregates — clear boundaries, no anemic domain',
-        'Clean Architecture' : 'Applied in dashboard service — strict layer separation: API → UseCases → Domain',
-        'Microservices'      : 'Dashboard + planning & scheduling both independently deployable from the monolith',
-        'Resiliency Patterns': 'Polly retry + circuit-breaker specifically for database connection handling in shared library',
-        'BDD'                : 'SpecFlow / ReqnRoll acceptance tests — .feature files as living regression documentation',
-        'Azure Functions'    : 'Timer triggers: nightly scheduled reports + CRM jobs (low-traffic window); Queue triggers: async retry workflows and non-blocking logging; Blob triggers: document processing on upload; HTTP triggers: lightweight API endpoints',
-        'Entity Framework 6' : 'EF6 on .NET 4.8 — large multi-tenant enterprise codebase, per-tenant DB architecture',
-        'EF Core'            : 'Used in .NET 8/9 services for greenfield data access layers',
-        'Dapper'             : 'Replaced EF in dashboard hot paths — raw SQL, significantly faster under load',
-        'LINQ'               : 'Everyday — projections, filtering, aggregation across all .NET work',
-        'T-SQL'              : 'Stored procs, CTEs, window functions for reporting and bulk operations',
-        'SQL Server'         : 'Primary DB at Siemens — large multi-tenant schema across thousands of clients',
-        'PostgreSQL'         : 'Used in Java-based and .NET microservices',
-        'Redis'              : 'Session store + L1/L2 cache for API response acceleration',
-        'Azure App Service'  : 'Ran Azure Functions across multiple trigger types: Timer (reports), Queue (retry/logging), Blob (documents), HTTP (lightweight APIs)',
-        'Azure Service Bus'  : 'Loan repayment reminders — Azure Queue has a max TTL of days/weeks, but repayment schedules span years; Service Bus supported scheduling messages years in advance',
-        'Azure Blob Storage' : 'Stored loan documents, ID photos, and pre-generated reports ready for analytics teams each morning',
-        'AWS Secrets Manager': 'DB credential resolution in a shared .NET library — region-aware, supports rotation without redeployment',
-        'Message Queues'     : 'Service-to-service async communication; used Azure Queue with retry-before-poison pattern',
-        'Docker'             : 'Used locally to run multiple dependent services together for development — configuration done by the platform team',
-        'OIDC / OAuth2'      : 'Worked on projects using OIDC and OAuth2 — integration, flow debugging, and consuming tokens; not protocol implementation',
-        'JWT'                : 'Worked with JWT-protected services — token validation, claims extraction; not issuer setup',
-        'Auth0'              : 'Worked on projects using Auth0 as the identity provider — integration and configuration side',
-        'Cookie Auth Scheme' : 'Built a custom cookie authentication handler for a .NET 8 service — delegating session validation to a central auth service',
-        'VAPT Remediation'   : 'Resolved injection, broken auth, and missing header findings from pen-test reports at IndiaLends',
-        'Azure DevOps'       : 'CI/CD pipelines, release gates, and board management at IndiaLends',
-        'Jenkins'            : 'Build + deploy pipelines for production releases at Siemens',
-        'TeamCity'           : 'Build server for .NET solutions and internal NuGet publishing at Siemens',
-        'SonarQube'          : 'Static analysis quality gate — issues had to be resolved before PRs could merge',
-        'Snyk'               : 'Dependency vulnerability scanning in CI — flagged risky package versions',
-        'Grafana'            : 'Production monitoring dashboards for microservices at Siemens',
-        'Datadog'            : 'APM traces and log monitoring across services',
-        'MyGet (NuGet feed)' : 'Internal NuGet feed — published shared libraries consumed across all .NET repos',
-        'NUnit'              : 'Unit + integration test runner across .NET services',
-        'SpecFlow'           : 'BDD acceptance tests — Gherkin .feature files with C# step definitions',
-        'ReqnRoll'           : 'SpecFlow open-source successor — migrated seamlessly, same Gherkin syntax',
-        'Moq'                : 'Mocking framework — repository and service layer mocks in unit tests',
-        'Unit Testing'       : 'Wrote tests for business logic, custom auth handlers, query and command handlers',
-        'Integration Testing': 'Real-DB integration tests covering repository and service layers end-to-end',
-        'Git'                : 'Daily — feature branches, PRs, rebasing across all roles',
-        'Azure Repos'        : 'Git hosting at IndiaLends for main application repos',
-        'TFS'                : 'Team Foundation Server — used at IndiaLends for version control on a CDN-related project',
-        'REST'               : 'Primary API style across all three companies — designed and consumed RESTful contracts',
-        'JSON'               : 'Standard data format for all API integrations; also used for config, request/response payloads',
-        'XML'                : 'Used extensively for banking and NBFC partner API integrations at IndiaLends — many financial APIs still require XML',
-        'Webhooks'           : 'Built HTTP-triggered Azure Functions to handle inbound webhook events from third-party banking partners',
-        'Bitbucket'          : 'Code hosting at Siemens — Bitbucket with PR pipelines and branch policies',
-        'Swagger / OpenAPI'  : 'Auto-generated API docs on all ASP.NET Core services',
-        'Postman'            : 'API testing + environment collections for all services',
-        'GitHub Copilot'     : 'Used for boilerplate acceleration — I review every suggestion before accepting',
-        'Claude Code'        : 'AI pair programmer for architecture exploration and building this portfolio',
-        'Jira'               : 'Sprint planning, bug tracking, and release management across all roles',
-        'Scrum'              : '2-week sprints, daily standups, sprint reviews and retrospectives',
-        'Kanban'             : 'Maintenance & Reliability initiative ran as a continuous Kanban flow',
-        'Azure Boards'       : 'Work item tracking, sprint boards, and backlog management at IndiaLends',
-        'Code Reviews'       : 'Regular PR reviewer and reviewee — feedback on architecture, naming, test coverage',
-        'Analytical Thinking': 'Identifying root causes over symptoms — PAN matching problem was found and solved this way',
-        'Root Cause Analysis': 'Diagnosed production defects across Work Orders, Dashboard, and Purchasing at Siemens',
-        'Production Troubleshooting': 'Diagnosed and resolved customer-reported defects in production as part of the M&R squad — log analysis via Datadog and Grafana, not infra or on-call',
-        'HTML'               : 'MVC Razor views at IndiaLends — markup for form-heavy application screens',
-        'CSS'                : 'Styling for MVC Razor views and Bootstrap overrides; not a dedicated UI engineer',
-        'Bootstrap'          : 'Used in ASP.NET MVC Razor views at IndiaLends for responsive layout and components',
-        'jQuery'             : 'Heavy use at IndiaLends — DOM manipulation, AJAX calls, form validation, UI interactions',
-        'DevExpress'         : 'Component library used at Siemens for data grids, charts, and complex UI widgets in MVC',
-        'Vue.js (in progress)': 'Learning Vue 3 Composition API — personal study, not yet in production',
-      };
-
-      const tip = document.createElement('div');
-      tip.id = 'skill-tip';
-      document.body.appendChild(tip);
-
-      function positionTip(e) {
-        const pad  = 12;
-        const tipW = Math.min(280, window.innerWidth - 16);
-        tip.style.maxWidth = tipW + 'px';
-        let left = e.clientX + pad;
-        let top  = e.clientY + pad;
-        if (left + tipW > window.innerWidth  - 8) left = e.clientX - tipW - pad;
-        if (left < 8) left = 8;
-        if (top  + 80   > window.innerHeight - 8) top  = e.clientY - 80  - pad;
-        if (top < 8) top = 8;
-        tip.style.left = left + 'px';
-        tip.style.top  = top  + 'px';
-      }
-
-      document.querySelectorAll('.skill-tags .tag').forEach(tag => {
-        const story = STORIES[tag.textContent.trim()];
-        if (!story) return;
-        tag.addEventListener('mouseenter', e => { tip.textContent = story; tip.style.opacity = '1'; positionTip(e); });
-        tag.addEventListener('mousemove',  positionTip);
-        tag.addEventListener('mouseleave', () => { tip.style.opacity = '0'; });
-      });
+    // Expand recognition if not already open
+    if (recogField && !recogField.classList.contains('expanded')) {
+      recogField.classList.add('expanded');
     }
 
-
-    // Timer counts only while this tab is active (Page Visibility API).
-    function showDownloadToast() {
-      const existing = document.getElementById('download-toast');
-      if (existing) existing.remove();
-
-      const toast = document.createElement('div');
-      toast.id = 'download-toast';
-      toast.innerHTML = `
-        <div style="font-weight:700; font-size:15px; color:#fff; margin-bottom:8px;">
-          Thanks for taking the time to look.
-        </div>
-        <div style="font-size:13px; color:#a8bfcc; line-height:1.6;">
-          Happy to go deeper on anything that stands out.
-          <br><br>
-          <a href="mailto:Deepanshu.Kumar@Outlook.in"
-             style="color:#1ecbe1; text-decoration:none; font-weight:600;">
-            Deepanshu.Kumar@Outlook.in
-          </a>
-          <br>
-          <span style="color:rgba(168,191,204,0.6); font-size:12px;">Open to exciting opportunities. Looking forward to the conversation.</span>
-        </div>
-      `;
-      toast.style.cssText = `
-        position: fixed; bottom: 32px; right: 32px;
-        background: rgba(10,14,26,0.97);
-        border: 1px solid rgba(43,156,186,0.5);
-        border-radius: 14px; padding: 20px 24px;
-        text-align: center; max-width: 260px;
-        box-shadow: 0 16px 48px rgba(0,0,0,0.6), 0 0 0 1px rgba(30,203,225,0.1);
-        z-index: 99999;
-        animation: toastIn 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
-      `;
-      document.body.appendChild(toast);
-
-      if (!document.getElementById('toast-style')) {
-        const s = document.createElement('style');
-        s.id = 'toast-style';
-        s.textContent = `
-          @keyframes toastIn  { from { opacity:0; transform:translateY(20px) scale(0.95); } to { opacity:1; transform:translateY(0) scale(1); } }
-          @keyframes toastOut { from { opacity:1; transform:translateY(0) scale(1); } to { opacity:0; transform:translateY(10px) scale(0.95); } }
-        `;
-        document.head.appendChild(s);
+    // Scroll to the recognition field after a short delay (let DOM expand)
+    setTimeout(() => {
+      if (recogField) {
+        recogField.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
+    }, 80);
+  };
 
-      const TOTAL_MS = 5000;
-      let remaining  = TOTAL_MS;
-      let lastTick   = Date.now();
-      let ticker     = null;
+  // ── Recommendation LinkedIn proof toggle ─────────────────────────
+  window.toggleRecProof = function(btn) {
+    const collapse = btn.nextElementSibling;
+    const isOpen = collapse.classList.toggle('rec-proof-collapse--open');
+    btn.setAttribute('aria-expanded', isOpen);
+    btn.classList.toggle('rec-proof-btn--open', isOpen);
+    const arrow = btn.querySelector('.rec-proof-arrow');
+    if (arrow) arrow.textContent = isOpen ? '↓' : '→';
+  };
 
-      function dismiss() {
-        document.removeEventListener('visibilitychange', onVisibility);
-        clearInterval(ticker);
-        const t = document.getElementById('download-toast');
-        if (!t) return;
-        t.style.animation = 'toastOut 0.3s ease forwards';
-        setTimeout(() => t.remove(), 320);
-      }
+  // ── Recognition proof toggle ──────────────────────────────────────
+  window.toggleProof = function(btn) {
+    const strip = document.getElementById('recog-proof-strip');
+    if (!strip) return;
+    const isOpen = strip.classList.toggle('recog-proof-strip--open');
+    btn.classList.toggle('recog-proof-btn--open', isOpen);
+    const arrow = btn.querySelector('.recog-proof-arrow');
+    if (arrow) arrow.textContent = isOpen ? '↓' : '→';
+  };
 
-      function startTick() {
-        lastTick = Date.now();
-        ticker   = setInterval(() => {
-          remaining -= Date.now() - lastTick;
-          lastTick   = Date.now();
-          if (remaining <= 0) dismiss();
-        }, 200);
-      }
-
-      function onVisibility() {
-        if (document.hidden) {
-          clearInterval(ticker);
-        } else {
-          lastTick = Date.now();
-          startTick();
-        }
-      }
-
-      document.addEventListener('visibilitychange', onVisibility);
-      startTick();
-    }
-
-
-    function initRecommendationsCarousel() {
-      const carousel  = document.getElementById('rec-carousel');
-      const viewport  = carousel && carousel.parentElement;
-      const dotsWrap  = document.getElementById('rec-dots');
-      const prevBtn   = document.getElementById('rec-prev');
-      const nextBtn   = document.getElementById('rec-next');
-      if (!carousel || !viewport) return;
-
-      const cards   = Array.from(carousel.querySelectorAll('.rec-card'));
-      const total   = cards.length;
-      let current   = 0;
-      let autoTimer = null;
-
-      // Size all cards to match viewport width explicitly
-      function sizeCards() {
-        const w = viewport.offsetWidth;
-        carousel.style.width = (w * total) + 'px';
-        cards.forEach(c => { c.style.width = w + 'px'; });
-      }
-      sizeCards();
-      window.addEventListener('resize', () => { sizeCards(); goTo(current, false); });
-
-      // Build dots
-      cards.forEach((_, i) => {
-        const dot = document.createElement('button');
-        dot.className = 'rec-dot' + (i === 0 ? ' active' : '');
-        dot.setAttribute('aria-label', `Slide ${i + 1}`);
-        dot.addEventListener('click', () => goTo(i));
-        dotsWrap.appendChild(dot);
-      });
-
-      function goTo(index, animate = true) {
-        current = (index + total) % total;
-        const offset = current * viewport.offsetWidth;
-        carousel.style.transition = animate ? 'transform 0.45s cubic-bezier(0.4,0,0.2,1)' : 'none';
-        carousel.style.transform  = `translateX(-${offset}px)`;
-        dotsWrap.querySelectorAll('.rec-dot').forEach((d, i) => {
-          d.classList.toggle('active', i === current);
-        });
-        resetAuto();
-      }
-
-      function resetAuto() {
-        clearInterval(autoTimer);
-        autoTimer = setInterval(() => goTo(current + 1), 5000);
-      }
-
-      prevBtn.addEventListener('click', () => goTo(current - 1));
-      nextBtn.addEventListener('click', () => goTo(current + 1));
-
-      let touchStartX = 0;
-      carousel.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-      carousel.addEventListener('touchend',   e => {
-        const diff = touchStartX - e.changedTouches[0].clientX;
-        if (Math.abs(diff) > 50) goTo(current + (diff > 0 ? 1 : -1));
-      });
-
-      carousel.addEventListener('mouseenter', () => clearInterval(autoTimer));
-      carousel.addEventListener('mouseleave', resetAuto);
-
-      resetAuto();
-    }
-
-
-    function navFullNameReveal() {
-      const heroName = document.querySelector('.hero-name');
-      const navLabel = document.getElementById('nav-fullname');
-      if (!heroName || !navLabel) return;
-
-      window.addEventListener('scroll', () => {
-        navLabel.classList.toggle('visible', heroName.getBoundingClientRect().bottom < 0);
-      }, { passive: true });
-    }
-
-
-    particleSystem();
-    typedTitleEffect();
-    navBehaviours();
-    scrollReveal();
-    // Polyfill loaded via defer before this script (see index.html) — Temporal guaranteed available.
-    careerTimer();
-    initKnob();
-    initSourceTooltip();
-    scrollProgressBar();
-    cardTilt();
-    activeNavHighlight();
-    skillTagTooltips();
-    initRecommendationsCarousel();
-    navFullNameReveal();
-
-    // Opens PDF in new tab. Shows toast on click + once more when user returns.
-    (function() {
-      const btns = [
-        document.getElementById('resume-dl-btn'),
-        document.getElementById('nav-resume-dl-btn'),
-        document.getElementById('nav-resume-dl-btn-mobile'),
-      ].filter(Boolean);
-
-      btns.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-          e.preventDefault();
-          window.open(btn.getAttribute('href'), '_blank');
-          showDownloadToast();
-
-          function onReturn() {
-            if (!document.hidden) {
-              document.removeEventListener('visibilitychange', onReturn);
-              showDownloadToast();
-            }
-          }
-          document.addEventListener('visibilitychange', onReturn);
-        });
-      });
-    })();
+})();
