@@ -248,15 +248,17 @@
       </div>
 
       <!-- Writing — live from Dev.to API -->
-      <div class="sidebar-group" id="writing-widget">
-        <div class="sidebar-group-title" style="display:flex;align-items:center;gap:6px;">
-          <span class="status-dot" style="width:5px;height:5px;background:var(--color-gold);box-shadow:0 0 6px var(--color-gold);flex-shrink:0;"></span>
-          Recent Writing
-          <a href="https://dev.to/dev-deepanshu-kumar" target="_blank" rel="noopener" class="writing-view-all" style="margin-left:auto;padding-top:0;">all →</a>
+      <div class="writing-console" id="writing-widget">
+        <div class="writing-console-bar">
+          <span class="terminal-dot terminal-dot--red"></span>
+          <span class="terminal-dot terminal-dot--yellow"></span>
+          <span class="terminal-dot terminal-dot--green"></span>
+          <span class="writing-console-title">$ GET dev.to/articles</span>
+          <a href="https://dev.to/dev-deepanshu-kumar" target="_blank" rel="noopener" class="writing-console-all">all →</a>
         </div>
-        <div class="writing-list" id="writing-list">
-          <div class="writing-loading">
-            <span class="writing-dim">// fetching dev.to...</span>
+        <div class="writing-console-body">
+          <div class="writing-list" id="writing-list">
+            <div class="writing-dim">// fetching...</div>
           </div>
         </div>
       </div>
@@ -423,14 +425,18 @@
         </div>
 
         <!-- Writing — mobile only (sidebar shows it on desktop) -->
-        <div class="mobile-writing-block" id="mobile-writing-block">
-          <div class="mobile-writing-header">
-            <span class="mobile-writing-dot"></span>
-            Recent Writing
-            <a href="https://dev.to/dev-deepanshu-kumar" target="_blank" rel="noopener" class="mobile-writing-all">View all →</a>
+        <div class="writing-console mobile-writing-block" id="mobile-writing-block">
+          <div class="writing-console-bar">
+            <span class="terminal-dot terminal-dot--red"></span>
+            <span class="terminal-dot terminal-dot--yellow"></span>
+            <span class="terminal-dot terminal-dot--green"></span>
+            <span class="writing-console-title">$ GET dev.to/articles</span>
+            <a href="https://dev.to/dev-deepanshu-kumar" target="_blank" rel="noopener" class="writing-console-all">all →</a>
           </div>
-          <div class="writing-list" id="mobile-writing-list">
-            <div class="writing-dim">// fetching dev.to...</div>
+          <div class="writing-console-body">
+            <div class="writing-list" id="mobile-writing-list">
+              <div class="writing-dim">// fetching...</div>
+            </div>
           </div>
         </div>
 
