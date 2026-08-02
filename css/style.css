@@ -2111,10 +2111,10 @@ code {
 }
 .cmd-inline-hint-text { color: var(--color-dim); }
 
-/* Mobile FAB — only on mobile, bottom-left above tabs */
+/* Mobile FAB — only on mobile, above widgets strip + tab bar */
 .cmd-fab {
   display: none;
-  position: fixed; bottom: 70px; right: 16px;
+  position: fixed; bottom: 108px; right: 16px;
   width: 42px; height: 42px; border-radius: 50%;
   background: var(--color-bg-card);
   border: 1px solid var(--color-border);
