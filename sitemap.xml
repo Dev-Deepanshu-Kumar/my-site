@@ -33,12 +33,20 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- Resume HTML (assets) -->
+  <!-- Resume HTML v1 (assets) -->
   <url>
     <loc>https://deepanshu-kumar.dev/assets/deepanshu-kumar.html</loc>
     <lastmod>2026-07-21</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- Resume HTML v2 — API doc aesthetic (assets) -->
+  <url>
+    <loc>https://deepanshu-kumar.dev/assets/deepanshu-kumar-v2.html</loc>
+    <lastmod>2026-08-02</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
+    <priority>0.6</priority>
   </url>
 
 </urlset>
