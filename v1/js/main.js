@@ -1,5 +1,5 @@
-﻿
-    // â”€â”€ Toggle: set to false to hide the "Open to new opportunities" badge â”€â”€
+
+    // ── Toggle: set to false to hide the "Open to new opportunities" badge ──
     const SHOW_OPEN_TO_WORK = true;
     const badge = document.getElementById('open-to-work-badge');
     if (badge) badge.style.display = SHOW_OPEN_TO_WORK ? '' : 'none';
@@ -120,17 +120,17 @@
         }
         return arr;
       })([
-  'C# Â· .NET Â· ASP.NET Core',
-  'Enterprise SaaS Â· 5+ Years',
-  'Backend Engineer Â· Problem Solver',
-  'Backend Engineer â€¢ .NET â€¢ Refactoring Yesterday, Building Tomorrow',
-  'Enterprise Software Â· Real Users',
-  'REST APIs Â· Microservices',
+  'C# · .NET · ASP.NET Core',
+  'Enterprise SaaS · 5+ Years',
+  'Backend Engineer · Problem Solver',
+  'Backend Engineer • .NET • Refactoring Yesterday, Building Tomorrow',
+  'Enterprise Software · Real Users',
+  'REST APIs · Microservices',
   'API-first Development',
   'SOLID Principles in Practice',
   'Business Logic over Boilerplate',
 
-  'From monolith to microservices â€” one PR at a time.',
+  'From monolith to microservices — one PR at a time.',
   'Learning modern architecture without forgetting solid fundamentals.',
 
   'I care about the why, not just the what.',
@@ -258,11 +258,11 @@
       }
     }
 
-    /* â”€â”€ Award image lightbox â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    /* ── Award image lightbox ──────────────────────────────────────
        Clicking any .award-thumb img opens a centred overlay.
        Clicking the overlay (or pressing Escape) closes it.
        Stops propagation so the exp-card toggle doesn't also fire.
-    â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+    ──────────────────────────────────────────────────────────────── */
     document.addEventListener('click', function(e) {
       const img = e.target.closest('.award-thumb img');
       if (!img) return;
@@ -296,23 +296,23 @@
       const proofBtn   = document.querySelector('.proof-btn');
       if (!card || !proof) return;
 
-      // step 1 â€” expand exp card if collapsed
+      // step 1 — expand exp card if collapsed
       if (!card.classList.contains('exp-card--expanded')) {
         card.classList.add('exp-card--expanded');
       }
 
-      // step 2 â€” scroll to recognitions heading once card expansion starts
+      // step 2 — scroll to recognitions heading once card expansion starts
       const recogSection = card.querySelector('.recog-section');
       (recogSection || card).scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-      // step 3 â€” open recognitions strip after card animation settles
+      // step 3 — open recognitions strip after card animation settles
       setTimeout(() => {
         proof.classList.add('awards-strip--open');
         if (proofBtn) proofBtn.classList.add('proof-btn--open');
         // re-scroll to recog section after bullets have expanded and pushed it down
         if (recogSection) recogSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-        // step 4 â€” auto-collapse after 4 s unless user clicked inside
+        // step 4 — auto-collapse after 4 s unless user clicked inside
         let userInteracted = false;
         const onInteract = () => { userInteracted = true; };
         proof.addEventListener('click', onInteract, { once: true });
@@ -352,11 +352,11 @@
             <span class="recog-rel recog-rel--${r.relationType}">${r.relation}</span>
           </div>
           <p class="recog-quote">"${r.quote}"</p>
-          <div class="recog-by">â€” ${r.by}${r.company ? ' Â· ' + r.company : ''}</div>
+          <div class="recog-by">— ${r.by}${r.company ? ' · ' + r.company : ''}</div>
         </div>
       `).join('');
 
-      // render screenshot strip â€” only entries that have a screenshot
+      // render screenshot strip — only entries that have a screenshot
       const withScreenshot = items.filter(r => r.screenshot);
       if (withScreenshot.length === 0) {
         // hide the proof button if no screenshots at all
@@ -367,7 +367,7 @@
           <figure class="award-thumb">
             <img
               src="${r.screenshot}"
-              alt="Recognition screenshot: ${r.title} â€” ${r.by}"
+              alt="Recognition screenshot: ${r.title} — ${r.by}"
               loading="lazy">
             <figcaption>${r.title}</figcaption>
           </figure>
@@ -378,13 +378,13 @@
     loadRecognitions();
 
 
-    // â”€â”€ Theme toggle â€” persists in localStorage â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // ── Theme toggle — persists in localStorage ──────────────────
     function applyTheme(theme) {
       document.documentElement.setAttribute('data-theme', theme);
       const btn   = document.getElementById('theme-toggle');
       const icon  = btn && btn.querySelector('.toggle-icon');
       const label = btn && btn.querySelector('.toggle-label');
-      if (icon)  icon.textContent  = theme === 'light' ? 'â˜€ï¸' : 'ðŸŒ™';
+      if (icon)  icon.textContent  = theme === 'light' ? '☀️' : '🌙';
       if (label) label.textContent = theme === 'light' ? 'Light' : 'Dark';
       btn && btn.setAttribute('aria-label', theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme');
     }
@@ -397,7 +397,7 @@
     function toggleTheme() {
       const next = document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
 
-      // Respect prefers-reduced-motion â€” skip animation
+      // Respect prefers-reduced-motion — skip animation
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
         localStorage.setItem('theme', next);
         applyTheme(next);
@@ -420,7 +420,7 @@
         transition: clip-path 0.9s cubic-bezier(0.4, 0, 0.2, 1);
       `;
 
-      // Trigger expand â€” rAF ensures the initial state is painted first
+      // Trigger expand — rAF ensures the initial state is painted first
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           const maxR = Math.ceil(Math.hypot(Math.max(ox, window.innerWidth - ox), Math.max(oy, window.innerHeight - oy)));
@@ -428,7 +428,7 @@
         });
       });
 
-      // Swap theme at halfway (~450ms) â€” user sees nothing mid-swap
+      // Swap theme at halfway (~450ms) — user sees nothing mid-swap
       setTimeout(() => {
         localStorage.setItem('theme', next);
         applyTheme(next);
@@ -459,13 +459,13 @@
         end:   new Date(2023, 11, 20),
       },
       {
-        label: 'Siemens â€” Asset Management Software',
+        label: 'Siemens — Asset Management Software',
         start: new Date(2024, 0, 2),
         end:   null,
       },
     ];
 
-    // Convert a JS Date â†’ Temporal.PlainDate (YYYY-MM-DD, local calendar).
+    // Convert a JS Date → Temporal.PlainDate (YYYY-MM-DD, local calendar).
     function toPlainDate(jsDate) {
       return Temporal.PlainDate.from({
         year:  jsDate.getFullYear(),
@@ -483,7 +483,7 @@
         const dur   = start.until(end, { largestUnit: 'years', smallestUnit: 'days' });
         return { years: dur.years, months: dur.months, days: dur.days };
       }
-      // Fallback: calendar-accurate diff using Date arithmetic â€” no magic constants.
+      // Fallback: calendar-accurate diff using Date arithmetic — no magic constants.
       // Walks year-by-year and month-by-month using actual month lengths.
       let y  = startJsDate.getFullYear();
       let m  = startJsDate.getMonth();   // 0-indexed
@@ -525,11 +525,11 @@
           <div class="timer-period">
             <div>
               <div class="timer-period-label">
-                ${ isActive ? '<span style="color:var(--color-gold)">â–¶ </span>' : '' }
+                ${ isActive ? '<span style="color:var(--color-gold)">▶ </span>' : '' }
                 ${ period.label }
               </div>
               <div class="timer-period-dates">
-                ${ formatDate(period.start) } â†’ ${ isActive ? 'Present' : formatDate(period.end) }
+                ${ formatDate(period.start) } → ${ isActive ? 'Present' : formatDate(period.end) }
               </div>
             </div>
             <div class="timer-display" id="timer-period-${ i }"></div>
@@ -592,8 +592,8 @@
     }
 
     // Render calendar units + sub-day live tick into a timer-display element.
-    // cal  = { years, months, days }  â€” calendar-accurate from Temporal
-    // ms   = raw elapsed milliseconds â€” for hours/minutes/seconds
+    // cal  = { years, months, days }  — calendar-accurate from Temporal
+    // ms   = raw elapsed milliseconds — for hours/minutes/seconds
     function renderUnits(container, cal, ms) {
       const totalSeconds = Math.floor(ms / 1000);
       const hours        = Math.floor(totalSeconds / 3600) % 24;
@@ -622,7 +622,7 @@
     }
 
 
-    // Weighted ensemble matcher â€” ported from C# production system.
+    // Weighted ensemble matcher — ported from C# production system.
     // Algorithm names are intentionally obfuscated; implementation details not exposed.
     const _nv = (function() {
       const _W     = [0.30, 0.08, 0.20, 0.30, 0.06, 0.06];
@@ -811,8 +811,8 @@
       const panel = document.getElementById('story-panel');
       const open  = panel.classList.toggle('open');
       btn.innerHTML = open
-        ? '<span>ðŸ“–</span> Hide story'
-        : '<span>ðŸ“–</span> The story behind this';
+        ? '<span>📖</span> Hide story'
+        : '<span>📖</span> The story behind this';
     }
 
 
@@ -1009,7 +1009,7 @@
       });
 
       document.getElementById('vld-verdict').className = 'verdict-banner ' + (res.match ? 'match' : 'nomatch');
-      document.getElementById('vld-icon').textContent  = res.match ? 'âœ…' : 'âŒ';
+      document.getElementById('vld-icon').textContent  = res.match ? '✅' : '❌';
       document.getElementById('vld-verdict-title').textContent = res.match ? 'Names Match' : 'Names Do Not Match';
 
       let sub = '';
@@ -1022,7 +1022,7 @@
       document.getElementById('vld-verdict-sub').textContent = sub;
 
       const rrow = document.getElementById('vld-reason-row');
-      if (res.special) { rrow.style.display = 'block'; rrow.innerHTML = `<span class="match-reason-chip">âš¡ ${sub}</span>`; }
+      if (res.special) { rrow.style.display = 'block'; rrow.innerHTML = `<span class="match-reason-chip">⚡ ${sub}</span>`; }
       else rrow.style.display = 'none';
 
       const pct   = Math.round(res.fuzzy * 100);
@@ -1201,79 +1201,79 @@
 
     function skillTagTooltips() {
       const STORIES = {
-        'C#'                 : 'Primary language across all 3 roles â€” APIs, services, background workers',
+        'C#'                 : 'Primary language across all 3 roles — APIs, services, background workers',
         'SQL'                : 'T-SQL stored procs, query optimisation, schema migrations across all roles',
         'JavaScript'         : 'Frontend logic at IndiaLends + interactive elements on this portfolio',
         'ASP.NET Core'       : 'Built Minimal APIs, middleware, and custom auth schemes across multiple services',
         '.NET Core'          : 'Target framework for all greenfield services since IndiaLends',
-        'Minimal APIs'       : 'Used for dashboard satellite service â€” lightweight, no controller overhead',
+        'Minimal APIs'       : 'Used for dashboard satellite service — lightweight, no controller overhead',
         'REST APIs'          : 'Designed and consumed REST contracts across all three companies',
-        'CQRS / MediatR'     : 'Used across most feature work â€” clean separation of commands and queries via MediatR pipeline',
-        'Domain-Driven Design': 'P&S microservice modelled around DDD aggregates â€” clear boundaries, no anemic domain',
-        'Clean Architecture' : 'Applied in dashboard service â€” strict layer separation: API â†’ UseCases â†’ Domain',
+        'CQRS / MediatR'     : 'Used across most feature work — clean separation of commands and queries via MediatR pipeline',
+        'Domain-Driven Design': 'P&S microservice modelled around DDD aggregates — clear boundaries, no anemic domain',
+        'Clean Architecture' : 'Applied in dashboard service — strict layer separation: API → UseCases → Domain',
         'Microservices'      : 'Dashboard + planning & scheduling both independently deployable from the monolith',
         'Resiliency Patterns': 'Polly retry + circuit-breaker specifically for database connection handling in shared library',
-        'BDD'                : 'SpecFlow / ReqnRoll acceptance tests â€” .feature files as living regression documentation',
+        'BDD'                : 'SpecFlow / ReqnRoll acceptance tests — .feature files as living regression documentation',
         'Azure Functions'    : 'Timer triggers: nightly scheduled reports + CRM jobs (low-traffic window); Queue triggers: async retry workflows and non-blocking logging; Blob triggers: document processing on upload; HTTP triggers: lightweight API endpoints',
-        'Entity Framework 6' : 'EF6 on .NET 4.8 â€” large multi-tenant enterprise codebase, per-tenant DB architecture',
+        'Entity Framework 6' : 'EF6 on .NET 4.8 — large multi-tenant enterprise codebase, per-tenant DB architecture',
         'EF Core'            : 'Used in .NET 8/9 services for greenfield data access layers',
-        'Dapper'             : 'Replaced EF in dashboard hot paths â€” raw SQL, significantly faster under load',
-        'LINQ'               : 'Everyday â€” projections, filtering, aggregation across all .NET work',
+        'Dapper'             : 'Replaced EF in dashboard hot paths — raw SQL, significantly faster under load',
+        'LINQ'               : 'Everyday — projections, filtering, aggregation across all .NET work',
         'T-SQL'              : 'Stored procs, CTEs, window functions for reporting and bulk operations',
-        'SQL Server'         : 'Primary DB at Siemens â€” large multi-tenant schema across thousands of clients',
+        'SQL Server'         : 'Primary DB at Siemens — large multi-tenant schema across thousands of clients',
         'PostgreSQL'         : 'Used in Java-based and .NET microservices',
         'Redis'              : 'Session store + L1/L2 cache for API response acceleration',
         'Azure App Service'  : 'Ran Azure Functions across multiple trigger types: Timer (reports), Queue (retry/logging), Blob (documents), HTTP (lightweight APIs)',
-        'Azure Service Bus'  : 'Loan repayment reminders â€” Azure Queue has a max TTL of days/weeks, but repayment schedules span years; Service Bus supported scheduling messages years in advance',
+        'Azure Service Bus'  : 'Loan repayment reminders — Azure Queue has a max TTL of days/weeks, but repayment schedules span years; Service Bus supported scheduling messages years in advance',
         'Azure Blob Storage' : 'Stored loan documents, ID photos, and pre-generated reports ready for analytics teams each morning',
-        'AWS Secrets Manager': 'DB credential resolution in a shared .NET library â€” region-aware, supports rotation without redeployment',
+        'AWS Secrets Manager': 'DB credential resolution in a shared .NET library — region-aware, supports rotation without redeployment',
         'Message Queues'     : 'Service-to-service async communication; used Azure Queue with retry-before-poison pattern',
-        'Docker'             : 'Used locally to run multiple dependent services together for development â€” configuration done by the platform team',
-        'OIDC / OAuth2'      : 'Worked on projects using OIDC and OAuth2 â€” integration, flow debugging, and consuming tokens; not protocol implementation',
-        'JWT'                : 'Worked with JWT-protected services â€” token validation, claims extraction; not issuer setup',
-        'Auth0'              : 'Worked on projects using Auth0 as the identity provider â€” integration and configuration side',
-        'Cookie Auth Scheme' : 'Built a custom cookie authentication handler for a .NET 8 service â€” delegating session validation to a central auth service',
+        'Docker'             : 'Used locally to run multiple dependent services together for development — configuration done by the platform team',
+        'OIDC / OAuth2'      : 'Worked on projects using OIDC and OAuth2 — integration, flow debugging, and consuming tokens; not protocol implementation',
+        'JWT'                : 'Worked with JWT-protected services — token validation, claims extraction; not issuer setup',
+        'Auth0'              : 'Worked on projects using Auth0 as the identity provider — integration and configuration side',
+        'Cookie Auth Scheme' : 'Built a custom cookie authentication handler for a .NET 8 service — delegating session validation to a central auth service',
         'VAPT Remediation'   : 'Resolved injection, broken auth, and missing header findings from pen-test reports at IndiaLends',
         'Azure DevOps'       : 'CI/CD pipelines, release gates, and board management at IndiaLends',
         'Jenkins'            : 'Build + deploy pipelines for production releases at Siemens',
         'TeamCity'           : 'Build server for .NET solutions and internal NuGet publishing at Siemens',
-        'SonarQube'          : 'Static analysis quality gate â€” issues had to be resolved before PRs could merge',
-        'Snyk'               : 'Dependency vulnerability scanning in CI â€” flagged risky package versions',
+        'SonarQube'          : 'Static analysis quality gate — issues had to be resolved before PRs could merge',
+        'Snyk'               : 'Dependency vulnerability scanning in CI — flagged risky package versions',
         'Grafana'            : 'Production monitoring dashboards for microservices at Siemens',
         'Datadog'            : 'APM traces and log monitoring across services',
-        'MyGet (NuGet feed)' : 'Internal NuGet feed â€” published shared libraries consumed across all .NET repos',
+        'MyGet (NuGet feed)' : 'Internal NuGet feed — published shared libraries consumed across all .NET repos',
         'NUnit'              : 'Unit + integration test runner across .NET services',
-        'SpecFlow'           : 'BDD acceptance tests â€” Gherkin .feature files with C# step definitions',
-        'ReqnRoll'           : 'SpecFlow open-source successor â€” migrated seamlessly, same Gherkin syntax',
-        'Moq'                : 'Mocking framework â€” repository and service layer mocks in unit tests',
+        'SpecFlow'           : 'BDD acceptance tests — Gherkin .feature files with C# step definitions',
+        'ReqnRoll'           : 'SpecFlow open-source successor — migrated seamlessly, same Gherkin syntax',
+        'Moq'                : 'Mocking framework — repository and service layer mocks in unit tests',
         'Unit Testing'       : 'Wrote tests for business logic, custom auth handlers, query and command handlers',
         'Integration Testing': 'Real-DB integration tests covering repository and service layers end-to-end',
-        'Git'                : 'Daily â€” feature branches, PRs, rebasing across all roles',
+        'Git'                : 'Daily — feature branches, PRs, rebasing across all roles',
         'Azure Repos'        : 'Git hosting at IndiaLends for main application repos',
-        'TFS'                : 'Team Foundation Server â€” used at IndiaLends for version control on a CDN-related project',
-        'REST'               : 'Primary API style across all three companies â€” designed and consumed RESTful contracts',
+        'TFS'                : 'Team Foundation Server — used at IndiaLends for version control on a CDN-related project',
+        'REST'               : 'Primary API style across all three companies — designed and consumed RESTful contracts',
         'JSON'               : 'Standard data format for all API integrations; also used for config, request/response payloads',
-        'XML'                : 'Used extensively for banking and NBFC partner API integrations at IndiaLends â€” many financial APIs still require XML',
+        'XML'                : 'Used extensively for banking and NBFC partner API integrations at IndiaLends — many financial APIs still require XML',
         'Webhooks'           : 'Built HTTP-triggered Azure Functions to handle inbound webhook events from third-party banking partners',
-        'Bitbucket'          : 'Code hosting at Siemens â€” Bitbucket with PR pipelines and branch policies',
+        'Bitbucket'          : 'Code hosting at Siemens — Bitbucket with PR pipelines and branch policies',
         'Swagger / OpenAPI'  : 'Auto-generated API docs on all ASP.NET Core services',
         'Postman'            : 'API testing + environment collections for all services',
-        'GitHub Copilot'     : 'Used for boilerplate acceleration â€” I review every suggestion before accepting',
+        'GitHub Copilot'     : 'Used for boilerplate acceleration — I review every suggestion before accepting',
         'Claude Code'        : 'AI pair programmer for architecture exploration and building this portfolio',
         'Jira'               : 'Sprint planning, bug tracking, and release management across all roles',
         'Scrum'              : '2-week sprints, daily standups, sprint reviews and retrospectives',
         'Kanban'             : 'Maintenance & Reliability initiative ran as a continuous Kanban flow',
         'Azure Boards'       : 'Work item tracking, sprint boards, and backlog management at IndiaLends',
-        'Code Reviews'       : 'Regular PR reviewer and reviewee â€” feedback on architecture, naming, test coverage',
-        'Analytical Thinking': 'Identifying root causes over symptoms â€” PAN matching problem was found and solved this way',
+        'Code Reviews'       : 'Regular PR reviewer and reviewee — feedback on architecture, naming, test coverage',
+        'Analytical Thinking': 'Identifying root causes over symptoms — PAN matching problem was found and solved this way',
         'Root Cause Analysis': 'Diagnosed production defects across Work Orders, Dashboard, and Purchasing at Siemens',
-        'Production Troubleshooting': 'Diagnosed and resolved customer-reported defects in production as part of the M&R squad â€” log analysis via Datadog and Grafana, not infra or on-call',
-        'HTML'               : 'MVC Razor views at IndiaLends â€” markup for form-heavy application screens',
+        'Production Troubleshooting': 'Diagnosed and resolved customer-reported defects in production as part of the M&R squad — log analysis via Datadog and Grafana, not infra or on-call',
+        'HTML'               : 'MVC Razor views at IndiaLends — markup for form-heavy application screens',
         'CSS'                : 'Styling for MVC Razor views and Bootstrap overrides; not a dedicated UI engineer',
         'Bootstrap'          : 'Used in ASP.NET MVC Razor views at IndiaLends for responsive layout and components',
-        'jQuery'             : 'Heavy use at IndiaLends â€” DOM manipulation, AJAX calls, form validation, UI interactions',
+        'jQuery'             : 'Heavy use at IndiaLends — DOM manipulation, AJAX calls, form validation, UI interactions',
         'DevExpress'         : 'Component library used at Siemens for data grids, charts, and complex UI widgets in MVC',
-        'Vue.js (in progress)': 'Learning Vue 3 Composition API â€” personal study, not yet in production',
+        'Vue.js (in progress)': 'Learning Vue 3 Composition API — personal study, not yet in production',
       };
 
       const tip = document.createElement('div');
@@ -1464,7 +1464,7 @@
     typedTitleEffect();
     navBehaviours();
     scrollReveal();
-    // Polyfill loaded via defer before this script (see index.html) â€” Temporal guaranteed available.
+    // Polyfill loaded via defer before this script (see index.html) — Temporal guaranteed available.
     careerTimer();
     initKnob();
     initSourceTooltip();
@@ -1499,4 +1499,3 @@
         });
       });
     })();
-
