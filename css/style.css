@@ -1774,6 +1774,39 @@ code {
   color: var(--color-muted); margin-top: 4px;
 }
 
+/* Writing Widget */
+.writing-list {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.writing-item {
+  display: flex; flex-direction: column; gap: 3px;
+  text-decoration: none;
+  padding: 7px 9px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-subtle);
+  background: var(--color-bg);
+  transition: border-color 0.2s, background 0.2s;
+}
+.writing-item:hover {
+  border-color: var(--color-gold);
+  background: var(--color-gold-dim);
+  text-decoration: none;
+}
+.writing-title {
+  font-size: 11px; font-weight: 500;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+.writing-item:hover .writing-title { color: var(--color-gold); }
+.writing-meta {
+  font-family: var(--font-mono); font-size: 9px;
+  color: var(--color-dim);
+}
+.writing-loading, .writing-dim {
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--color-dim); font-style: italic;
+}
+
 /* Request Counter */
 .request-counter {
   display: flex; flex-direction: column; gap: 4px;
