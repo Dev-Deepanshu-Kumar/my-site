@@ -1533,7 +1533,6 @@ code {
 .endpoint-section.visible .stat-card:nth-child(1) { animation-delay: 0.1s; }
 .endpoint-section.visible .stat-card:nth-child(2) { animation-delay: 0.2s; }
 .endpoint-section.visible .stat-card:nth-child(3) { animation-delay: 0.3s; }
-.endpoint-section.visible .stat-card:nth-child(4) { animation-delay: 0.4s; }
 @keyframes popIn {
   0% { opacity: 0; transform: translateY(20px) scale(0.95); }
   70% { transform: translateY(-4px) scale(1.02); }
