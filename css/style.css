@@ -2091,6 +2091,53 @@ code {
   font-family: var(--font-mono); font-size: 12px; color: var(--color-dim);
 }
 
+/* Inline hint in overview meta */
+.cmd-inline-hint {
+  background: none; border: none; padding: 0; cursor: pointer;
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--color-muted);
+  display: flex; align-items: center; gap: 5px;
+  transition: color 0.2s;
+}
+.cmd-inline-hint:hover { color: var(--color-accent-light); }
+.cmd-inline-hint kbd {
+  font-family: var(--font-mono); font-size: 11px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-bottom-width: 2px;
+  border-radius: 3px;
+  padding: 1px 6px;
+  color: var(--color-text);
+}
+.cmd-inline-hint-text { color: var(--color-dim); }
+
+/* Mobile FAB — only on mobile, bottom-left above tabs */
+.cmd-fab {
+  display: none;
+  position: fixed; bottom: 70px; right: 16px;
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  cursor: pointer; z-index: 148;
+  align-items: center; justify-content: center;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.cmd-fab:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 12px rgba(43,156,186,0.3);
+}
+.cmd-fab-slash {
+  font-family: var(--font-mono); font-size: 18px;
+  font-weight: 700; color: var(--method-get);
+  line-height: 1;
+}
+@media (max-width: 900px) {
+  .cmd-fab { display: flex; }
+  /* hide topbar hint on mobile — FAB replaces it */
+  .cmd-topbar-hint { display: none !important; }
+}
+
 /* Topbar / hint button */
 .cmd-topbar-hint {
   display: flex; align-items: center; gap: 5px;

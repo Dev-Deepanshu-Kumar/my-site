@@ -527,7 +527,10 @@
       document.querySelectorAll('.skill-tag.selected').forEach(t => t.classList.remove('selected'));
       tag.classList.add('selected');
       bumpRequest('GET');
-      const name = tag.textContent.trim();
+      // strip any injected lat-tip text before looking up
+      const name = [...tag.childNodes]
+        .filter(n => n.nodeType === Node.TEXT_NODE)
+        .map(n => n.textContent).join('').trim();
       const data = SKILL_DATA[name];
       const terminal = document.getElementById('skill-terminal');
       const title = document.getElementById('skill-terminal-title');
@@ -1158,7 +1161,7 @@
     { label: 'API: portfolio.json',    sub: 'curl this site',            href: '/api/portfolio.json', icon: '{}' },
   ];
 
-  function openPalette() {
+  window.openPalette = function() {
     cmdPalette.classList.add('open');
     cmdBackdrop.classList.add('open');
     cmdInput.value = '';

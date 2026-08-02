@@ -483,6 +483,15 @@
             <span class="meta-label">Stack</span>
             <span class="meta-value">.NET · C# · REST · DDD · Azure · SQL Server</span>
           </div>
+          <div class="meta-row meta-row--cmd">
+            <span class="meta-label">Navigate</span>
+            <span class="meta-value">
+              <button class="cmd-inline-hint" onclick="openPalette()">
+                <kbd>/</kbd> or <kbd>Ctrl+K</kbd>
+                <span class="cmd-inline-hint-text">— command palette</span>
+              </button>
+            </span>
+          </div>
         </div>
       </div>
     </section>
@@ -702,7 +711,7 @@
               <div class="skill-domain-name">"backend"</div>
               <div class="skill-tags">
                 <span class="skill-tag skill-tag--primary" data-ms="12">ASP.NET Core</span>
-                <span class="skill-tag skill-tag--primary" data-ms="10">. NET Core</span>
+                <span class="skill-tag skill-tag--primary" data-ms="10">.NET Core</span>
                 <span class="skill-tag" data-ms="28">Minimal APIs</span>
                 <span class="skill-tag skill-tag--primary" data-ms="9">REST</span>
                 <span class="skill-tag" data-ms="45">CQRS / MediatR</span>
@@ -1208,6 +1217,11 @@
 
   <!-- HTTP Status Toast -->
   <div class="http-toast" id="http-toast"></div>
+
+  <!-- Command palette mobile FAB -->
+  <button class="cmd-fab" id="cmd-fab" aria-label="Open command palette" onclick="openPalette()">
+    <span class="cmd-fab-slash">/</span>
+  </button>
 
   <!-- Command Palette -->
   <div class="cmd-backdrop" id="cmd-backdrop"></div>
