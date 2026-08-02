@@ -41,13 +41,6 @@
     <priority>0.3</priority>
   </url>
 
-  <!-- Resume HTML v2 — API doc aesthetic (assets) -->
-  <url>
-    <loc>https://deepanshu-kumar.dev/assets/deepanshu-kumar-v2.html</loc>
-    <lastmod>2026-08-02</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
 
 </urlset>
 
