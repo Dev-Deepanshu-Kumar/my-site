@@ -36,7 +36,10 @@
           <span class="writing-title">${a.title}</span>
           <span class="writing-meta">${date} · ${mins} min read</span>
         </a>`;
-      }).join('');
+      }).join('') +
+      `<a class="writing-view-all" href="https://dev.to/dev-deepanshu-kumar" target="_blank" rel="noopener">
+        View all writings →
+      </a>`;
     } catch (e) {
       list.innerHTML = '<div class="writing-dim">// unavailable</div>';
     }

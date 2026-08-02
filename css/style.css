@@ -1802,6 +1802,16 @@ code {
   font-family: var(--font-mono); font-size: 9px;
   color: var(--color-dim);
 }
+.writing-view-all {
+  display: block;
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--color-dim); text-align: right;
+  padding-top: 4px;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.writing-view-all:hover { color: var(--color-accent-light); text-decoration: none; }
+
 .writing-loading, .writing-dim {
   font-family: var(--font-mono); font-size: 10px;
   color: var(--color-dim); font-style: italic;
