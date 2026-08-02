@@ -17,13 +17,6 @@
     <priority>0.6</priority>
   </url>
 
-  <!-- v1 — preserved, lower priority -->
-  <url>
-    <loc>https://deepanshu-kumar.dev/v1/</loc>
-    <lastmod>2026-07-21</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
-  </url>
 
   <!-- Resume PDF -->
   <url>
