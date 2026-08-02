@@ -1073,6 +1073,213 @@
     return jaroWinkler(sorted1, sorted2);
   }
 
+  // ── x-response-time header ───────────────────────────────────────
+  const rtEl = document.getElementById('hero-response-time');
+  if (rtEl) {
+    const paint = performance.getEntriesByType('navigation')[0];
+    const ms = paint
+      ? Math.round(paint.domContentLoadedEventEnd - paint.startTime)
+      : Math.round(performance.now());
+    // Reveal after hero types in
+    setTimeout(() => { rtEl.textContent = ms + 'ms'; }, 3800);
+  }
+
+
+  // ── Page title follows scroll ─────────────────────────────────────
+  const sectionTitles = {
+    'overview':        'Overview',
+    'experience':      'GET /experience',
+    'skills':          'GET /skills',
+    'validator':       'POST /validate/pan-name',
+    'recommendations': 'GET /recommendations',
+    'education':       'GET /education',
+  };
+  const baseTitle = 'deepanshu-kumar.dev';
+
+  const titleObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const label = sectionTitles[entry.target.id];
+        document.title = label ? `${label} — ${baseTitle}` : baseTitle;
+      }
+    });
+  }, { threshold: 0.3 });
+
+  Object.keys(sectionTitles).forEach(id => {
+    const el = document.getElementById(id);
+    if (el) titleObserver.observe(el);
+  });
+
+
+  // ── Skills as latency ─────────────────────────────────────────────
+  document.querySelectorAll('.skill-tag[data-ms]').forEach(tag => {
+    const ms = parseInt(tag.dataset.ms);
+    // colour tier
+    tag.classList.remove('skill-tag--primary');
+    if (ms < 20)       tag.classList.add('skill-lat--fast');
+    else if (ms < 60)  tag.classList.add('skill-lat--mid');
+    else               tag.classList.add('skill-lat--slow');
+
+    // tooltip on hover
+    tag.setAttribute('title', `${ms}ms`);
+    tag.addEventListener('mouseenter', function() {
+      let tip = this.querySelector('.lat-tip');
+      if (!tip) {
+        tip = document.createElement('span');
+        tip.className = 'lat-tip';
+        this.appendChild(tip);
+      }
+      tip.textContent = ms + 'ms';
+    });
+    tag.addEventListener('mouseleave', function() {
+      this.querySelector('.lat-tip')?.remove();
+    });
+  });
+
+
+  // ── Command Palette ───────────────────────────────────────────────
+  const cmdBackdrop = document.getElementById('cmd-backdrop');
+  const cmdPalette  = document.getElementById('cmd-palette');
+  const cmdInput    = document.getElementById('cmd-input');
+  const cmdResults  = document.getElementById('cmd-results');
+
+  const CMD_ITEMS = [
+    { label: 'Overview',               sub: 'Introduction',              id: 'overview',        icon: '◉' },
+    { label: 'GET /experience',        sub: 'Work history',              id: 'experience',      icon: 'GET' },
+    { label: 'GET /skills/technical',  sub: 'Tech stack & tools',        id: 'skills',          icon: 'GET', tab: 'technical' },
+    { label: 'GET /skills/soft',       sub: 'Soft skills with proof',    id: 'skills',          icon: 'GET', tab: 'soft' },
+    { label: 'POST /validate/pan-name',sub: 'Live fuzzy name demo',      id: 'validator',       icon: 'POST' },
+    { label: 'GET /recommendations',   sub: 'Peer & manager recs',       id: 'recommendations', icon: 'GET' },
+    { label: 'GET /education',         sub: 'Academic credentials',      id: 'education',       icon: 'GET' },
+    { label: 'Download Resume',        sub: 'Deepanshu_Kumar_Resume.pdf',href: 'Deepanshu_Kumar_Resume.pdf', icon: '↓', download: true },
+    { label: 'Email',                  sub: 'Deepanshu.Kumar@Outlook.in',href: 'mailto:Deepanshu.Kumar@Outlook.in', icon: '✉' },
+    { label: 'GitHub',                 sub: 'Dev-Deepanshu-Kumar',       href: 'https://github.com/Dev-Deepanshu-Kumar', icon: '◈' },
+    { label: 'LinkedIn',               sub: 'deepanshu-kumar-dev',       href: 'https://linkedin.com/in/deepanshu-kumar-dev', icon: '⬡' },
+    { label: 'API: portfolio.json',    sub: 'curl this site',            href: '/api/portfolio.json', icon: '{}' },
+  ];
+
+  function openPalette() {
+    cmdPalette.classList.add('open');
+    cmdBackdrop.classList.add('open');
+    cmdInput.value = '';
+    renderCmdResults('');
+    setTimeout(() => cmdInput.focus(), 50);
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closePalette() {
+    cmdPalette.classList.remove('open');
+    cmdBackdrop.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function renderCmdResults(query) {
+    const q = query.toLowerCase().trim();
+    const filtered = q
+      ? CMD_ITEMS.filter(i =>
+          i.label.toLowerCase().includes(q) ||
+          i.sub.toLowerCase().includes(q))
+      : CMD_ITEMS;
+
+    if (!filtered.length) {
+      cmdResults.innerHTML = '<div class="cmd-empty">No results</div>';
+      return;
+    }
+
+    cmdResults.innerHTML = filtered.map((item, idx) => {
+      const isGet  = item.icon === 'GET';
+      const isPost = item.icon === 'POST';
+      const iconCls = isGet ? 'cmd-icon cmd-icon--get' : isPost ? 'cmd-icon cmd-icon--post' : 'cmd-icon';
+      return `<div class="cmd-item" data-idx="${idx}" data-original-idx="${CMD_ITEMS.indexOf(item)}">
+        <span class="${iconCls}">${item.icon}</span>
+        <span class="cmd-item-label">${item.label}</span>
+        <span class="cmd-item-sub">${item.sub}</span>
+        <span class="cmd-enter">↵</span>
+      </div>`;
+    }).join('');
+
+    // activate first
+    cmdResults.querySelector('.cmd-item')?.classList.add('active');
+
+    // click handler
+    cmdResults.querySelectorAll('.cmd-item').forEach(el => {
+      el.addEventListener('click', () => executeCmdItem(CMD_ITEMS[parseInt(el.dataset.originalIdx)]));
+      el.addEventListener('mouseenter', () => {
+        cmdResults.querySelectorAll('.cmd-item').forEach(e => e.classList.remove('active'));
+        el.classList.add('active');
+      });
+    });
+  }
+
+  function executeCmdItem(item) {
+    closePalette();
+    if (item.href) {
+      if (item.download) {
+        const a = document.createElement('a');
+        a.href = item.href; a.download = ''; a.click();
+      } else {
+        window.open(item.href, item.href.startsWith('http') ? '_blank' : '_self');
+      }
+      return;
+    }
+    if (item.id) {
+      const el = document.getElementById(item.id);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (item.tab) setTimeout(() => switchSkillTab(item.tab, null), 400);
+      }
+    }
+  }
+
+  cmdInput.addEventListener('input', e => renderCmdResults(e.target.value));
+
+  cmdInput.addEventListener('keydown', e => {
+    const items = [...cmdResults.querySelectorAll('.cmd-item')];
+    const activeIdx = items.findIndex(i => i.classList.contains('active'));
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      const next = items[(activeIdx + 1) % items.length];
+      items.forEach(i => i.classList.remove('active'));
+      next?.classList.add('active');
+      next?.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      const prev = items[(activeIdx - 1 + items.length) % items.length];
+      items.forEach(i => i.classList.remove('active'));
+      prev?.classList.add('active');
+      prev?.scrollIntoView({ block: 'nearest' });
+    } else if (e.key === 'Enter') {
+      const active = cmdResults.querySelector('.cmd-item.active');
+      if (active) executeCmdItem(CMD_ITEMS[parseInt(active.dataset.originalIdx)]);
+    } else if (e.key === 'Escape') {
+      closePalette();
+    }
+  });
+
+  cmdBackdrop.addEventListener('click', closePalette);
+
+  // trigger: / key or Ctrl+K
+  document.addEventListener('keydown', e => {
+    const tag = document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if (e.key === '/' || (e.ctrlKey && e.key === 'k')) {
+      e.preventDefault();
+      cmdPalette.classList.contains('open') ? closePalette() : openPalette();
+    }
+    if (e.key === 'Escape') closePalette();
+  });
+
+  // hint in topbar — press / to search
+  const topbarRight = document.querySelector('.topbar-right');
+  if (topbarRight) {
+    const hint = document.createElement('button');
+    hint.className = 'cmd-topbar-hint';
+    hint.innerHTML = '<span class="cmd-hint-slash">/</span> search';
+    hint.onclick = openPalette;
+    topbarRight.insertBefore(hint, topbarRight.firstChild);
+  }
+
+
   // ── Lightbox ──────────────────────────────────────────────────────
   const lightbox    = document.getElementById('lightbox');
   const lightboxImg = document.getElementById('lightbox-img');
