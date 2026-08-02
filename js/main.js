@@ -6,7 +6,15 @@
   'use strict';
 
   // ── Dev.to Writing Widget ─────────────────────────────────────────
+  // Set to false to hide both sidebar and mobile writing widgets instantly
+  const WRITING_WIDGET_ENABLED = true;
+
   (async function loadWriting() {
+    if (!WRITING_WIDGET_ENABLED) {
+      document.getElementById('writing-widget')?.style.setProperty('display', 'none');
+      document.getElementById('mobile-writing-block')?.style.setProperty('display', 'none');
+      return;
+    }
     const list        = document.getElementById('writing-list');
     const mobileList  = document.getElementById('mobile-writing-list');
     if (!list && !mobileList) return;
