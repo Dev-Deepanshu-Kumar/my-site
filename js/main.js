@@ -1076,6 +1076,37 @@
     return jaroWinkler(sorted1, sorted2);
   }
 
+  // ── HTTP Status Ticker ───────────────────────────────────────────
+  const TICKER_CODES = [
+    { code: '200 OK',                    cls: 's2xx' },
+    { code: '201 Created',               cls: 's2xx' },
+    { code: '204 No Content',            cls: 's2xx' },
+    { code: '206 Partial Content',       cls: 's2xx' },
+    { code: '301 Moved Permanently',     cls: 's3xx' },
+    { code: '304 Not Modified',          cls: 's3xx' },
+    { code: '400 Bad Request',           cls: 's4xx' },
+    { code: '401 Unauthorized',          cls: 's4xx' },
+    { code: '403 Forbidden',             cls: 's4xx' },
+    { code: '404 Not Found',             cls: 's4xx' },
+    { code: '409 Conflict',              cls: 's4xx' },
+    { code: '422 Unprocessable Entity',  cls: 's4xx' },
+    { code: '429 Too Many Requests',     cls: 's4xx' },
+    { code: '500 Internal Server Error', cls: 's5xx' },
+    { code: '502 Bad Gateway',           cls: 's5xx' },
+    { code: '503 Service Unavailable',   cls: 's5xx' },
+    { code: '504 Gateway Timeout',       cls: 's5xx' },
+  ];
+
+  const tickerTrack = document.getElementById('status-ticker-track');
+  if (tickerTrack) {
+    // Double the list for seamless infinite scroll
+    const items = [...TICKER_CODES, ...TICKER_CODES]
+      .map(({ code, cls }) =>
+        `<span class="status-ticker-item ${cls}">${code}</span>`)
+      .join('');
+    tickerTrack.innerHTML = items;
+  }
+
   // ── x-response-time header ───────────────────────────────────────
   const rtEl = document.getElementById('hero-response-time');
   if (rtEl) {
