@@ -1802,6 +1802,39 @@ code {
   font-family: var(--font-mono); font-size: 9px;
   color: var(--color-dim);
 }
+/* Mobile-only writing block (sidebar shows it on desktop) */
+.mobile-writing-block {
+  display: none;   /* hidden on desktop — sidebar has it */
+  margin-bottom: 24px;
+  padding: 14px 16px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius);
+}
+.mobile-writing-header {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 10px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  color: var(--color-dim); margin-bottom: 10px;
+}
+.mobile-writing-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--color-gold);
+  box-shadow: 0 0 6px var(--color-gold);
+  flex-shrink: 0;
+}
+.mobile-writing-all {
+  margin-left: auto;
+  font-family: var(--font-mono); font-size: 10px;
+  color: var(--color-dim); text-decoration: none;
+  text-transform: none; letter-spacing: 0;
+}
+.mobile-writing-all:hover { color: var(--color-accent-light); }
+
+@media (max-width: 900px) {
+  .mobile-writing-block { display: block; }
+}
+
 .writing-view-all {
   display: block;
   font-family: var(--font-mono); font-size: 10px;

@@ -7,12 +7,15 @@
 
   // ── Dev.to Writing Widget ─────────────────────────────────────────
   (async function loadWriting() {
-    const list = document.getElementById('writing-list');
-    if (!list) return;
+    const list        = document.getElementById('writing-list');
+    const mobileList  = document.getElementById('mobile-writing-list');
+    if (!list && !mobileList) return;
 
     // skip on file:// — CORS won't allow it, fail silently
     if (location.protocol === 'file:') {
-      list.innerHTML = '<div class="writing-dim">// live on deployed site</div>';
+      const msg = '<div class="writing-dim">// live on deployed site</div>';
+      if (list)       list.innerHTML = msg;
+      if (mobileList) mobileList.innerHTML = msg;
       return;
     }
 
@@ -25,23 +28,29 @@
       const articles = await res.json();
 
       if (!articles.length) {
-        list.innerHTML = '<div class="writing-dim">// no posts yet</div>';
+        const msg = '<div class="writing-dim">// no posts yet</div>';
+        if (list)       list.innerHTML = msg;
+        if (mobileList) mobileList.innerHTML = msg;
         return;
       }
 
-      list.innerHTML = articles.map(a => {
+      const items = articles.map(a => {
         const mins = a.reading_time_minutes || '?';
         const date = new Date(a.published_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
         return `<a class="writing-item" href="${a.url}" target="_blank" rel="noopener">
           <span class="writing-title">${a.title}</span>
           <span class="writing-meta">${date} · ${mins} min read</span>
         </a>`;
-      }).join('') +
-      `<a class="writing-view-all" href="https://dev.to/dev-deepanshu-kumar" target="_blank" rel="noopener">
-        View all writings →
-      </a>`;
+      }).join('');
+
+      const viewAll = `<a class="writing-view-all" href="https://dev.to/dev-deepanshu-kumar" target="_blank" rel="noopener">View all writings →</a>`;
+
+      if (list)       list.innerHTML       = items + viewAll;
+      if (mobileList) mobileList.innerHTML = items;  // "View all" in header on mobile
     } catch (e) {
-      list.innerHTML = '<div class="writing-dim">// unavailable</div>';
+      const msg = '<div class="writing-dim">// unavailable</div>';
+      if (list)       list.innerHTML = msg;
+      if (mobileList) mobileList.innerHTML = msg;
     }
   })();
 
