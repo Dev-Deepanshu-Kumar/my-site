@@ -28,8 +28,8 @@
     }
 
     try {
-      const res = await fetch(
-        'https://dev.to/api/articles?username=dev-deepanshu-kumar&per_page=3',
+     const res = await fetch(
+        `https://dev.to/api/articles?username=dev-deepanshu-kumar&per_page=3&_=${Date.now()}`,
         { headers: { 'Accept': 'application/json' }, cache: 'no-store' }
       );
       if (!res.ok) throw new Error(res.status);
