@@ -30,7 +30,7 @@
     try {
       const res = await fetch(
         'https://dev.to/api/articles?username=dev-deepanshu-kumar&per_page=3',
-        { headers: { 'Accept': 'application/json' } }
+        { headers: { 'Accept': 'application/json' }, cache: 'no-store' }
       );
       if (!res.ok) throw new Error(res.status);
       const articles = await res.json();
