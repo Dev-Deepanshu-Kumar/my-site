@@ -113,3 +113,33 @@ initTimeline();
     });
   }
 })();
+
+// ── Mobile tab bar ───────────────────────────────────────────────────
+//
+// To add a new endpoint tab: add one entry here. method: null = icon.
+// Label kept short (~5 chars) — truncated by CSS on small screens.
+// Keep in sync with CMD_ITEMS in interactions.js and sections in index.html.
+//
+const MOBILE_TABS = [
+  { section: 'overview',        method: null,   icon: '&#x25C9;', label: 'Overview' },
+  { section: 'experience',      method: 'get',  icon: null,       label: 'Exp'      },
+  { section: 'skills',          method: 'get',  icon: null,       label: 'Skills'   },
+  { section: 'validator',       method: 'post', icon: null,       label: 'Demo'     },
+  { section: 'recommendations', method: 'get',  icon: null,       label: 'Recs'     },
+  { section: 'education',       method: 'get',  icon: null,       label: 'Edu'      },
+];
+
+// Rendered in a standalone IIFE below for fault isolation —
+// if any earlier module throws, the nav still appears.
+function _buildMobileTabs() {
+  var nav = document.getElementById('mobile-tabs');
+  if (!nav) return;
+  nav.innerHTML = MOBILE_TABS.map(function(t, i) {
+    var icon = t.method
+      ? '<span class="mobile-tab-icon method-badge method-' + t.method + '" style="padding:1px 4px;font-size:8px;">' + t.method.toUpperCase() + '</span>'
+      : '<span class="mobile-tab-icon">' + t.icon + '</span>';
+    return '<a href="#' + t.section + '" class="mobile-tab' + (i === 0 ? ' active' : '') + '" data-section="' + t.section + '">'
+      + icon + '<span class="mobile-tab-label">' + t.label + '</span></a>';
+  }).join('');
+}
+_buildMobileTabs();
