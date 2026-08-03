@@ -157,7 +157,7 @@ Plain markdown. Update when: new job, new rec, new recognition.
 | `interactions.js` | `CMD_ITEMS[]` for command palette entries |
 | `skills.js` | `SKILL_DATA{}` for skill terminal man page content |
 | `validator.js` | Algorithm weights in `finalResult`, default threshold in HTML |
-| `timeline.js` | `TIMELINE_PERIODS[]` for career bar, `MOBILE_TABS[]` for bottom nav |
+| `timeline.js` | `TIMELINE_PERIODS[]` for career bar, `MOBILE_TABS[]` for bottom nav — both in the same file |
 
 ## JS Globals (cross-file dependencies)
 
