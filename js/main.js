@@ -1391,4 +1391,126 @@
     if (arrow) arrow.textContent = isOpen ? '↓' : '→';
   };
 
+  // ── Timeline bar — proportional widths from real dates ──────────
+  //
+  // To add a new org: add an entry to TIMELINE_PERIODS, add a
+  // .timeline-segment--<key> CSS rule for the colour, and add a
+  // <div class="timeline-segment timeline-segment--<key>" data-key="<key>">
+  // in the HTML.  Widths update automatically on next load.
+  //
+  const TIMELINE_PERIODS = [
+    { key: 'telebu',     start: new Date(2019, 11, 1), end: new Date(2020, 11, 31), label: 'Telebu',     color: '#a78bfa' },
+    { key: 'gap',        start: new Date(2021,  0, 1), end: new Date(2022,  2, 31), label: 'Career break', color: null },
+    { key: 'indialends', start: new Date(2022,  3, 1), end: new Date(2023, 11, 31), label: 'IndiaLends', color: 'var(--color-gold)' },
+    { key: 'siemens',    start: new Date(2024,  0, 1), end: null,                   label: 'Siemens',    color: 'var(--color-accent)' },
+  ];
+
+  function initTimeline() {
+    const bar    = document.getElementById('timeline-bar');
+    const gapZzz = document.getElementById('gap-zzz');
+    if (!bar) return;
+
+    const now    = new Date();
+    const total  = TIMELINE_PERIODS.reduce((sum, p) => {
+      const end = p.end || now;
+      return sum + (end - p.start);
+    }, 0);
+
+    let gapOffsetPct  = 0;
+    let gapWidthPct   = 0;
+    let accumulated   = 0;
+
+    TIMELINE_PERIODS.forEach(p => {
+      const seg = bar.querySelector(`[data-key="${p.key}"]`);
+      if (!seg) return;
+      const end      = p.end || now;
+      const duration = end - p.start;
+      const pct      = (duration / total) * 100;
+
+      seg.style.flex = `0 0 ${pct.toFixed(3)}%`;
+
+      const months = Math.round(duration / (1000 * 60 * 60 * 24 * 30.44));
+      const label  = p.end
+        ? `${p.label} · ${_fmtDate(p.start)} – ${_fmtDate(p.end)} · ${months}mo`
+        : `${p.label} · ${_fmtDate(p.start)} – Present · ${months}mo`;
+
+      if (p.key === 'gap') {
+        gapOffsetPct = (accumulated / total) * 100;
+        gapWidthPct  = pct;
+        seg.setAttribute('data-tooltip', `Career break · ${_fmtDate(p.start)} – ${_fmtDate(p.end)} — recalibrating`);
+        if (gapZzz) {
+          const tooltip = gapZzz.querySelector('.gap-tooltip');
+          if (tooltip) tooltip.textContent = `Career break · ${_fmtDate(p.start)} – ${_fmtDate(p.end)} — recalibrating`;
+        }
+      } else {
+        seg.setAttribute('title', label);
+      }
+
+      accumulated += duration;
+    });
+
+    // reposition zzz overlay to match gap segment exactly
+    if (gapZzz) {
+      gapZzz.style.left  = `${gapOffsetPct.toFixed(3)}%`;
+      gapZzz.style.width = `${gapWidthPct.toFixed(3)}%`;
+    }
+
+    // year markers
+    const yearsEl = document.getElementById('timeline-years');
+    if (yearsEl) {
+      const startYear = TIMELINE_PERIODS[0].start.getFullYear();
+      const endDate   = now;
+      const totalSpan = endDate - TIMELINE_PERIODS[0].start;
+      const endYear   = endDate.getFullYear();
+      let html = '';
+
+      for (let yr = startYear; yr <= endYear; yr++) {
+        const d   = new Date(yr, 0, 1);
+        const pct = ((d - TIMELINE_PERIODS[0].start) / totalSpan) * 100;
+        if (pct < 0 || pct > 100) continue;
+        const isNow = yr === endYear;
+        const left  = isNow ? '100%' : `${pct.toFixed(2)}%`;
+        const anchor = isNow ? 'translateX(-100%)' : 'translateX(-50%)';
+        html += `<span class="timeline-year${isNow ? ' timeline-year--now' : ''}"
+                       style="left:${left};transform:${anchor}">${isNow ? 'now' : yr}</span>`;
+      }
+      yearsEl.innerHTML = html;
+    }
+
+    // legend — most recent first, skip gap
+    const legend = document.getElementById('timeline-legend');
+    if (legend) {
+      const items = [...TIMELINE_PERIODS]
+        .filter(p => p.color)
+        .map(p => {
+          const suffix = !p.end ? ' (current)' : '';
+          return `<div class="timeline-legend-item">
+            <span class="timeline-legend-dot" style="background:${p.color}"></span>
+            ${p.label}${suffix}
+          </div>`;
+        });
+      legend.innerHTML = items.join('');
+    }
+  }
+
+  function _fmtDate(d) {
+    if (!d) return 'Present';
+    return d.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+  }
+
+  initTimeline();
+
+  // ── Gap segment tooltip (tap on mobile, hover handled by CSS) ────
+  const gapSegment = document.querySelector('.timeline-segment--gap');
+  const gapZzz     = document.querySelector('.gap-zzz');
+  if (gapSegment && gapZzz) {
+    gapSegment.addEventListener('click', function(e) {
+      e.stopPropagation();
+      gapZzz.classList.toggle('tooltip-visible');
+    });
+    document.addEventListener('click', function() {
+      gapZzz.classList.remove('tooltip-visible');
+    });
+  }
+
 })();
