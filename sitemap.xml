@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Primary — v2 (current) -->
+  <url>
+    <loc>https://deepanshu-kumar.dev/</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- API endpoint — machine-readable career data -->
+  <url>
+    <loc>https://deepanshu-kumar.dev/api/portfolio.json</loc>
+    <lastmod>2026-08-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+
+  <!-- Resume PDF -->
+  <url>
+    <loc>https://deepanshu-kumar.dev/Deepanshu_Kumar_Resume.pdf</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Resume HTML v1 (assets) -->
+  <url>
+    <loc>https://deepanshu-kumar.dev/assets/deepanshu-kumar.html</loc>
+    <lastmod>2026-07-21</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+
+</urlset>
+
+<!--
+  External profiles (not own domain — for reference only):
+  Dev.to:    https://dev.to/dev-deepanshu-kumar
+  Medium:    https://medium.com/@dev-deepanshu-kumar
+  LinkedIn:  https://linkedin.com/in/deepanshu-kumar-dev
+  GitHub:    https://github.com/Dev-Deepanshu-Kumar
+-->

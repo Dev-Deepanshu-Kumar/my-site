@@ -1,0 +1,655 @@
+/* ============================================================
+   LIGHT THEME — warm cream palette
+   Applied when <html data-theme="light">.
+   Dark defaults live in style.css :root.
+   ============================================================ */
+
+[data-theme="light"] {
+  --color-bg:           #fdf6e3;
+  --color-bg-card:      rgba(255, 251, 240, 0.95);
+  --color-border:       rgba(160, 120, 60, 0.18);
+  --color-accent:       #1a7a96;
+  --color-accent-light: #0fa8c8;
+  --color-gold:         #b8720a;
+  --color-gold-light:   #d08810;
+  --color-text:         #2c1f0e;
+  --color-muted:        #6b5040;
+  --color-dim:          #9a8070;
+}
+
+/* ── Base ── */
+[data-theme="light"] body {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+/* ── Navbar ── */
+[data-theme="light"] #navbar {
+  background: rgba(253, 246, 227, 0.94);
+  border-bottom-color: rgba(160, 120, 60, 0.15);
+}
+[data-theme="light"] #navbar.scrolled {
+  box-shadow: 0 4px 24px rgba(80, 50, 10, 0.08);
+}
+[data-theme="light"] .nav-links a {
+  color: var(--color-muted);
+}
+[data-theme="light"] .nav-links a:hover {
+  color: var(--color-text);
+}
+[data-theme="light"] #nav-drawer {
+  background: rgba(253, 246, 227, 0.98);
+  border-color: var(--color-border);
+}
+[data-theme="light"] #nav-drawer a {
+  color: var(--color-muted);
+}
+
+/* ── Particles — dark enough to show on large bright monitors ── */
+[data-theme="light"] #particle-canvas {
+  opacity: 0.7;
+  filter: hue-rotate(10deg) saturate(0.8) brightness(0.38);
+}
+
+/* ── Hardcoded #fff text — comprehensive override ── */
+[data-theme="light"] .highlight-title,
+[data-theme="light"] .highlight-body,
+[data-theme="light"] .exp-title,
+[data-theme="light"] .exp-company,
+[data-theme="light"] .exp-company:hover,
+[data-theme="light"] .edu-degree,
+[data-theme="light"] .rec-name,
+[data-theme="light"] .resume-title,
+[data-theme="light"] .skill-category-title,
+[data-theme="light"] .story-heading,
+[data-theme="light"] .section-subtext,
+[data-theme="light"] .timer-period-label,
+[data-theme="light"] .timer-total-label,
+[data-theme="light"] .recog-label,
+[data-theme="light"] .soft-skill-name {
+  color: var(--color-text) !important;
+  -webkit-text-fill-color: var(--color-text) !important;
+}
+
+/* Section headings — visible warm teal-brown, distinct from black on bright screens */
+[data-theme="light"] .section-heading {
+  color: #1c4a52;
+  -webkit-text-fill-color: #1c4a52;
+}
+
+/* Stat numbers — keep teal→gold gradient */
+[data-theme="light"] .stat-number {
+  background: linear-gradient(135deg, var(--color-accent-light), var(--color-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Section heading accent span */
+[data-theme="light"] .section-heading span {
+  background: linear-gradient(135deg, var(--color-accent-light), var(--color-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Hero name gradient — warm teal to amber */
+[data-theme="light"] .hero-name-text {
+  background: linear-gradient(135deg, #1a7a96, #b8720a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .hero-eyebrow { color: var(--color-accent); }
+[data-theme="light"] .hero-summary { color: var(--color-muted); }
+
+/* ── Cards — warm white, barely-there shadow ── */
+[data-theme="light"] .exp-card,
+[data-theme="light"] .highlight-card,
+[data-theme="light"] .stat-card,
+[data-theme="light"] .edu-card,
+[data-theme="light"] .flip-card-front,
+[data-theme="light"] .soft-skill-card,
+[data-theme="light"] .rec-card,
+[data-theme="light"] .recog-card,
+[data-theme="light"] .validator-card,
+[data-theme="light"] .resume-card,
+[data-theme="light"] .career-timer-card {
+  background: rgba(255, 252, 243, 0.97);
+  border-color: rgba(160, 120, 60, 0.14);
+  box-shadow: 0 2px 20px rgba(80, 50, 10, 0.06);
+}
+[data-theme="light"] .exp-card:hover,
+[data-theme="light"] .highlight-card:hover {
+  box-shadow: 0 8px 32px rgba(80, 50, 10, 0.1);
+}
+
+/* Resume card — suppress the dark radial gradient overlay */
+[data-theme="light"] .resume-card::before {
+  background: radial-gradient(ellipse at 20% 50%, rgba(26,122,150,0.04) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 50%, rgba(184,114,10,0.03) 0%, transparent 60%);
+}
+[data-theme="light"] .resume-subtitle,
+[data-theme="light"] .resume-tag { color: var(--color-muted); }
+[data-theme="light"] .resume-tag {
+  background: rgba(160, 120, 60, 0.07);
+  border-color: rgba(160, 120, 60, 0.18);
+}
+[data-theme="light"] .resume-icon-bg {
+  background: linear-gradient(135deg, rgba(26,122,150,0.1), rgba(184,114,10,0.08));
+  border-color: rgba(26,122,150,0.2);
+}
+
+/* ── Footer — seamless, no box ── */
+[data-theme="light"] #site-footer {
+  background: transparent;
+  border-top-color: rgba(160, 120, 60, 0.15);
+  color: var(--color-dim);
+}
+[data-theme="light"] #site-footer p:last-child {
+  color: var(--color-muted) !important;
+  opacity: 0.75;
+}
+[data-theme="light"] #site-footer a { color: var(--color-accent); }
+[data-theme="light"] .footer-name {
+  background: linear-gradient(135deg, #1a7a96, #b8720a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Exp card internals ── */
+[data-theme="light"] .exp-bullets li { color: var(--color-muted); }
+[data-theme="light"] .exp-bullets li::before { color: var(--color-accent); }
+[data-theme="light"] .exp-location { color: var(--color-dim); }
+[data-theme="light"] .exp-expand-hint { color: var(--color-dim); }
+[data-theme="light"] .exp-date-badge {
+  background: rgba(26, 122, 150, 0.07);
+  border-color: rgba(26, 122, 150, 0.18);
+  color: var(--color-accent);
+}
+[data-theme="light"] .exp-date-badge--current {
+  background: rgba(26, 122, 150, 0.12);
+  border-color: rgba(26, 122, 150, 0.3);
+}
+
+/* ── Timeline ── */
+[data-theme="light"] .timeline::before {
+  background: linear-gradient(to bottom, var(--color-accent), transparent);
+}
+[data-theme="light"] .timeline-dot {
+  background: var(--color-accent);
+  border-color: var(--color-bg);
+  box-shadow: 0 0 0 3px rgba(26,122,150,0.15);
+}
+
+/* ── Career timer ── */
+[data-theme="light"] .career-timer-heading { color: var(--color-muted); }
+[data-theme="light"] .timer-period-dates { color: var(--color-dim); }
+[data-theme="light"] .timer-divider {
+  background: linear-gradient(to right, rgba(160, 120, 60, 0.2), transparent);
+}
+/* timer numbers — solid rich teal, strong contrast on cream */
+[data-theme="light"] .timer-value {
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: #1a7a96;
+  color: #1a7a96;
+}
+[data-theme="light"] .timer-unit-label { color: #b8720a; }
+[data-theme="light"] .timer-total-row .timer-value {
+  -webkit-text-fill-color: #b8720a;
+  color: #b8720a;
+}
+
+/* ── Story panel ── */
+[data-theme="light"] .story-panel {
+  background: rgba(250, 244, 228, 0.98);
+  border-color: rgba(160, 120, 60, 0.18);
+}
+[data-theme="light"] .story-inner {
+  background: rgba(240, 232, 210, 0.85);
+  border-color: rgba(160, 120, 60, 0.18);
+}
+[data-theme="light"] .story-inner::-webkit-scrollbar-thumb { background: rgba(160,120,60,0.3); }
+[data-theme="light"] .story-beat-text { color: var(--color-muted); }
+[data-theme="light"] .story-beat-text strong { color: var(--color-text); }
+
+/* ── Tags ── */
+[data-theme="light"] .tag-blue {
+  background: rgba(26, 122, 150, 0.07);
+  border-color: rgba(26, 122, 150, 0.2);
+  color: #0e6a88;
+}
+[data-theme="light"] .tag-gold {
+  background: rgba(184, 114, 10, 0.07);
+  border-color: rgba(184, 114, 10, 0.2);
+  color: #8a5500;
+}
+[data-theme="light"] .tag-green {
+  background: rgba(22, 140, 100, 0.07);
+  border-color: rgba(22, 140, 100, 0.2);
+  color: #0e7a58;
+}
+
+/* ── Section eyebrow ── */
+[data-theme="light"] .section-eyebrow-tag {
+  background: rgba(26, 122, 150, 0.07);
+  border-color: rgba(26, 122, 150, 0.22);
+  color: var(--color-accent);
+}
+[data-theme="light"] .section-eyebrow-line {
+  background: linear-gradient(to right, rgba(26,122,150,0.3), transparent);
+}
+
+/* ── Contact pills ── */
+[data-theme="light"] .contact-pill {
+  background: rgba(255, 252, 243, 0.9);
+  border-color: rgba(160, 120, 60, 0.22);
+  color: var(--color-muted);
+}
+[data-theme="light"] .contact-pill:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: rgba(26,122,150,0.05);
+}
+
+/* ── Validator powder blobs — light theme only ── */
+.validator-blobs { display: none; }
+
+[data-theme="light"] .validator-blobs {
+  display: block;
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 24px;
+  z-index: 0;
+}
+
+/* all content above blobs */
+[data-theme="light"] .validator-card > *:not(.validator-blobs) {
+  position: relative;
+  z-index: 1;
+}
+
+.vblob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(48px);
+  opacity: 0;
+}
+
+[data-theme="light"] .vblob { opacity: 1; }
+
+/* blob 1 — teal, top-left, wide roam */
+.vblob-1 {
+  width: 300px; height: 300px;
+  background: rgba(15, 168, 200, 0.13);
+  top: -100px; left: -80px;
+  animation: blobDrift1 10s ease-in-out infinite;
+}
+
+/* blob 2 — amber, bottom-right, wide roam */
+.vblob-2 {
+  width: 260px; height: 260px;
+  background: rgba(184, 114, 10, 0.11);
+  bottom: -80px; right: -60px;
+  animation: blobDrift2 12s ease-in-out infinite;
+}
+
+/* blob 3 — rose, centre-right, diagonal sweep */
+.vblob-3 {
+  width: 200px; height: 200px;
+  background: rgba(200, 100, 130, 0.09);
+  top: 25%; right: 10%;
+  animation: blobDrift3 14s ease-in-out infinite;
+}
+
+/* blob 4 — sage, bottom-centre, lateral sweep */
+.vblob-4 {
+  width: 220px; height: 220px;
+  background: rgba(80, 160, 120, 0.08);
+  bottom: -40px; left: 15%;
+  animation: blobDrift4 11s ease-in-out infinite;
+}
+
+/* blob 5 — lavender, centre roamer — fills dead corners */
+.vblob-5 {
+  width: 240px; height: 240px;
+  background: rgba(130, 100, 200, 0.07);
+  top: 40%; left: 30%;
+  animation: blobDrift5 15s ease-in-out infinite;
+}
+
+@keyframes blobDrift1 {
+  0%,100% { transform: translate(0, 0) scale(1); }
+  25%     { transform: translate(80px, 60px) scale(1.1); }
+  50%     { transform: translate(140px, 120px) scale(0.95); }
+  75%     { transform: translate(40px, 80px) scale(1.05); }
+}
+@keyframes blobDrift2 {
+  0%,100% { transform: translate(0, 0) scale(1); }
+  25%     { transform: translate(-100px, -60px) scale(1.08); }
+  50%     { transform: translate(-160px, -120px) scale(0.93); }
+  75%     { transform: translate(-60px, -80px) scale(1.04); }
+}
+@keyframes blobDrift3 {
+  0%,100% { transform: translate(0, 0) scale(1); }
+  30%     { transform: translate(-80px, 60px) scale(1.07); }
+  60%     { transform: translate(-140px, -40px) scale(0.94); }
+  80%     { transform: translate(-40px, 80px) scale(1.03); }
+}
+@keyframes blobDrift4 {
+  0%,100% { transform: translate(0, 0) scale(1); }
+  35%     { transform: translate(100px, -60px) scale(1.09); }
+  65%     { transform: translate(180px, -100px) scale(0.95); }
+  85%     { transform: translate(60px, -40px) scale(1.04); }
+}
+@keyframes blobDrift5 {
+  0%,100% { transform: translate(0, 0) scale(1); }
+  20%     { transform: translate(-80px, -80px) scale(1.06); }
+  45%     { transform: translate(80px, -100px) scale(0.93); }
+  70%     { transform: translate(100px, 60px) scale(1.08); }
+  90%     { transform: translate(-40px, 60px) scale(0.97); }
+}
+
+/* ── Validator card — atmospheric depth matching dark theme language ── */
+[data-theme="light"] .validator-card {
+  background:
+    radial-gradient(ellipse at 15% 50%, rgba(26,122,150,0.07) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 30%, rgba(184,114,10,0.06) 0%, transparent 55%),
+    rgba(255, 252, 243, 0.97);
+  border-color: rgba(26, 122, 150, 0.22);
+  box-shadow:
+    0 8px 40px rgba(26, 122, 150, 0.08),
+    0 2px 8px rgba(80, 50, 10, 0.05),
+    inset 0 1px 0 rgba(255,255,255,0.8);
+}
+
+/* ── Validator inputs — warm tinted with visible depth ── */
+[data-theme="light"] .validator-input {
+  background: rgba(255, 255, 255, 0.35);
+  border-color: rgba(160, 120, 60, 0.22);
+  color: var(--color-text);
+  -webkit-text-fill-color: var(--color-text);
+  box-shadow: inset 0 1px 4px rgba(80,50,10,0.06);
+}
+[data-theme="light"] .validator-input:focus {
+  border-color: var(--color-accent);
+  box-shadow: inset 0 1px 4px rgba(80,50,10,0.04), 0 0 0 3px rgba(26,122,150,0.1);
+}
+[data-theme="light"] .validator-input::placeholder {
+  color: rgba(106,80,64,0.28);
+  opacity: 1;
+}
+[data-theme="light"] .validator-label {
+  color: var(--color-accent);
+  -webkit-text-fill-color: var(--color-accent);
+  letter-spacing: 2.5px;
+}
+[data-theme="light"] .validator-vs {
+  color: var(--color-gold);
+  font-weight: 800;
+}
+[data-theme="light"] .validator-note {
+  background: rgba(26,122,150,0.06);
+  border-color: rgba(26,122,150,0.18);
+  color: var(--color-muted);
+}
+
+/* ── Story trigger ── */
+[data-theme="light"] .story-trigger {
+  background: rgba(26,122,150,0.05);
+  border-color: rgba(26,122,150,0.22);
+  color: var(--color-accent);
+}
+[data-theme="light"] .story-trigger:hover {
+  background: rgba(26,122,150,0.1);
+}
+
+/* ── Threshold knob row — warm inset panel ── */
+[data-theme="light"] .threshold-row {
+  background: linear-gradient(135deg, rgba(26,122,150,0.05), rgba(184,114,10,0.04));
+  border-color: rgba(26,122,150,0.15);
+  box-shadow: inset 0 1px 3px rgba(80,50,10,0.04);
+}
+[data-theme="light"] .threshold-label { color: var(--color-gold); }
+[data-theme="light"] .threshold-hint { color: var(--color-muted); }
+[data-theme="light"] .knob-val {
+  color: var(--color-accent);
+  font-weight: 800;
+}
+[data-theme="light"] .knob-sub { color: var(--color-dim); }
+
+/* ── Verdict / score ── */
+[data-theme="light"] .verdict-banner {
+  background: rgba(255, 252, 243, 0.95);
+  border-color: rgba(160, 120, 60, 0.12);
+}
+[data-theme="light"] .score-gauge-track {
+  background: rgba(160, 120, 60, 0.1);
+}
+[data-theme="light"] .algo-grid .algo-card {
+  background: rgba(255, 252, 243, 0.9);
+  border-color: rgba(160, 120, 60, 0.12);
+}
+[data-theme="light"] .algo-name { color: var(--color-muted); }
+
+/* ── Recommendations carousel ── */
+[data-theme="light"] .rec-card { background: #fffcf3; }
+[data-theme="light"] .rec-body,
+[data-theme="light"] .rec-role,
+[data-theme="light"] .rec-context { color: var(--color-muted); }
+[data-theme="light"] .rec-arrow {
+  background: rgba(255,252,243,0.9);
+  border-color: rgba(160,120,60,0.2);
+  color: var(--color-muted);
+}
+[data-theme="light"] .rec-arrow:hover {
+  background: rgba(26,122,150,0.08);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+[data-theme="light"] .rec-dot { background: rgba(160,120,60,0.25); }
+[data-theme="light"] .rec-dot.active { background: var(--color-accent); }
+
+/* ── Education ── */
+[data-theme="light"] .edu-inst { color: var(--color-muted); }
+[data-theme="light"] .edu-year-badge {
+  background: rgba(26,122,150,0.07);
+  border-color: rgba(26,122,150,0.18);
+  color: var(--color-accent);
+}
+[data-theme="light"] .flip-hint { color: var(--color-dim); }
+[data-theme="light"] .flip-card-back {
+  background: rgba(26, 122, 150, 0.92);
+}
+[data-theme="light"] .flip-back-title,
+[data-theme="light"] .flip-back-body,
+[data-theme="light"] .flip-back-close { color: #fff; -webkit-text-fill-color: #fff; }
+
+/* ── Soft skills ── */
+[data-theme="light"] .soft-skill-card:hover {
+  border-color: rgba(184,114,10,0.35);
+  background: rgba(184,114,10,0.04);
+  box-shadow: 0 8px 24px rgba(184,114,10,0.08);
+}
+[data-theme="light"] .soft-skill-proof {
+  color: var(--color-dim);
+  border-color: rgba(160,120,60,0.25);
+}
+[data-theme="light"] .soft-skill-proof:hover,
+[data-theme="light"] .soft-skill-card:hover .soft-skill-proof {
+  color: var(--color-accent);
+  border-color: rgba(26,122,150,0.4);
+}
+
+/* ── Recognitions ── */
+[data-theme="light"] .recog-heading { color: var(--color-text); }
+[data-theme="light"] .recog-sub { color: var(--color-dim); }
+[data-theme="light"] .recog-points {
+  background: rgba(184,114,10,0.09);
+  border-color: rgba(184,114,10,0.22);
+  color: var(--color-gold);
+}
+[data-theme="light"] .recog-quote { color: var(--color-muted); }
+[data-theme="light"] .recog-by { color: var(--color-dim); }
+[data-theme="light"] .recog-rel--manager {
+  background: rgba(26,122,150,0.07);
+  border-color: rgba(26,122,150,0.2);
+  color: var(--color-accent);
+}
+[data-theme="light"] .recog-rel--senior {
+  background: rgba(184,114,10,0.07);
+  border-color: rgba(184,114,10,0.2);
+  color: var(--color-gold);
+}
+[data-theme="light"] .recog-rel--team {
+  background: rgba(22,140,100,0.07);
+  border-color: rgba(22,140,100,0.2);
+  color: #0e7a58;
+}
+[data-theme="light"] .awards-strip-heading { color: var(--color-dim); }
+[data-theme="light"] .proof-btn {
+  border-color: rgba(160,120,60,0.25);
+  color: var(--color-dim);
+}
+[data-theme="light"] .proof-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  background: rgba(26,122,150,0.04);
+}
+[data-theme="light"] .award-thumb img {
+  background: #f7f0e0;
+  border-color: rgba(160,120,60,0.18);
+}
+[data-theme="light"] .awards-toggle-btn {
+  background: rgba(160,120,60,0.05);
+  border-color: rgba(160,120,60,0.2);
+  color: var(--color-muted);
+}
+
+/* ── Theme toggle — warm cream, amber accent ── */
+#theme-toggle {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px 8px 10px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 24px;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+}
+#theme-toggle:hover {
+  transform: translateY(-2px);
+}
+#theme-toggle:focus-visible {
+  outline: 2px solid var(--color-accent-light);
+  outline-offset: 2px;
+}
+
+/* dark mode hover — cyan glow */
+#theme-toggle:hover {
+  border-color: rgba(30, 203, 225, 0.4);
+  box-shadow: 0 6px 28px rgba(30, 203, 225, 0.1);
+}
+/* light mode hover — amber glow */
+[data-theme="light"] #theme-toggle:hover {
+  border-color: rgba(184, 114, 10, 0.45);
+  box-shadow: 0 6px 28px rgba(184, 114, 10, 0.12);
+}
+[data-theme="light"] #theme-toggle {
+  background: rgba(255, 252, 243, 0.97);
+  border-color: rgba(160, 120, 60, 0.25);
+  box-shadow: 0 4px 20px rgba(80, 50, 10, 0.1);
+}
+
+/* toggle track */
+#theme-toggle .toggle-track {
+  position: relative;
+  width: 32px;
+  height: 18px;
+  border-radius: 9px;
+  background: rgba(122, 143, 166, 0.2);
+  border: 1px solid rgba(122, 143, 166, 0.25);
+  transition: background 0.3s, border-color 0.3s;
+  flex-shrink: 0;
+}
+[data-theme="light"] #theme-toggle .toggle-track {
+  background: rgba(184, 114, 10, 0.18);
+  border-color: rgba(184, 114, 10, 0.28);
+}
+
+/* toggle thumb */
+#theme-toggle .toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-muted);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s;
+}
+[data-theme="light"] #theme-toggle .toggle-thumb {
+  transform: translateX(14px);
+  background: var(--color-gold);
+}
+
+/* label */
+#theme-toggle .toggle-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: var(--color-muted);
+  transition: color 0.25s;
+  user-select: none;
+}
+#theme-toggle:hover .toggle-label { color: var(--color-text); }
+
+#theme-toggle .toggle-icon {
+  font-size: 13px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+@media (max-width: 480px) {
+  #theme-toggle { bottom: 18px; right: 16px; padding: 7px 11px 7px 9px; }
+}
+
+/* ── Skill-tag tooltip — light theme ── */
+[data-theme="light"] #skill-tip {
+  background: rgba(255, 252, 243, 0.98);
+  border-color: rgba(26, 122, 150, 0.3);
+  color: var(--color-muted);
+  box-shadow: 0 8px 32px rgba(80, 50, 10, 0.12);
+}
+
+/* ── Source info tooltip — light theme ── */
+[data-theme="light"] #src-tooltip {
+  background: rgba(255, 252, 243, 0.98);
+  border-color: rgba(26, 122, 150, 0.3);
+  color: var(--color-muted);
+  box-shadow: 0 12px 40px rgba(80, 50, 10, 0.14);
+}
+
+[data-theme="light"] #src-tooltip strong {
+  color: var(--color-text);
+}
+
+[data-theme="light"] .tip-arrow {
+  background: rgba(255, 252, 243, 0.98);
+  border-right-color: rgba(26, 122, 150, 0.3);
+  border-bottom-color: rgba(26, 122, 150, 0.3);
+}

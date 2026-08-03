@@ -1,0 +1,75 @@
+{
+  "_note": "This is a real API endpoint. Try: curl https://deepanshu-kumar.dev/api/portfolio.json",
+  "status": 200,
+  "engineer": {
+    "name": "Deepanshu Kumar",
+    "title": "Software Engineer",
+    "location": "Noida, India",
+    "availability": "open-to-work",
+    "email": "Deepanshu.Kumar@Outlook.in",
+    "links": {
+      "linkedin": "https://linkedin.com/in/deepanshu-kumar-dev",
+      "github": "https://github.com/Dev-Deepanshu-Kumar",
+      "devto": "https://dev.to/dev-deepanshu-kumar",
+      "medium": "https://medium.com/@dev-deepanshu-kumar",
+      "site": "https://deepanshu-kumar.dev"
+    }
+  },
+  "stack": {
+    "primary": ["C#", ".NET Core", ".NET 8", "ASP.NET Core", "SQL Server", "REST APIs"],
+    "secondary": ["Dapper", "EF Core", "Redis", "Azure", "Docker", "OIDC/OAuth2"],
+    "patterns": ["DDD", "Clean Architecture", "Microservices", "Strangler Fig", "CQRS", "BDD"]
+  },
+  "experience": [
+    {
+      "company": "Siemens — Asset Management Software",
+      "role": "Software Engineer",
+      "period": "Jan 2024 — Present",
+      "location": "Noida, India",
+      "context": "Enterprise CMMS platform · 170+ projects · 2,500+ tenant orgs",
+      "highlights": [
+        "Dashboard satellite service (Strangler Fig) — independently deployable from monolith",
+        "Planning & Scheduling microservice — DDD aggregate, technician assignment, labor-entry",
+        "Shared NuGet library — AWS Secrets Manager + Redis + retry/circuit-breaker",
+        "Dapper + stored proc migration — replaced EF for dashboard performance",
+        ".NET 8 Minimal APIs with custom cookie auth delegating to OIDC/Auth0"
+      ]
+    },
+    {
+      "company": "IndiaLends — GC Web Ventures Pvt Ltd",
+      "role": "Software Engineer",
+      "period": "Apr 2022 — Dec 2023",
+      "location": "Gurugram, India",
+      "context": "FinTech digital lending platform",
+      "highlights": [
+        "PAN name-matching engine — weighted ensemble, 30K+ validation, ~90% API cost reduction",
+        "Loan/credit-card backend APIs and business workflows",
+        "Azure Functions — HTTP, Queue, Blob, Timer triggers via Service Bus",
+        "Banking & NBFC partner integrations (JSON/XML)",
+        "VAPT remediation"
+      ]
+    },
+    {
+      "company": "Telebu Communications LLP",
+      "role": "Software Development Engineer I",
+      "period": "Dec 2019 — Dec 2020",
+      "location": "Hyderabad, India",
+      "context": "Healthcare platform — Tabiib",
+      "highlights": [
+        "Doctor search, appointment scheduling, healthcare backend APIs",
+        "Dashboard & reporting — booking analytics, subscription tracking, Tabiib Plus",
+        "Data aggregation and reporting views"
+      ]
+    }
+  ],
+  "education": [
+    { "degree": "MCA — Master of Computer Applications", "institution": "L.N. Mishra Institute · Magadh University", "period": "2016–2019" },
+    { "degree": "B.Sc. Information Technology", "institution": "NIIT Boring Road · Kuvempu University", "period": "2013–2016" },
+    { "certification": "GNIIT — Software Engineering", "institution": "NIIT, New Delhi", "year": "2017", "grade": "Excellent" }
+  ],
+  "meta": {
+    "generated": "static",
+    "source": "https://deepanshu-kumar.dev",
+    "tip": "If you're reading this in a terminal, hello. Let's talk: Deepanshu.Kumar@Outlook.in"
+  }
+}
