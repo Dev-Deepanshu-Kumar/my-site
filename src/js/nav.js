@@ -1,3 +1,15 @@
+/**
+ * nav.js — scroll spy, sidebar drawer, JSON toggles, skill tabs, mobile tabs
+ *
+ * Globals consumed from other modules:
+ *   showToast(status, message) — defined in interactions.js
+ *   bumpRequest(type)          — defined in uptime.js
+ *
+ * Load order: must run after interactions.js and uptime.js are concatenated.
+ * In build.js the order is: writing → boot → nav → uptime → interactions → ...
+ * nav.js calls showToast/bumpRequest only inside switchSkillTab() which fires
+ * on user interaction, so by that point all modules are loaded.
+ */
 (function() {
   'use strict';
 

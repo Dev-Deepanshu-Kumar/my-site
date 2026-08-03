@@ -1,3 +1,13 @@
+/**
+ * writing.js — Dev.to article widget
+ *
+ * Fetches latest 3 articles from Dev.to API and renders them
+ * in the sidebar writing console + mobile writing block.
+ *
+ * Config:
+ *   WRITING_WIDGET_ENABLED — set false to hide widget entirely
+ *   per_page param in fetch URL — controls how many articles show
+ */
 (function() {
   'use strict';
 

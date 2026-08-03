@@ -1,4 +1,10 @@
-/* === base.css — variables, reset, body, ambient, global ===  */
+/**
+ * base.css — CSS custom properties, reset, body, ambient orbs, global links
+ *
+ * All colour and spacing tokens live here.
+ * Change a value here and it propagates everywhere.
+ * Load order: must be first — all other files depend on these variables.
+ */
 
 :root {
   /* Base palette */

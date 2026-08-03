@@ -1,4 +1,14 @@
-/* === components.css — validator, recommendations, education, recognition, footer, scroll, boot, mobile tabs, request fly, widgets, terminal, toasts, latency, command palette, lightbox === */
+/**
+ * components.css — all self-contained UI components
+ *
+ * Contains: validator pipeline + tryit panel, origin story, recommendations,
+ * education, recognition proof strip, footer, scroll progress bar, boot overlay,
+ * mobile bottom tabs, request fly animation, mobile widgets strip, sidebar widgets,
+ * writing console, skill terminal, HTTP toasts, skill latency tags,
+ * command palette, lightbox.
+ *
+ * Depends on: base.css
+ */
 
 /* ═══════════════════ VALIDATOR ═══════════════════════════════════════ */
 .pipeline-diagram {

@@ -1,3 +1,20 @@
+/**
+ * interactions.js — toasts, request fly, ticker, title, latency, command palette,
+ *                   lightbox, proof toggles, console easter egg
+ *
+ * Exports (window globals used by other modules):
+ *   window.showToast(status, message)       — called by nav.js, validator.js
+ *   window.openPalette()                    — called by HTML onclick
+ *   window.openExperienceRecognition(e)     — called by HTML onclick
+ *   window.toggleRecProof(btn)              — called by HTML onclick
+ *   window.toggleProof(btn)                 — called by HTML onclick
+ *
+ * Globals consumed:
+ *   window.bumpRequest(type)               — defined in uptime.js
+ *   window.switchSkillTab(tab, btnEl)      — defined in nav.js
+ *
+ * To add a command palette entry: add an object to CMD_ITEMS[].
+ */
 (function() {
   'use strict';
 

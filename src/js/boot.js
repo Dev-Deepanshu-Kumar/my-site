@@ -1,3 +1,15 @@
+/**
+ * boot.js — boot sequence, hero terminal typing, x-motto typewriter
+ *
+ * Runs entirely on page load — no dependencies on other modules.
+ * Timing chain:
+ *   0ms     boot overlay starts
+ *   3200ms  boot overlay fades out
+ *   3500ms  hero curl command starts typing
+ *   ~5500ms x-motto typewriter starts
+ *
+ * To change the typed phrases: edit the phrases[] array in typedMotto().
+ */
 (function() {
   'use strict';
 

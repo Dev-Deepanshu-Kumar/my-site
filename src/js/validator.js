@@ -1,3 +1,22 @@
+/**
+ * validator.js — PAN name fuzzy matching algorithm + animated pipeline trace
+ *
+ * Exports:
+ *   window.runValidator()   — called by HTML onclick on the "Send Request" button
+ *
+ * Globals consumed:
+ *   window.bumpRequest(type)       — defined in uptime.js
+ *   window.showToast(status, msg)  — defined in interactions.js
+ *
+ * Algorithm weights (production values, tuned against 30k records):
+ *   Jaro-Winkler        35%
+ *   Damerau-Levenshtein 25%
+ *   Dice coefficient    20%
+ *   Token sort ratio    20%
+ *
+ * Default threshold: 72% — scores within ±5% trigger fallback to external API.
+ * To adjust: change the default value of vld-threshold input in index.html.
+ */
 (function() {
   'use strict';
 

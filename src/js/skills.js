@@ -1,3 +1,13 @@
+/**
+ * skills.js — skill terminal (man page panel) + SKILL_DATA config
+ *
+ * Globals consumed:
+ *   window.bumpRequest(type)  — defined in uptime.js
+ *
+ * To add/update a skill entry: edit SKILL_DATA below.
+ * Keys must exactly match the text content of the .skill-tag elements in index.html.
+ * Fields: synopsis, usage, where, see
+ */
 (function() {
   'use strict';
 

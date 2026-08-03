@@ -1,4 +1,12 @@
-/* === layout.css — topbar, ticker, sidebar, method badges, content === */
+/**
+ * layout.css — topbar, HTTP status ticker, sidebar, method badges, main content
+ *
+ * Responsive breakpoints in this file:
+ *   900px — sidebar becomes a drawer, hamburger appears, ticker adjusts
+ *   480px — topbar items collapse
+ *
+ * Depends on: base.css (variables)
+ */
 
 /* ── Top Bar ──────────────────────────────────────────────────────── */
 .topbar {

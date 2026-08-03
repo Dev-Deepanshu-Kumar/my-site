@@ -1,4 +1,12 @@
-/* === animations.css — entrance stagger, glow, shimmer, visual energy, responsive overrides === */
+/**
+ * animations.css — entrance animations, stagger effects, glow pulses,
+ *                  shimmer, and all mobile responsive overrides
+ *
+ * Load order: must be last — overrides rules in sections.css and components.css.
+ * Breakpoints: 1000px, 900px, 480px.
+ *
+ * Depends on: base.css, sections.css, components.css
+ */
 
 /* ── Responsive base ──────────────────────────────────────────────── */
 @media (max-width: 1000px) {

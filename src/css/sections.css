@@ -1,4 +1,15 @@
-/* === sections.css — overview/hero, experience/timeline, skills === */
+/**
+ * sections.css — overview/hero terminal, experience/timeline bar, skills tags
+ *
+ * Timeline bar widths are set programmatically by timeline.js — the CSS
+ * here only handles colours and shared segment rules. Do not add flex values.
+ *
+ * To add a new company colour:
+ *   .timeline-segment--<key> { background: <color>; }
+ *   Then add the entry to TIMELINE_PERIODS in src/js/timeline.js.
+ *
+ * Depends on: base.css, layout.css
+ */
 
 /* ═══════════════════ OVERVIEW — Hero energy ══════════════════════ */
 .hero-terminal {

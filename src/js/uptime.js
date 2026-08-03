@@ -1,3 +1,15 @@
+/**
+ * uptime.js — career clock, rate limit / explored counter, request counter
+ *
+ * Exports (window globals used by other modules):
+ *   window.bumpRequest(type)  — called by nav.js, interactions.js, validator.js
+ *
+ * Config:
+ *   CAREER_START              — your engineering start date
+ *   GAP_DAYS                  — days to subtract (career break)
+ *   EXCLUDE_FROM_COUNT        — section IDs that don't count toward explored total
+ *                               (overview is excluded — always visible on load)
+ */
 (function() {
   'use strict';
 
