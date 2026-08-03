@@ -1,1516 +1,276 @@
-/* ═══════════════════════════════════════════════════════════════════
-   Portfolio v2 — Interactivity
-   ═══════════════════════════════════════════════════════════════════ */
-
-(function() {
-  'use strict';
-
-  // ── Dev.to Writing Widget ─────────────────────────────────────────
-  // Set to false to hide both sidebar and mobile writing widgets instantly
-  const WRITING_WIDGET_ENABLED = true;
-
-  (async function loadWriting() {
-    if (!WRITING_WIDGET_ENABLED) {
-      document.getElementById('writing-widget')?.style.setProperty('display', 'none');
-      document.getElementById('mobile-writing-block')?.style.setProperty('display', 'none');
-      return;
-    }
-    const list        = document.getElementById('writing-list');
-    const mobileList  = document.getElementById('mobile-writing-list');
-    if (!list && !mobileList) return;
-
-    // skip on file:// — CORS won't allow it, fail silently
-    if (location.protocol === 'file:') {
-      const msg = '<div class="writing-dim">// live on deployed site</div>';
-      if (list)       list.innerHTML = msg;
-      if (mobileList) mobileList.innerHTML = msg;
-      return;
-    }
-
-    try {
-     const res = await fetch(
-        `https://dev.to/api/articles?username=dev-deepanshu-kumar&per_page=3&_=${Date.now()}`,
-        { headers: { 'Accept': 'application/json' }, cache: 'no-store' }
-      );
-      if (!res.ok) throw new Error(res.status);
-      const articles = await res.json();
-
-      if (!articles.length) {
-        const msg = '<div class="writing-dim">// no posts yet</div>';
-        if (list)       list.innerHTML = msg;
-        if (mobileList) mobileList.innerHTML = msg;
-        return;
-      }
-
-      const items = articles.map(a => {
-        const mins = a.reading_time_minutes || '?';
-        const date = new Date(a.published_at).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
-        return `<a class="writing-item" href="${a.url}" target="_blank" rel="noopener">
-          <span class="writing-title">${a.title}</span>
-          <span class="writing-meta">${date} · ${mins} min read</span>
-        </a>`;
-      }).join('');
-
-      const viewAll = `<a class="writing-view-all" href="https://dev.to/dev-deepanshu-kumar" target="_blank" rel="noopener">View all writings →</a>`;
-
-      if (list)       list.innerHTML       = items + viewAll;
-      if (mobileList) mobileList.innerHTML = items;  // "View all" in header on mobile
-    } catch (e) {
-      const msg = '<div class="writing-dim">// unavailable</div>';
-      if (list)       list.innerHTML = msg;
-      if (mobileList) mobileList.innerHTML = msg;
-    }
-  })();
-
-  // ── Boot Sequence ─────────────────────────────────────────────────
-  const bootOverlay = document.getElementById('boot-overlay');
-  const bootLines = bootOverlay.querySelectorAll('.boot-line');
-
-  bootLines.forEach(line => {
-    const delay = parseInt(line.dataset.delay) || 0;
-    setTimeout(() => line.classList.add('show'), delay);
-  });
-
-  // End boot after all lines shown + brief pause
-  setTimeout(() => {
-    bootOverlay.classList.add('done');
-    // Remove from DOM after transition
-    setTimeout(() => bootOverlay.remove(), 600);
-  }, 3200);
-
-
-  // ── Hero Terminal Typing ────────────────────────────────────────────
-  const heroCmd = document.getElementById('hero-cmd');
-  const heroResponse = document.getElementById('hero-response');
-  const heroText = 'curl https://deepanshu-kumar.dev';
-
-  function typeHero() {
-    let i = 0;
-    const cursor = document.querySelector('.hero-cursor');
-
-    function typeChar() {
-      if (i < heroText.length) {
-        heroCmd.textContent += heroText[i];
-        i++;
-        setTimeout(typeChar, 35 + Math.random() * 25);
-      } else {
-        // Done typing — show response lines
-        if (cursor) cursor.style.display = 'none';
-        setTimeout(revealResponse, 300);
-      }
-    }
-
-    function revealResponse() {
-      const lines = heroResponse.querySelectorAll('.hero-resp-line');
-      lines.forEach((line, idx) => {
-        setTimeout(() => line.classList.add('show'), idx * 150);
-      });
-    }
-
-    // Start after boot sequence ends
-    setTimeout(typeChar, 3500);
-  }
-  typeHero();
-
-
-  // ── Typed Motto (x-motto header) ─────────────────────────────────
-  function typedMotto() {
-    const phrases = [
-      'C# · .NET · ASP.NET Core',
-      'Backend Engineer · Problem Solver',
-      'REST APIs · Microservices',
-      'From monolith to microservices — one PR at a time.',
-      'I ask why before I ask how.',
-      'Good APIs are invisible. Bad ones haunt you.',
-      'Build it right. Then build it fast.',
-      "I don't chase clever code. I chase clear code.",
-      "I like software that's easy to change.",
-      'I fix causes, not symptoms.',
-      'The best fix is the one nobody notices.',
-      'Async by default. Thoughtful by choice.',
-      'Understanding the problem before writing the solution.',
-      'I care as much about maintainability as functionality.',
-      'If it\'s flaky, I\'ll find out why.',
-      'I read the error logs, not just the tickets.',
-    ];
-
-    // Shuffle
-    for (let i = phrases.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [phrases[i], phrases[j]] = [phrases[j], phrases[i]];
-    }
-
-    const el = document.getElementById('hero-typed');
-    const cursor = document.querySelector('.hero-typed-cursor');
-    if (!el) return;
-
-    let phraseIdx = 0, charIdx = 0, isDeleting = false, pause = 0;
-
-    function tick() {
-      if (pause > 0) { pause--; setTimeout(tick, 40); return; }
-
-      const current = phrases[phraseIdx];
-
-      if (!isDeleting) {
-        el.textContent = current.slice(0, charIdx + 1);
-        charIdx++;
-        if (charIdx >= current.length) {
-          isDeleting = true;
-          pause = 50; // pause at full text
-        }
-        setTimeout(tick, 40 + Math.random() * 30);
-      } else {
-        el.textContent = current.slice(0, charIdx - 1);
-        charIdx--;
-        if (charIdx <= 0) {
-          isDeleting = false;
-          phraseIdx = (phraseIdx + 1) % phrases.length;
-          pause = 10;
-        }
-        setTimeout(tick, 25);
-      }
-    }
-
-    // Start after hero response lines show (~5.5s from page load)
-    setTimeout(tick, 5500);
-  }
-  typedMotto();
-
-
-  // ── Scroll Spy + Entrance Animations ─────────────────────────────
-
-  const sections = document.querySelectorAll('.endpoint-section');
-  const sidebarLinks = document.querySelectorAll('.sidebar-link[href^="#"]');
-
-  // Scroll spy — highlight active sidebar link
-  const spyObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = entry.target.id;
-        sidebarLinks.forEach(link => {
-          link.classList.toggle('active', link.getAttribute('href') === `#${id}`);
-        });
-      }
-    });
-  }, { rootMargin: '-20% 0px -60% 0px', threshold: 0 });
-
-  sections.forEach(section => spyObserver.observe(section));
-
-  // Entrance animation — sections fade in on scroll
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        revealObserver.unobserve(entry.target); // once only
-      }
-    });
-  }, { rootMargin: '0px 0px -80px 0px', threshold: 0.1 });
-
-  sections.forEach(section => revealObserver.observe(section));
-
-
-  // ── Mobile Drawer ─────────────────────────────────────────────────
-
-  const hamburger = document.getElementById('hamburger');
-  const sidebar = document.getElementById('sidebar');
-  let backdrop = null;
-
-  function createBackdrop() {
-    backdrop = document.createElement('div');
-    backdrop.className = 'sidebar-backdrop';
-    document.body.appendChild(backdrop);
-    backdrop.addEventListener('click', closeDrawer);
-  }
-
-  function openDrawer() {
-    sidebar.classList.add('open');
-    hamburger.classList.add('active');
-    if (!backdrop) createBackdrop();
-    backdrop.classList.add('visible');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeDrawer() {
-    sidebar.classList.remove('open');
-    hamburger.classList.remove('active');
-    if (backdrop) backdrop.classList.remove('visible');
-    document.body.style.overflow = '';
-  }
-
-  hamburger.addEventListener('click', () => {
-    sidebar.classList.contains('open') ? closeDrawer() : openDrawer();
-  });
-
-  // Close drawer when sidebar link clicked (mobile)
-  sidebarLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      if (window.innerWidth <= 900) closeDrawer();
-    });
-  });
-
-
-  // ── Collapsible JSON Objects ──────────────────────────────────────
-
-  window.toggleJson = function(header) {
-    const obj = header.closest('.json-object');
-    obj.classList.toggle('expanded');
-  };
-
-  window.toggleNestedJson = function(field) {
-    field.classList.toggle('expanded');
-  };
-
-  // Auto-expand first role on load
-  const firstCollapsible = document.querySelector('[data-collapsible]');
-  if (firstCollapsible) firstCollapsible.classList.add('expanded');
-
-
-  // ── Skill Tab Switching ───────────────────────────────────────────
-  window.switchSkillTab = function(tab, btnEl) {
-    // Toggle panels
-    document.getElementById('skill-panel-technical').style.display = tab === 'technical' ? '' : 'none';
-    document.getElementById('skill-panel-soft').style.display = tab === 'soft' ? '' : 'none';
-    // Toggle active tab button
-    document.querySelectorAll('.skill-tab').forEach(t => t.classList.remove('active'));
-    btnEl.classList.add('active');
-    // HTTP toast
-    showToast(200, `GET /skills/${tab}`);
-    bumpRequest('GET');
-  };
-
-
-  // ── Mobile Bottom Tabs ────────────────────────────────────────────
-  const mobileTabs = document.querySelectorAll('.mobile-tab');
-
-  // Sync mobile tabs with scroll spy + bump animation
-  const mobileTabObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const id = entry.target.id;
-        mobileTabs.forEach(tab => {
-          const isActive = tab.dataset.section === id;
-          const wasActive = tab.classList.contains('active');
-          tab.classList.toggle('active', isActive);
-          // Bump animation when newly activated
-          if (isActive && !wasActive) {
-            tab.classList.add('just-activated');
-            setTimeout(() => tab.classList.remove('just-activated'), 400);
-          }
-        });
-      }
-    });
-  }, { rootMargin: '-30% 0px -50% 0px', threshold: 0 });
-
-  sections.forEach(section => mobileTabObserver.observe(section));
-
-
-  // ── Scroll Progress Bar ───────────────────────────────────────────
-  const scrollBar = document.getElementById('scroll-progress-bar');
-  if (scrollBar) {
-    window.addEventListener('scroll', () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      scrollBar.style.width = pct + '%';
-    }, { passive: true });
-  }
-
-
-  // ── Request Fly Animation ─────────────────────────────────────────
-  // When clicking sidebar/tab links, fire a "request" visual
-
-  const flyEl = document.getElementById('request-fly');
-
-  function fireRequestFly(fromEl, isPost) {
-    if (!flyEl || !fromEl) return;
-    const rect = fromEl.getBoundingClientRect();
-    flyEl.style.left = rect.left + rect.width / 2 - 20 + 'px';
-    flyEl.style.top = rect.top + 'px';
-    flyEl.textContent = isPost ? 'POST' : 'GET';
-    flyEl.className = 'request-fly active' + (isPost ? ' post-fly' : '');
-
-    // Reset for next use
-    setTimeout(() => { flyEl.className = 'request-fly'; }, 600);
-  }
-
-  // Fire on sidebar link clicks
-  sidebarLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
-      const isPost = link.textContent.includes('POST');
-      fireRequestFly(link, isPost);
-    });
-  });
-
-  // Fire on mobile tab clicks
-  mobileTabs.forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      const isPost = tab.querySelector('.method-post') !== null;
-      fireRequestFly(tab, isPost);
-    });
-  });
-
-
-  // ── Live Uptime Counter ────────────────────────────────────────────
-  // Career start: Dec 2, 2019
-  const CAREER_START = new Date(2019, 11, 2);
-  // Gap period (excluded): Jan 2021 – Mar 2022 = ~456 days
-  const GAP_DAYS = 456;
-
-  function updateUptime() {
-    const now = new Date();
-    let totalMs = now - CAREER_START;
-    totalMs -= GAP_DAYS * 86400000; // subtract gap
-
-    const totalSecs = Math.floor(totalMs / 1000);
-    const years = Math.floor(totalSecs / (365.25 * 86400));
-    const months = Math.floor((totalSecs % (365.25 * 86400)) / (30.44 * 86400));
-    const days = Math.floor((totalSecs % (30.44 * 86400)) / 86400);
-    const hours = Math.floor((totalSecs % 86400) / 3600);
-    const mins = Math.floor((totalSecs % 3600) / 60);
-    const secs = totalSecs % 60;
-
-    const el = (id) => document.getElementById(id);
-    if (el('uptime-years')) el('uptime-years').textContent = years;
-    if (el('uptime-months')) el('uptime-months').textContent = months;
-    if (el('uptime-days')) el('uptime-days').textContent = days;
-    if (el('uptime-hours')) el('uptime-hours').textContent = hours;
-    if (el('uptime-mins')) el('uptime-mins').textContent = String(mins).padStart(2, '0');
-    if (el('uptime-secs')) el('uptime-secs').textContent = String(secs).padStart(2, '0');
-
-    // Mobile compact uptime with tick
-    const mwUptime = el('mw-uptime');
-    if (mwUptime) {
-      mwUptime.textContent = `${years}y ${months}mo ${days}d`;
-      mwUptime.classList.add('tick');
-      setTimeout(() => mwUptime.classList.remove('tick'), 100);
-    }
-  }
-  updateUptime();
-  setInterval(updateUptime, 1000);
-
-
-  // ── Rate Limit Progress ───────────────────────────────────────────
-  const visitedSections = new Set();
-  const totalEndpoints = 6;
-
-  const rateLimitObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        visitedSections.add(entry.target.id);
-        const count = visitedSections.size;
-        const pct = (count / totalEndpoints * 100) + '%';
-        const fill = document.getElementById('ratelimit-fill');
-        const text = document.getElementById('ratelimit-text');
-        if (fill) fill.style.width = pct;
-        if (text) text.textContent = `${count} / ${totalEndpoints} endpoints explored`;
-        // Mobile widget sync
-        const mwFill = document.getElementById('mw-ratelimit-fill');
-        const mwText = document.getElementById('mw-ratelimit-text');
-        if (mwFill) mwFill.style.width = pct;
-        if (mwText) mwText.textContent = `${count}/${totalEndpoints}`;
-      }
-    });
-  }, { threshold: 0.3 });
-
-  sections.forEach(section => rateLimitObserver.observe(section));
-
-
-  // ── Request Counter ────────────────────────────────────────────────
-  let reqGets = 0, reqPosts = 0;
-
-  function bumpRequest(type) {
-    if (type === 'POST') reqPosts++;
-    else reqGets++;
-    const total = reqGets + reqPosts;
-    const countEl = document.getElementById('req-count');
-    const breakdownEl = document.getElementById('req-breakdown');
-    if (countEl) {
-      countEl.textContent = total;
-      countEl.classList.add('bump');
-      setTimeout(() => countEl.classList.remove('bump'), 150);
-    }
-    if (breakdownEl) breakdownEl.textContent = `${reqGets} GET · ${reqPosts} POST`;
-    // Mobile widget sync
-    const mwReq = document.getElementById('mw-requests');
-    if (mwReq) mwReq.textContent = total;
-  }
-
-  // Hook into existing interactions
-  // Scroll → GET, Validator run → POST, Skill click → GET
-  const reqScrollObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && !entry.target.dataset.reqCounted) {
-        entry.target.dataset.reqCounted = 'true';
-        bumpRequest('GET');
-      }
-    });
-  }, { threshold: 0.5 });
-  sections.forEach(s => reqScrollObserver.observe(s));
-
-
-  // ── HTTP Status Toasts ────────────────────────────────────────────
-  const httpToast = document.getElementById('http-toast');
-  let toastTimer = null;
-
-  function showToast(status, message) {
-    if (!httpToast) return;
-    const cls = status < 300 ? '--200' : status < 400 ? '--301' : '--404';
-    httpToast.innerHTML = `<span class="toast-status toast-status${cls}">${status}</span>${message}`;
-    httpToast.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => httpToast.classList.remove('show'), 2500);
-  }
-
-  // Show 200 when scrolling into a section
-  const toastObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting && !entry.target.dataset.toasted) {
-        entry.target.dataset.toasted = 'true';
-        const path = entry.target.id === 'overview' ? '/' : '/' + entry.target.id;
-        showToast(200, `GET ${path}`);
-      }
-    });
-  }, { threshold: 0.5 });
-
-  sections.forEach(section => toastObserver.observe(section));
-
-
-  // ── Skill Terminal (man page) ─────────────────────────────────────
-  const SKILL_DATA = {
-    "C#": { synopsis: "Primary language · 5+ years daily", usage: "All backend services, APIs, shared libraries, Azure Functions", where: "Siemens, IndiaLends, Telebu", see: "ASP.NET Core, .NET Core, LINQ" },
-    "SQL": { synopsis: "Query language for relational databases", usage: "Stored procedures, query optimization, migrations, reporting", where: "All companies — SQL Server primary", see: "T-SQL, Dapper, EF Core" },
-    "JavaScript": { synopsis: "Frontend & scripting", usage: "jQuery UI components, Azure Function triggers, this portfolio", where: "IndiaLends (frontend), Siemens (DevExpress)", see: "jQuery, Vue.js" },
-    "ASP.NET Core": { synopsis: "Web framework for .NET", usage: "REST APIs, Minimal APIs, MVC endpoints, middleware pipelines", where: "Siemens (dashboard satellite, P&S microservice)", see: "Minimal APIs, REST, OIDC" },
-    ".NET Core": { synopsis: "Cross-platform runtime", usage: "All new services since 2022, shared libraries, container targets", where: "Siemens, IndiaLends", see: "ASP.NET Core, Docker" },
-    "Minimal APIs": { synopsis: ".NET 8 lightweight API pattern", usage: "Dashboard satellite service, P&S microservice endpoints", where: "Siemens — new services", see: "ASP.NET Core, REST" },
-    "REST": { synopsis: "API design pattern", usage: "All service interfaces — resource-oriented, versioned, documented", where: "All companies", see: "Swagger/OpenAPI, JSON" },
-    "CQRS / MediatR": { synopsis: "Command/Query separation + mediator", usage: "P&S microservice — separate read/write models", where: "Siemens", see: "DDD, Clean Architecture" },
-    "DDD": { synopsis: "Domain-Driven Design", usage: "Aggregate design, bounded contexts, ubiquitous language in P&S service", where: "Siemens (P&S microservice)", see: "Clean Architecture, CQRS" },
-    "Clean Architecture": { synopsis: "Layered dependency inversion", usage: "Service structure: Domain → Application → Infrastructure → API", where: "Siemens — all new services", see: "DDD, CQRS / MediatR" },
-    "Microservices": { synopsis: "Independently deployable services", usage: "Dashboard satellite (Strangler Fig), P&S service, credential service", where: "Siemens — platform modernisation", see: "Docker, REST, DDD" },
-    "BDD": { synopsis: "Behaviour-Driven Development", usage: "SpecFlow/ReqnRoll scenarios, Given-When-Then test structure", where: "Siemens — all new services", see: "NUnit, SpecFlow, Moq" },
-    "Azure Functions": { synopsis: "Serverless compute", usage: "HTTP triggers (webhooks), Queue/Blob/Timer triggers for async workflows", where: "IndiaLends — document processing, scheduled reports", see: "Service Bus, Blob Storage" },
-    "Entity Framework": { synopsis: "ORM for .NET (EF6 legacy)", usage: "Existing monolith data access layer — 170+ project codebase", where: "Siemens (legacy platform)", see: "EF Core, Dapper, LINQ" },
-    "EF Core": { synopsis: "Modern ORM for .NET Core", usage: "New service data layers, migrations, code-first models", where: "Siemens (new services)", see: "Dapper, LINQ, PostgreSQL" },
-    "Dapper": { synopsis: "Micro-ORM — raw SQL performance", usage: "Replaced EF for dashboard — 3x faster queries via stored procs", where: "Siemens (dashboard optimization)", see: "T-SQL, SQL Server" },
-    "LINQ": { synopsis: "Language-integrated query", usage: "Collection transformations, EF queries, data pipeline operations", where: "All companies", see: "EF Core, C#" },
-    "T-SQL": { synopsis: "SQL Server dialect", usage: "Stored procedures, views, performance tuning, index optimization", where: "Siemens, IndiaLends", see: "SQL Server, Dapper" },
-    "SQL Server": { synopsis: "Primary relational database", usage: "Multi-tenant schemas, stored procs, maintenance jobs, Always On AG", where: "Siemens, IndiaLends", see: "T-SQL, Dapper, EF Core" },
-    "PostgreSQL": { synopsis: "Open-source relational DB", usage: "New microservice data stores, container-friendly deployments", where: "Siemens (new services)", see: "EF Core, Docker" },
-    "Redis": { synopsis: "In-memory cache / data store", usage: "Session caching, credential caching (shared library), distributed lock", where: "Siemens (shared NuGet library)", see: "AWS Secrets Manager, Resiliency" },
-    "Azure App Service": { synopsis: "PaaS web hosting", usage: "Production deployment target for monolith and satellites", where: "Siemens, IndiaLends", see: "Docker, Azure DevOps" },
-    "Service Bus": { synopsis: "Enterprise message broker", usage: "Async event-driven workflows, decoupled service communication", where: "IndiaLends (financial workflows)", see: "Azure Functions, Queue triggers" },
-    "Blob Storage": { synopsis: "Azure object storage", usage: "Document storage, report generation output, file upload handling", where: "IndiaLends", see: "Azure Functions" },
-    "AWS Secrets Manager": { synopsis: "Cloud secret management", usage: "Secure DB credential resolution, region-aware rotation in shared library", where: "Siemens (container migration)", see: "Redis, Resiliency Patterns" },
-    "Docker": { synopsis: "Container runtime", usage: "Local dev environments, Linux container targets for platform migration", where: "Siemens (Windows→Linux migration)", see: "Microservices, .NET Core" },
-    "OIDC / OAuth2": { synopsis: "Auth protocol standards", usage: "Enterprise SSO integration, token validation middleware", where: "Siemens (Auth0 ecosystem)", see: "JWT, Auth0, Cookie Auth" },
-    "JWT": { synopsis: "JSON Web Tokens", usage: "API authentication, claims-based authorization, token refresh flows", where: "Siemens, IndiaLends", see: "OIDC, Auth0" },
-    "Auth0": { synopsis: "Identity platform", usage: "Centralised auth service, tenant isolation, session management", where: "Siemens", see: "OIDC, JWT" },
-    "VAPT Remediation": { synopsis: "Vulnerability & Penetration Testing fixes", usage: "Remediated findings from security assessments — XSS, CSRF, injection", where: "IndiaLends", see: "Auth, Security" },
-    "Azure DevOps": { synopsis: "CI/CD + project management", usage: "Build pipelines, release gates, Azure Repos, work items", where: "IndiaLends, Siemens (boards)", see: "Jenkins, TeamCity" },
-    "Jenkins": { synopsis: "CI/CD automation server", usage: "Production release pipelines, automated testing gates", where: "Siemens", see: "TeamCity, SonarQube" },
-    "TeamCity": { synopsis: "JetBrains CI/CD", usage: "Build configurations, NuGet package publishing to MyGet", where: "Siemens", see: "Jenkins, MyGet" },
-    "SonarQube": { synopsis: "Static code analysis", usage: "Code quality gates — coverage, duplication, complexity, vulnerabilities", where: "Siemens (CI pipeline)", see: "Snyk, Jenkins" },
-    "Snyk": { synopsis: "Dependency vulnerability scanning", usage: "NuGet package security, container image scanning in CI", where: "Siemens", see: "SonarQube, Docker" },
-    "Grafana": { synopsis: "Observability dashboards", usage: "Production monitoring — API latency, error rates, resource usage", where: "Siemens (production)", see: "Datadog" },
-    "Datadog": { synopsis: "APM & monitoring platform", usage: "Distributed tracing, log aggregation, alerting on production issues", where: "Siemens", see: "Grafana" },
-    "NUnit": { synopsis: "Unit testing framework", usage: "All unit + integration tests, parameterized test cases", where: "Siemens", see: "Moq, SpecFlow" },
-    "SpecFlow": { synopsis: "BDD framework for .NET", usage: "Given-When-Then feature files, stakeholder-readable test specs", where: "Siemens", see: "ReqnRoll, NUnit" },
-    "ReqnRoll": { synopsis: "SpecFlow successor (OSS)", usage: "Migration from SpecFlow, new BDD scenarios post-2024", where: "Siemens (new services)", see: "SpecFlow, NUnit" },
-    "Moq": { synopsis: "Mocking framework", usage: "Dependency isolation in unit tests, verify interactions", where: "Siemens", see: "NUnit, BDD" },
-  };
-
-  document.querySelectorAll('.skill-tag').forEach(tag => {
-    tag.style.cursor = 'pointer';
-    tag.addEventListener('click', () => {
-      // Deselect all, select this
-      document.querySelectorAll('.skill-tag.selected').forEach(t => t.classList.remove('selected'));
-      tag.classList.add('selected');
-      bumpRequest('GET');
-      // strip any injected lat-tip text before looking up
-      const name = [...tag.childNodes]
-        .filter(n => n.nodeType === Node.TEXT_NODE)
-        .map(n => n.textContent).join('').trim();
-      const data = SKILL_DATA[name];
-      const terminal = document.getElementById('skill-terminal');
-      const title = document.getElementById('skill-terminal-title');
-      const body = document.getElementById('skill-terminal-body');
-
-      if (!data) {
-        title.textContent = `$ man ${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
-        body.innerHTML = `<span class="man-dim">No manual entry for ${name}</span>`;
-        terminal.classList.add('active');
-        return;
-      }
-
-      title.textContent = `$ man ${name.toLowerCase().replace(/[^a-z0-9]/g, '-')}`;
-      body.innerHTML = `
+(function(){"use strict";(async function(){const b=document.getElementById("writing-list"),E=document.getElementById("mobile-writing-list");if(!(!b&&!E)){if(location.protocol==="file:"){const A='<div class="writing-dim">// live on deployed site</div>';b&&(b.innerHTML=A),E&&(E.innerHTML=A);return}try{const A=await fetch(`https://dev.to/api/articles?username=dev-deepanshu-kumar&per_page=3&_=${Date.now()}`,{headers:{Accept:"application/json"},cache:"no-store"});if(!A.ok)throw new Error(A.status);const m=await A.json();if(!m.length){const p='<div class="writing-dim">// no posts yet</div>';b&&(b.innerHTML=p),E&&(E.innerHTML=p);return}const d=m.map(p=>{const i=p.reading_time_minutes||"?",n=new Date(p.published_at).toLocaleDateString("en-IN",{month:"short",year:"numeric"});return`<a class="writing-item" href="${p.url}" target="_blank" rel="noopener">
+          <span class="writing-title">${p.title}</span>
+          <span class="writing-meta">${n} \xB7 ${i} min read</span>
+        </a>`}).join(""),o='<a class="writing-view-all" href="https://dev.to/dev-deepanshu-kumar" target="_blank" rel="noopener">View all writings \u2192</a>';b&&(b.innerHTML=d+o),E&&(E.innerHTML=d)}catch{const m='<div class="writing-dim">// unavailable</div>';b&&(b.innerHTML=m),E&&(E.innerHTML=m)}}})()})(),(function(){"use strict";const T=document.getElementById("boot-overlay");T.querySelectorAll(".boot-line").forEach(o=>{const p=parseInt(o.dataset.delay)||0;setTimeout(()=>o.classList.add("show"),p)}),setTimeout(()=>{T.classList.add("done"),setTimeout(()=>T.remove(),600)},3200);const b=document.getElementById("hero-cmd"),E=document.getElementById("hero-response"),A="curl https://deepanshu-kumar.dev";function m(){let o=0;const p=document.querySelector(".hero-cursor");function i(){o<A.length?(b.textContent+=A[o],o++,setTimeout(i,35+Math.random()*25)):(p&&(p.style.display="none"),setTimeout(n,300))}function n(){E.querySelectorAll(".hero-resp-line").forEach((u,r)=>{setTimeout(()=>u.classList.add("show"),r*150)})}setTimeout(i,3500)}m();function d(){const o=["C# \xB7 .NET \xB7 ASP.NET Core","Backend Engineer \xB7 Problem Solver","REST APIs \xB7 Microservices","From monolith to microservices \u2014 one PR at a time.","I ask why before I ask how.","Good APIs are invisible. Bad ones haunt you.","Build it right. Then build it fast.","I don't chase clever code. I chase clear code.","I like software that's easy to change.","I fix causes, not symptoms.","The best fix is the one nobody notices.","Async by default. Thoughtful by choice.","Understanding the problem before writing the solution.","I care as much about maintainability as functionality.","If it's flaky, I'll find out why.","I read the error logs, not just the tickets."];for(let f=o.length-1;f>0;f--){const x=Math.floor(Math.random()*(f+1));[o[f],o[x]]=[o[x],o[f]]}const p=document.getElementById("hero-typed"),i=document.querySelector(".hero-typed-cursor");if(!p)return;let n=0,l=0,u=!1,r=0;function h(){if(r>0){r--,setTimeout(h,40);return}const f=o[n];u?(p.textContent=f.slice(0,l-1),l--,l<=0&&(u=!1,n=(n+1)%o.length,r=10),setTimeout(h,25)):(p.textContent=f.slice(0,l+1),l++,l>=f.length&&(u=!0,r=50),setTimeout(h,40+Math.random()*30))}setTimeout(h,5500)}d()})(),(function(){"use strict";const T=document.querySelectorAll(".endpoint-section"),D=document.querySelectorAll('.sidebar-link[href^="#"]'),b=new IntersectionObserver(r=>{r.forEach(h=>{if(h.isIntersecting){const f=h.target.id;D.forEach(x=>{x.classList.toggle("active",x.getAttribute("href")===`#${f}`)})}})},{rootMargin:"-20% 0px -60% 0px",threshold:0});T.forEach(r=>b.observe(r));const E=new IntersectionObserver(r=>{r.forEach(h=>{h.isIntersecting&&(h.target.classList.add("visible"),E.unobserve(h.target))})},{rootMargin:"0px 0px -80px 0px",threshold:.1});T.forEach(r=>E.observe(r));const A=document.getElementById("hamburger"),m=document.getElementById("sidebar");let d=null;function o(){d=document.createElement("div"),d.className="sidebar-backdrop",document.body.appendChild(d),d.addEventListener("click",i)}function p(){m.classList.add("open"),A.classList.add("active"),d||o(),d.classList.add("visible"),document.body.style.overflow="hidden"}function i(){m.classList.remove("open"),A.classList.remove("active"),d&&d.classList.remove("visible"),document.body.style.overflow=""}A.addEventListener("click",()=>{m.classList.contains("open")?i():p()}),D.forEach(r=>{r.addEventListener("click",()=>{window.innerWidth<=900&&i()})}),window.toggleJson=function(r){r.closest(".json-object").classList.toggle("expanded")},window.toggleNestedJson=function(r){r.classList.toggle("expanded")};const n=document.querySelector("[data-collapsible]");n&&n.classList.add("expanded"),window.switchSkillTab=function(r,h){document.getElementById("skill-panel-technical").style.display=r==="technical"?"":"none",document.getElementById("skill-panel-soft").style.display=r==="soft"?"":"none",document.querySelectorAll(".skill-tab").forEach(f=>f.classList.remove("active")),h&&h.classList.add("active"),showToast(200,`GET /skills/${r}`),bumpRequest("GET")};const l=new IntersectionObserver(r=>{r.forEach(h=>{if(h.isIntersecting){const f=h.target.id;document.querySelectorAll(".mobile-tab").forEach(v=>{const j=v.dataset.section===f,O=v.classList.contains("active");v.classList.toggle("active",j),j&&!O&&(v.classList.add("just-activated"),setTimeout(()=>v.classList.remove("just-activated"),400))})}})},{rootMargin:"-30% 0px -50% 0px",threshold:0});T.forEach(r=>l.observe(r));const u=document.getElementById("scroll-progress-bar");u&&window.addEventListener("scroll",()=>{const r=document.documentElement.scrollHeight-window.innerHeight;u.style.width=(r>0?window.scrollY/r*100:0)+"%"},{passive:!0})})(),(function(){"use strict";const T=document.querySelectorAll(".endpoint-section"),D=new Date(2019,11,2),b=456;function E(){let u=new Date-D;u-=b*864e5;const r=Math.floor(u/1e3),h=Math.floor(r/(365.25*86400)),f=Math.floor(r%(365.25*86400)/(30.44*86400)),x=Math.floor(r%(30.44*86400)/86400),v=Math.floor(r%86400/3600),j=Math.floor(r%3600/60),O=r%60,k=ge=>document.getElementById(ge);k("uptime-years")&&(k("uptime-years").textContent=h),k("uptime-months")&&(k("uptime-months").textContent=f),k("uptime-days")&&(k("uptime-days").textContent=x),k("uptime-hours")&&(k("uptime-hours").textContent=v),k("uptime-mins")&&(k("uptime-mins").textContent=String(j).padStart(2,"0")),k("uptime-secs")&&(k("uptime-secs").textContent=String(O).padStart(2,"0"));const re=k("mw-uptime");re&&(re.textContent=`${h}y ${f}mo ${x}d`,re.classList.add("tick"),setTimeout(()=>re.classList.remove("tick"),100))}E(),setInterval(E,1e3);const A=new Set,m=new Set(["overview"]),d=[...T].filter(l=>!m.has(l.id)).length,o=new IntersectionObserver(l=>{l.forEach(u=>{if(u.isIntersecting&&!m.has(u.target.id)){A.add(u.target.id);const r=A.size,h=r/d*100+"%",f=document.getElementById("ratelimit-fill"),x=document.getElementById("ratelimit-text");f&&(f.style.width=h),x&&(x.textContent=`${r} / ${d} endpoints explored`);const v=document.getElementById("mw-ratelimit-fill"),j=document.getElementById("mw-ratelimit-text");v&&(v.style.width=h),j&&(j.textContent=`${r}/${d}`)}})},{threshold:.3});T.forEach(l=>o.observe(l));let p=0,i=0;window.bumpRequest=function(l){l==="POST"?i++:p++;const u=p+i,r=document.getElementById("req-count"),h=document.getElementById("req-breakdown");r&&(r.textContent=u,r.classList.add("bump"),setTimeout(()=>r.classList.remove("bump"),150)),h&&(h.textContent=`${p} GET \xB7 ${i} POST`);const f=document.getElementById("mw-requests");f&&(f.textContent=u)};const n=new IntersectionObserver(l=>{l.forEach(u=>{u.isIntersecting&&!u.target.dataset.reqCounted&&(u.target.dataset.reqCounted="true",window.bumpRequest("GET"))})},{threshold:.5});T.forEach(l=>n.observe(l))})(),(function(){"use strict";const T=document.querySelectorAll(".endpoint-section"),D=document.querySelectorAll('.sidebar-link[href^="#"]'),b=document.getElementById("request-fly");function E(e,t){if(!b||!e)return;const s=e.getBoundingClientRect();b.style.left=s.left+s.width/2-20+"px",b.style.top=s.top+"px",b.textContent=t?"POST":"GET",b.className="request-fly active"+(t?" post-fly":""),setTimeout(()=>{b.className="request-fly"},600)}D.forEach(e=>{e.addEventListener("click",t=>{const s=e.textContent.includes("POST");E(e,s)})});const A=document.getElementById("mobile-tabs");A&&A.addEventListener("click",e=>{const t=e.target.closest(".mobile-tab");if(!t)return;const s=t.querySelector(".method-post")!==null;E(t,s)});const m=document.getElementById("http-toast");let d=null;function o(e,t){if(!m)return;const s=e<300?"--200":e<400?"--301":"--404";m.innerHTML=`<span class="toast-status toast-status${s}">${e}</span>${t}`,m.classList.add("show"),clearTimeout(d),d=setTimeout(()=>m.classList.remove("show"),2500)}const p=new IntersectionObserver(e=>{e.forEach(t=>{if(t.isIntersecting&&!t.target.dataset.toasted){t.target.dataset.toasted="true";const s=t.target.id==="overview"?"/":"/"+t.target.id;o(200,`GET ${s}`)}})},{threshold:.5});T.forEach(e=>p.observe(e));const i={"C#":{synopsis:"Primary language \xB7 5+ years daily",usage:"All backend services, APIs, shared libraries, Azure Functions",where:"Siemens, IndiaLends, Telebu",see:"ASP.NET Core, .NET Core, LINQ"},SQL:{synopsis:"Query language for relational databases",usage:"Stored procedures, query optimization, migrations, reporting",where:"All companies \u2014 SQL Server primary",see:"T-SQL, Dapper, EF Core"},JavaScript:{synopsis:"Frontend & scripting",usage:"jQuery UI components, Azure Function triggers, this portfolio",where:"IndiaLends (frontend), Siemens (DevExpress)",see:"jQuery, Vue.js"},"ASP.NET Core":{synopsis:"Web framework for .NET",usage:"REST APIs, Minimal APIs, MVC endpoints, middleware pipelines",where:"Siemens (dashboard satellite, P&S microservice)",see:"Minimal APIs, REST, OIDC"},".NET Core":{synopsis:"Cross-platform runtime",usage:"All new services since 2022, shared libraries, container targets",where:"Siemens, IndiaLends",see:"ASP.NET Core, Docker"},"Minimal APIs":{synopsis:".NET 8 lightweight API pattern",usage:"Dashboard satellite service, P&S microservice endpoints",where:"Siemens \u2014 new services",see:"ASP.NET Core, REST"},REST:{synopsis:"API design pattern",usage:"All service interfaces \u2014 resource-oriented, versioned, documented",where:"All companies",see:"Swagger/OpenAPI, JSON"},"CQRS / MediatR":{synopsis:"Command/Query separation + mediator",usage:"P&S microservice \u2014 separate read/write models",where:"Siemens",see:"DDD, Clean Architecture"},DDD:{synopsis:"Domain-Driven Design",usage:"Aggregate design, bounded contexts, ubiquitous language in P&S service",where:"Siemens (P&S microservice)",see:"Clean Architecture, CQRS"},"Clean Architecture":{synopsis:"Layered dependency inversion",usage:"Service structure: Domain \u2192 Application \u2192 Infrastructure \u2192 API",where:"Siemens \u2014 all new services",see:"DDD, CQRS / MediatR"},Microservices:{synopsis:"Independently deployable services",usage:"Dashboard satellite (Strangler Fig), P&S service, credential service",where:"Siemens \u2014 platform modernisation",see:"Docker, REST, DDD"},BDD:{synopsis:"Behaviour-Driven Development",usage:"SpecFlow/ReqnRoll scenarios, Given-When-Then test structure",where:"Siemens \u2014 all new services",see:"NUnit, SpecFlow, Moq"},"Azure Functions":{synopsis:"Serverless compute",usage:"HTTP triggers (webhooks), Queue/Blob/Timer triggers for async workflows",where:"IndiaLends \u2014 document processing, scheduled reports",see:"Service Bus, Blob Storage"},"Entity Framework":{synopsis:"ORM for .NET (EF6 legacy)",usage:"Existing monolith data access layer \u2014 170+ project codebase",where:"Siemens (legacy platform)",see:"EF Core, Dapper, LINQ"},"EF Core":{synopsis:"Modern ORM for .NET Core",usage:"New service data layers, migrations, code-first models",where:"Siemens (new services)",see:"Dapper, LINQ, PostgreSQL"},Dapper:{synopsis:"Micro-ORM \u2014 raw SQL performance",usage:"Replaced EF for dashboard \u2014 3x faster queries via stored procs",where:"Siemens (dashboard optimization)",see:"T-SQL, SQL Server"},LINQ:{synopsis:"Language-integrated query",usage:"Collection transformations, EF queries, data pipeline operations",where:"All companies",see:"EF Core, C#"},"T-SQL":{synopsis:"SQL Server dialect",usage:"Stored procedures, views, performance tuning, index optimization",where:"Siemens, IndiaLends",see:"SQL Server, Dapper"},"SQL Server":{synopsis:"Primary relational database",usage:"Multi-tenant schemas, stored procs, maintenance jobs, Always On AG",where:"Siemens, IndiaLends",see:"T-SQL, Dapper, EF Core"},PostgreSQL:{synopsis:"Open-source relational DB",usage:"New microservice data stores, container-friendly deployments",where:"Siemens (new services)",see:"EF Core, Docker"},Redis:{synopsis:"In-memory cache / data store",usage:"Session caching, credential caching (shared library), distributed lock",where:"Siemens (shared NuGet library)",see:"AWS Secrets Manager, Resiliency"},"Azure App Service":{synopsis:"PaaS web hosting",usage:"Production deployment target for monolith and satellites",where:"Siemens, IndiaLends",see:"Docker, Azure DevOps"},"Service Bus":{synopsis:"Enterprise message broker",usage:"Async event-driven workflows, decoupled service communication",where:"IndiaLends (financial workflows)",see:"Azure Functions, Queue triggers"},"Blob Storage":{synopsis:"Azure object storage",usage:"Document storage, report generation output, file upload handling",where:"IndiaLends",see:"Azure Functions"},"AWS Secrets Manager":{synopsis:"Cloud secret management",usage:"Secure DB credential resolution, region-aware rotation in shared library",where:"Siemens (container migration)",see:"Redis, Resiliency Patterns"},Docker:{synopsis:"Container runtime",usage:"Local dev environments, Linux container targets for platform migration",where:"Siemens (Windows\u2192Linux migration)",see:"Microservices, .NET Core"},"OIDC / OAuth2":{synopsis:"Auth protocol standards",usage:"Enterprise SSO integration, token validation middleware",where:"Siemens (Auth0 ecosystem)",see:"JWT, Auth0, Cookie Auth"},JWT:{synopsis:"JSON Web Tokens",usage:"API authentication, claims-based authorization, token refresh flows",where:"Siemens, IndiaLends",see:"OIDC, Auth0"},Auth0:{synopsis:"Identity platform",usage:"Centralised auth service, tenant isolation, session management",where:"Siemens",see:"OIDC, JWT"},"VAPT Remediation":{synopsis:"Vulnerability & Penetration Testing fixes",usage:"Remediated findings from security assessments \u2014 XSS, CSRF, injection",where:"IndiaLends",see:"Auth, Security"},"Azure DevOps":{synopsis:"CI/CD + project management",usage:"Build pipelines, release gates, Azure Repos, work items",where:"IndiaLends, Siemens (boards)",see:"Jenkins, TeamCity"},Jenkins:{synopsis:"CI/CD automation server",usage:"Production release pipelines, automated testing gates",where:"Siemens",see:"TeamCity, SonarQube"},TeamCity:{synopsis:"JetBrains CI/CD",usage:"Build configurations, NuGet package publishing to MyGet",where:"Siemens",see:"Jenkins, MyGet"},SonarQube:{synopsis:"Static code analysis",usage:"Code quality gates \u2014 coverage, duplication, complexity, vulnerabilities",where:"Siemens (CI pipeline)",see:"Snyk, Jenkins"},Snyk:{synopsis:"Dependency vulnerability scanning",usage:"NuGet package security, container image scanning in CI",where:"Siemens",see:"SonarQube, Docker"},Grafana:{synopsis:"Observability dashboards",usage:"Production monitoring \u2014 API latency, error rates, resource usage",where:"Siemens (production)",see:"Datadog"},Datadog:{synopsis:"APM & monitoring platform",usage:"Distributed tracing, log aggregation, alerting on production issues",where:"Siemens",see:"Grafana"},NUnit:{synopsis:"Unit testing framework",usage:"All unit + integration tests, parameterized test cases",where:"Siemens",see:"Moq, SpecFlow"},SpecFlow:{synopsis:"BDD framework for .NET",usage:"Given-When-Then feature files, stakeholder-readable test specs",where:"Siemens",see:"ReqnRoll, NUnit"},ReqnRoll:{synopsis:"SpecFlow successor (OSS)",usage:"Migration from SpecFlow, new BDD scenarios post-2024",where:"Siemens (new services)",see:"SpecFlow, NUnit"},Moq:{synopsis:"Mocking framework",usage:"Dependency isolation in unit tests, verify interactions",where:"Siemens",see:"NUnit, BDD"}};document.querySelectorAll(".skill-tag").forEach(e=>{e.style.cursor="pointer",e.addEventListener("click",()=>{document.querySelectorAll(".skill-tag.selected").forEach(S=>S.classList.remove("selected")),e.classList.add("selected"),bumpRequest("GET");const t=[...e.childNodes].filter(S=>S.nodeType===Node.TEXT_NODE).map(S=>S.textContent).join("").trim(),s=i[t],a=document.getElementById("skill-terminal"),y=document.getElementById("skill-terminal-title"),c=document.getElementById("skill-terminal-body");if(!s){y.textContent=`$ man ${t.toLowerCase().replace(/[^a-z0-9]/g,"-")}`,c.innerHTML=`<span class="man-dim">No manual entry for ${t}</span>`,a.classList.add("active");return}y.textContent=`$ man ${t.toLowerCase().replace(/[^a-z0-9]/g,"-")}`,c.innerHTML=`
         <div class="man-section">
           <div class="man-heading">NAME</div>
-          <div class="man-content">${name}</div>
+          <div class="man-content">${t}</div>
         </div>
         <div class="man-section">
           <div class="man-heading">SYNOPSIS</div>
-          <div class="man-content">${data.synopsis}</div>
+          <div class="man-content">${s.synopsis}</div>
         </div>
         <div class="man-section">
           <div class="man-heading">USAGE</div>
-          <div class="man-content man-content--gold">${data.usage}</div>
+          <div class="man-content man-content--gold">${s.usage}</div>
         </div>
         <div class="man-section">
           <div class="man-heading">WHERE</div>
-          <div class="man-content man-content--green">${data.where}</div>
+          <div class="man-content man-content--green">${s.where}</div>
         </div>
         <div class="man-section">
           <div class="man-heading">SEE ALSO</div>
-          <div class="man-content man-ref">${data.see}</div>
+          <div class="man-content man-ref">${s.see}</div>
         </div>
-      `;
-      terminal.classList.add('active');
-      terminal.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    });
-  });
-
-
-  // ── Console Easter Egg ────────────────────────────────────────────
-  console.log('%c' + `
-  ╔═══════════════════════════════════════════════════════════╗
-  ║                                                           ║
-  ║   Hey! You opened DevTools. I like you already.           ║
-  ║                                                           ║
-  ║   🔧  Deepanshu Kumar                                     ║
-  ║   💼  Backend Engineer · .NET · 5+ years                  ║
-  ║   📍  Noida, India                                        ║
-  ║                                                           ║
-  ║   If you're hiring:                                       ║
-  ║   → deepanshu.kumar@outlook.in                            ║
-  ║   → linkedin.com/in/deepanshu-kumar-dev                   ║
-  ║                                                           ║
-  ║   This site: Zero dependencies. Vanilla JS. No framework. ║
-  ║   Because sometimes the best architecture is the simplest. ║
-  ║                                                           ║
-  ╚═══════════════════════════════════════════════════════════╝
-  `, 'color: #1ecbe1; font-family: monospace; font-size: 11px;');
-
-  console.log('%cGET /hire-me → 200 OK', 'color: #49cc90; font-weight: bold; font-size: 14px;');
-
-
-  // ── PAN Name Validator (Simplified for prototype) ─────────────────
-  // Full weighted ensemble algorithm — Jaro-Winkler + Damerau-Levenshtein
-  // + Dice/Sorensen + token sort
-
-  window.runValidator = function() {
-    const rawName1 = document.getElementById('vld-name1').value.trim();
-    const rawName2 = document.getElementById('vld-name2').value.trim();
-    const threshold = parseInt(document.getElementById('vld-threshold').value) || 72;
-    const animate = document.getElementById('vld-animate').checked;
-    const resultEl = document.getElementById('vld-result');
-    const statusEl = document.getElementById('vld-status');
-    const bodyEl = document.getElementById('vld-response-body');
-    const traceEl = document.getElementById('pipeline-trace');
-    const traceBody = document.getElementById('trace-body');
-    const elapsedEl = document.getElementById('trace-elapsed');
-    const btn = document.getElementById('vld-btn');
-
-    bumpRequest('POST');
-
-    if (!rawName1 || !rawName2) {
-      resultEl.style.display = 'block';
-      traceEl.style.display = 'none';
-      statusEl.textContent = '400 Bad Request';
-      statusEl.style.color = '#f87171';
-      bodyEl.textContent = JSON.stringify({ error: "Both fields required", status: 400 }, null, 2);
-      return;
-    }
-
-    const name1 = rawName1.toUpperCase();
-    const name2 = rawName2.toUpperCase();
-
-    // Strip titles
-    const TITLES = /^(DR|MR|MRS|MS|SHRI|SMT|PROF)\.?\s+/i;
-    const afterTitle1 = name1.replace(TITLES, '');
-    const afterTitle2 = name2.replace(TITLES, '');
-    const titlesFound = name1 !== afterTitle1 || name2 !== afterTitle2;
-
-    // Expand common prefixes/suffixes
-    const EXPANSIONS = {
-      'MD': 'MOHAMMAD', 'MOHD': 'MOHAMMAD', 'MHD': 'MOHAMMAD',
-      'PT': 'PANDIT', 'PD': 'PANDIT',
-      'KR': 'KUMAR', 'KMR': 'KUMAR',
-      'CH': 'CHANDRA', 'CHDR': 'CHANDRA',
-      'SK': 'SHEIKH', 'SH': 'SHEIKH',
-      'SM': 'SAMAN', 'SRI': 'SHRI',
-      'RAM': 'RAMA', 'DEV': 'DEVI',
-      'JR': 'JUNIOR', 'SR': 'SENIOR',
-    };
-
-    function expandAbbrevs(name) {
-      const tokens = name.split(/\s+/);
-      const expanded = tokens.map(t => EXPANSIONS[t] || t);
-      return expanded.join(' ');
-    }
-
-    const expanded1 = expandAbbrevs(afterTitle1);
-    const expanded2 = expandAbbrevs(afterTitle2);
-    const expansionsApplied = expanded1 !== afterTitle1 || expanded2 !== afterTitle2;
-    const stripped1 = expanded1;
-    const stripped2 = expanded2;
-
-    // Fast paths
-    const isExact = stripped1 === stripped2;
-    const tokens1 = stripped1.split(/\s+/).filter(Boolean);
-    const tokens2 = stripped2.split(/\s+/).filter(Boolean);
-    const isReversed = !isExact && tokens1.slice().reverse().join(' ') === tokens2.join(' ');
-
-    // Abbreviation check — recursive permutation approach (matches original repo)
-    // Generates all permutations of tokens + partial-initial variants, checks if
-    // the shorter name (no spaces) exists in that set.
-
-    function* _perms(arr, r) {
-      if (!r) { yield []; return; }
-      for (let i = 0; i < arr.length; i++)
-        for (const p of _perms(arr.filter((_, j) => j !== i), r - 1)) yield [arr[i], ...p];
-    }
-
-    function _abbrevs(nm) {
-      const tk = nm.split(' '), out = new Set();
-      for (let r = 0; r <= tk.length; r++)
-        for (const p of _perms(tk, r)) out.add(p.join(''));
-      return out;
-    }
-
-    function _abbrevPnC(nm) {
-      const tk = nm.split(' '), out = new Set();
-      // it <= tk.length: allows replacing ALL tokens with initials (e.g. "DK" from "DEEPANSHU KUMAR")
-      for (let it = 1; it <= tk.length; it++) {
-        for (let i = 0; i <= tk.length - it; i++) {
-          const t = [...tk];
-          for (let j = i; j < i + it; j++) t[j] = tk[j][0] || '';
-          for (const a of _abbrevs(t.join(' '))) out.add(a);
-        }
-      }
-      return out;
-    }
-
-    const longer = stripped1.length >= stripped2.length ? stripped1 : stripped2;
-    const shorter = (stripped1.length >= stripped2.length ? stripped2 : stripped1).replace(/ /g, '');
-    const abbrevSet = _abbrevs(longer);
-    const abbrevPnCSet = _abbrevPnC(longer);
-    const hasAbbrev = abbrevSet.has(shorter) || abbrevPnCSet.has(shorter);
-    // Collect a sample of generated abbreviations for the trace display (filter empty strings)
-    const abbrevSamples = [...new Set([...abbrevSet, ...abbrevPnCSet])].filter(a => a.length > 0).slice(0, 12);
-
-    // Generate phonetic variations (Indian names)
-    function getVariations(name) {
-      const vars = [name];
-      const rules = [
-        [/PH/g, 'F'], [/EE/g, 'I'], [/OO/g, 'U'],
-        [/TH/g, 'T'], [/DH/g, 'D'], [/SH/g, 'S'],
-        [/GH/g, 'G'], [/KH/g, 'K'], [/BH/g, 'B'],
-        [/AA/g, 'A'], [/EE/g, 'I'], [/Y$/g, 'I'],
-        [/W/g, 'V'], [/Z/g, 'J'],
-      ];
-      rules.forEach(([pat, rep]) => {
-        const v = name.replace(pat, rep);
-        if (v !== name && !vars.includes(v)) vars.push(v);
-      });
-      return vars;
-    }
-    const variations1 = getVariations(stripped1);
-    const variations2 = getVariations(stripped2);
-
-    // Find which variation pairs are closest
-    let bestVarPair = null;
-    let bestVarScore = 0;
-    variations1.forEach(v1 => {
-      variations2.forEach(v2 => {
-        const s = jaroWinkler(v1, v2);
-        if (s > bestVarScore) { bestVarScore = s; bestVarPair = [v1, v2]; }
-      });
-    });
-
-    // Calculate scores
-    const jw = jaroWinkler(stripped1, stripped2);
-    const dl = 1 - (damerauLevenshtein(stripped1, stripped2) / Math.max(stripped1.length, stripped2.length));
-    const dice = diceCoefficient(stripped1, stripped2);
-    const tokenSort = tokenSortRatio(stripped1, stripped2);
-    const composite = Math.round((jw * 0.35 + dl * 0.25 + dice * 0.20 + tokenSort * 0.20) * 100);
-    const isMatch = composite >= threshold;
-    const band = Math.abs(composite - threshold) <= 5;
-
-    const finalResult = {
-      match: isMatch,
-      composite_score: composite,
-      threshold: threshold,
-      verdict: isMatch ? "MATCH" : (band ? "REVIEW_BAND" : "REJECT"),
-      fallback_required: band,
-      algorithms: {
-        jaro_winkler: { score: Math.round(jw * 100), weight: 0.35 },
-        damerau_levenshtein: { score: Math.round(dl * 100), weight: 0.25 },
-        dice_coefficient: { score: Math.round(dice * 100), weight: 0.20 },
-        token_sort: { score: Math.round(tokenSort * 100), weight: 0.20 }
-      },
-      input: { name_on_pan: stripped1, name_provided: stripped2 }
-    };
-
-    function showResult() {
-      statusEl.textContent = '200 OK';
-      statusEl.style.color = 'var(--method-get)';
-      resultEl.style.display = 'block';
-      bodyEl.textContent = JSON.stringify(finalResult, null, 2);
-      btn.disabled = false;
-      btn.textContent = 'Send Request';
-      // Scroll to the response
-      setTimeout(() => {
-        resultEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 100);
-    }
-
-    // Quick mode
-    if (!animate) {
-      traceEl.style.display = 'none';
-      showResult();
-      return;
-    }
-
-    // ── Animated trace mode ───────────────────────────────────────
-    btn.disabled = true;
-    btn.textContent = 'Processing...';
-    resultEl.style.display = 'none';
-    traceEl.style.display = 'block';
-    traceBody.innerHTML = '';
-
-    let elapsed = 0;
-    const timer = setInterval(() => {
-      elapsed += 50;
-      if (elapsedEl) elapsedEl.textContent = elapsed + 'ms';
-    }, 50);
-
-    // Build trace steps as an array of {delay, html}
-    const trace = [];
-    let delay = 0;
-    const STEP = 350;
-
-    // Step 1: Normalize
-    delay += STEP;
-    trace.push({ delay, html: `
+      `,a.classList.add("active"),a.scrollIntoView({behavior:"smooth",block:"nearest"})})}),console.log(`%c
+  \u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557
+  \u2551                                                           \u2551
+  \u2551   Hey! You opened DevTools. I like you already.           \u2551
+  \u2551                                                           \u2551
+  \u2551   \u{1F527}  Deepanshu Kumar                                     \u2551
+  \u2551   \u{1F4BC}  Backend Engineer \xB7 .NET \xB7 5+ years                  \u2551
+  \u2551   \u{1F4CD}  Noida, India                                        \u2551
+  \u2551                                                           \u2551
+  \u2551   If you're hiring:                                       \u2551
+  \u2551   \u2192 deepanshu.kumar@outlook.in                            \u2551
+  \u2551   \u2192 linkedin.com/in/deepanshu-kumar-dev                   \u2551
+  \u2551                                                           \u2551
+  \u2551   This site: Zero dependencies. Vanilla JS. No framework. \u2551
+  \u2551   Because sometimes the best architecture is the simplest. \u2551
+  \u2551                                                           \u2551
+  \u255A\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255D
+  `,"color: #1ecbe1; font-family: monospace; font-size: 11px;"),console.log("%cGET /hire-me \u2192 200 OK","color: #49cc90; font-weight: bold; font-size: 14px;"),window.runValidator=function(){const e=document.getElementById("vld-name1").value.trim(),t=document.getElementById("vld-name2").value.trim(),s=parseInt(document.getElementById("vld-threshold").value)||72,a=document.getElementById("vld-animate").checked,y=document.getElementById("vld-result"),c=document.getElementById("vld-status"),S=document.getElementById("vld-response-body"),B=document.getElementById("pipeline-trace"),K=document.getElementById("trace-body"),ee=document.getElementById("trace-elapsed"),z=document.getElementById("vld-btn");if(bumpRequest("POST"),!e||!t){y.style.display="block",B.style.display="none",c.textContent="400 Bad Request",c.style.color="#f87171",S.textContent=JSON.stringify({error:"Both fields required",status:400},null,2);return}const te=e.toUpperCase(),$=t.toUpperCase(),le=/^(DR|MR|MRS|MS|SHRI|SMT|PROF)\.?\s+/i,U=te.replace(le,""),H=$.replace(le,""),be=te!==U||$!==H,de={MD:"MOHAMMAD",MOHD:"MOHAMMAD",MHD:"MOHAMMAD",PT:"PANDIT",PD:"PANDIT",KR:"KUMAR",KMR:"KUMAR",CH:"CHANDRA",CHDR:"CHANDRA",SK:"SHEIKH",SH:"SHEIKH",SM:"SAMAN",SRI:"SHRI",RAM:"RAMA",DEV:"DEVI",JR:"JUNIOR",SR:"SENIOR"};function pe(w){return w.split(/\s+/).map(J=>de[J]||J).join(" ")}const q=pe(U),Z=pe(H),Me=q!==U||Z!==H,N=q,I=Z,M=N===I,Y=N.split(/\s+/).filter(Boolean),$e=I.split(/\s+/).filter(Boolean),me=!M&&Y.slice().reverse().join(" ")===$e.join(" ");function*Re(w,C){if(!C){yield[];return}for(let W=0;W<w.length;W++)for(const J of Re(w.filter((ce,he)=>he!==W),C-1))yield[w[W],...J]}function Oe(w){const C=w.split(" "),W=new Set;for(let J=0;J<=C.length;J++)for(const ce of Re(C,J))W.add(ce.join(""));return W}function He(w){const C=w.split(" "),W=new Set;for(let J=1;J<=C.length;J++)for(let ce=0;ce<=C.length-J;ce++){const he=[...C];for(let ke=ce;ke<ce+J;ke++)he[ke]=C[ke][0]||"";for(const ke of Oe(he.join(" ")))W.add(ke)}return W}const Ae=N.length>=I.length?N:I,g=(N.length>=I.length?I:N).replace(/ /g,""),L=Oe(Ae),F=He(Ae),P=L.has(g)||F.has(g),se=[...new Set([...L,...F])].filter(w=>w.length>0).slice(0,12);function ne(w){const C=[w];return[[/PH/g,"F"],[/EE/g,"I"],[/OO/g,"U"],[/TH/g,"T"],[/DH/g,"D"],[/SH/g,"S"],[/GH/g,"G"],[/KH/g,"K"],[/BH/g,"B"],[/AA/g,"A"],[/EE/g,"I"],[/Y$/g,"I"],[/W/g,"V"],[/Z/g,"J"]].forEach(([J,ce])=>{const he=w.replace(J,ce);he!==w&&!C.includes(he)&&C.push(he)}),C}const ae=ne(N),qe=ne(I);let ue=null,Pe=0;ae.forEach(w=>{qe.forEach(C=>{const W=l(w,C);W>Pe&&(Pe=W,ue=[w,C])})});const Fe=l(N,I),je=1-u(N,I)/Math.max(N.length,I.length),Ge=r(N,I),_e=h(N,I),xe=Math.round((Fe*.35+je*.25+Ge*.2+_e*.2)*100),Ie=xe>=s,Le=Math.abs(xe-s)<=5,ie={match:Ie,composite_score:xe,threshold:s,verdict:Ie?"MATCH":Le?"REVIEW_BAND":"REJECT",fallback_required:Le,algorithms:{jaro_winkler:{score:Math.round(Fe*100),weight:.35},damerau_levenshtein:{score:Math.round(je*100),weight:.25},dice_coefficient:{score:Math.round(Ge*100),weight:.2},token_sort:{score:Math.round(_e*100),weight:.2}},input:{name_on_pan:N,name_provided:I}};function De(){c.textContent="200 OK",c.style.color="var(--method-get)",y.style.display="block",S.textContent=JSON.stringify(ie,null,2),z.disabled=!1,z.textContent="Send Request",setTimeout(()=>{y.scrollIntoView({behavior:"smooth",block:"nearest"})},100)}if(!a){B.style.display="none",De();return}z.disabled=!0,z.textContent="Processing...",y.style.display="none",B.style.display="block",K.innerHTML="";let ze=0;const Be=setInterval(()=>{ze+=50,ee&&(ee.textContent=ze+"ms")},50),Q=[];let R=0;const oe=350;if(R+=oe,Q.push({delay:R,html:`
       <div class="trace-step">
-        <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">Normalize — uppercase, trim whitespace</span></div>
+        <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">Normalize \u2014 uppercase, trim whitespace</span></div>
         <div class="trace-data trace-data--highlight">
-          <span class="trace-dim">pan →</span> <span class="trace-val">"${name1}"</span><br>
-          <span class="trace-dim">provided →</span> <span class="trace-val">"${name2}"</span>
+          <span class="trace-dim">pan \u2192</span> <span class="trace-val">"${te}"</span><br>
+          <span class="trace-dim">provided \u2192</span> <span class="trace-val">"${$}"</span>
         </div>
       </div>
-    `});
-
-    // Step 2: Strip titles (only show if titles found)
-    if (titlesFound) {
-      delay += STEP;
-      trace.push({ delay, html: `
+    `}),be&&(R+=oe,Q.push({delay:R,html:`
         <div class="trace-step">
-          <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">Strip titles — Dr., Mr., Shri, Smt.</span></div>
+          <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">Strip titles \u2014 Dr., Mr., Shri, Smt.</span></div>
           <div class="trace-data trace-data--highlight">
-            <span class="trace-dim">cleaned →</span> <span class="trace-val">"${afterTitle1}"</span> vs <span class="trace-val">"${afterTitle2}"</span>
+            <span class="trace-dim">cleaned \u2192</span> <span class="trace-val">"${U}"</span> vs <span class="trace-val">"${H}"</span>
           </div>
         </div>
-      `});
-    }
-
-    // Step 2b: Expand abbreviations (Md→Mohammad, Kr→Kumar, etc.)
-    if (expansionsApplied) {
-      delay += STEP;
-      trace.push({ delay, html: `
+      `})),Me?(R+=oe,Q.push({delay:R,html:`
         <div class="trace-step">
-          <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">Expand prefixes/suffixes — Md, Kr, Pt, Ch, Sk</span></div>
+          <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">Expand prefixes/suffixes \u2014 Md, Kr, Pt, Ch, Sk</span></div>
           <div class="trace-data trace-data--highlight">
-            ${afterTitle1 !== expanded1 ? `<span class="trace-dim">"${afterTitle1}" →</span> <span class="trace-val">"${expanded1}"</span><br>` : ''}
-            ${afterTitle2 !== expanded2 ? `<span class="trace-dim">"${afterTitle2}" →</span> <span class="trace-val">"${expanded2}"</span>` : ''}
-            ${afterTitle1 === expanded1 && afterTitle2 !== expanded2 ? '' : afterTitle1 !== expanded1 && afterTitle2 === expanded2 ? '' : ''}
+            ${U!==q?`<span class="trace-dim">"${U}" \u2192</span> <span class="trace-val">"${q}"</span><br>`:""}
+            ${H!==Z?`<span class="trace-dim">"${H}" \u2192</span> <span class="trace-val">"${Z}"</span>`:""}
+            
           </div>
         </div>
-      `});
-    } else {
-      delay += STEP;
-      trace.push({ delay, html: `
+      `})):(R+=oe,Q.push({delay:R,html:`
         <div class="trace-step">
-          <div class="trace-label"><span class="trace-icon trace-icon--skip"></span><span class="trace-action">Expand prefixes/suffixes — <span class="trace-dim">none found</span></span></div>
+          <div class="trace-label"><span class="trace-icon trace-icon--skip"></span><span class="trace-action">Expand prefixes/suffixes \u2014 <span class="trace-dim">none found</span></span></div>
         </div>
-      `});
-    }
-
-    // Step 3: Exact match check
-    delay += STEP;
-    if (isExact) {
-      trace.push({ delay, html: `
+      `})),R+=oe,M){Q.push({delay:R,html:`
         <div class="trace-step">
-          <div class="trace-label"><span class="trace-icon trace-icon--hit"></span><span class="trace-action">Fast-path: Exact match — <span class="trace-green">HIT!</span></span></div>
+          <div class="trace-label"><span class="trace-icon trace-icon--hit"></span><span class="trace-action">Fast-path: Exact match \u2014 <span class="trace-green">HIT!</span></span></div>
           <div class="trace-data trace-data--green">
-            <span class="trace-green">✓ Names are identical. Short-circuit → 100% match</span>
+            <span class="trace-green">\u2713 Names are identical. Short-circuit \u2192 100% match</span>
           </div>
         </div>
-      `});
-      // Short circuit — show result after this
-      runTrace(trace, traceBody, () => { clearInterval(timer); finalResult.composite_score = 100; finalResult.match = true; finalResult.verdict = "MATCH"; showResult(); });
-      return;
-    } else {
-      trace.push({ delay, html: `
+      `}),n(Q,K,()=>{clearInterval(Be),ie.composite_score=100,ie.match=!0,ie.verdict="MATCH",De()});return}else Q.push({delay:R,html:`
         <div class="trace-step">
-          <div class="trace-label"><span class="trace-icon trace-icon--skip"></span><span class="trace-action">Fast-path: Exact match — <span class="trace-dim">no hit</span></span></div>
+          <div class="trace-label"><span class="trace-icon trace-icon--skip"></span><span class="trace-action">Fast-path: Exact match \u2014 <span class="trace-dim">no hit</span></span></div>
         </div>
-      `});
-    }
-
-    // Step 4: Reversed order
-    delay += STEP;
-    if (isReversed) {
-      trace.push({ delay, html: `
+      `});if(R+=oe,me){Q.push({delay:R,html:`
         <div class="trace-step">
-          <div class="trace-label"><span class="trace-icon trace-icon--hit"></span><span class="trace-action">Fast-path: Reversed word order — <span class="trace-green">HIT!</span></span></div>
+          <div class="trace-label"><span class="trace-icon trace-icon--hit"></span><span class="trace-action">Fast-path: Reversed word order \u2014 <span class="trace-green">HIT!</span></span></div>
           <div class="trace-data trace-data--green">
-            <span class="trace-dim">"${tokens1.join(' ')}"</span> = <span class="trace-dim">"${tokens2.join(' ')}"</span> reversed<br>
-            <span class="trace-green">✓ Match confirmed via word reorder</span>
+            <span class="trace-dim">"${Y.join(" ")}"</span> = <span class="trace-dim">"${$e.join(" ")}"</span> reversed<br>
+            <span class="trace-green">\u2713 Match confirmed via word reorder</span>
           </div>
         </div>
-      `});
-      runTrace(trace, traceBody, () => { clearInterval(timer); finalResult.composite_score = 98; finalResult.match = true; finalResult.verdict = "MATCH"; showResult(); });
-      return;
-    } else {
-      trace.push({ delay, html: `
+      `}),n(Q,K,()=>{clearInterval(Be),ie.composite_score=98,ie.match=!0,ie.verdict="MATCH",De()});return}else Q.push({delay:R,html:`
         <div class="trace-step">
-          <div class="trace-label"><span class="trace-icon trace-icon--skip"></span><span class="trace-action">Fast-path: Reversed word order — <span class="trace-dim">no hit</span></span></div>
+          <div class="trace-label"><span class="trace-icon trace-icon--skip"></span><span class="trace-action">Fast-path: Reversed word order \u2014 <span class="trace-dim">no hit</span></span></div>
         </div>
-      `});
-    }
-
-    // Step 5: Abbreviation (recursive permutation)
-    delay += STEP;
-    const abbrevDisplay = abbrevSamples.map((a, i) =>
-      `<span class="trace-var${a === shorter ? ' trace-var--match' : ''}" style="animation-delay:${i * 60}ms">${a}</span>`
-    ).join('');
-
-    trace.push({ delay, html: `
+      `});R+=oe;const Qe=se.map((w,C)=>`<span class="trace-var${w===g?" trace-var--match":""}" style="animation-delay:${C*60}ms">${w}</span>`).join("");Q.push({delay:R,html:`
       <div class="trace-step">
-        <div class="trace-label"><span class="trace-icon ${hasAbbrev ? 'trace-icon--hit' : 'trace-icon--skip'}"></span><span class="trace-action">Fast-path: Abbreviation (recursive permutations) — <span class="${hasAbbrev ? 'trace-green' : 'trace-dim'}">${hasAbbrev ? 'HIT!' : 'no hit'}</span></span></div>
-        <div class="trace-data ${hasAbbrev ? 'trace-data--green' : ''}">
-          <span class="trace-dim">Generated from "${longer}":</span>
-          <div class="trace-variations">${abbrevDisplay}</div>
+        <div class="trace-label"><span class="trace-icon ${P?"trace-icon--hit":"trace-icon--skip"}"></span><span class="trace-action">Fast-path: Abbreviation (recursive permutations) \u2014 <span class="${P?"trace-green":"trace-dim"}">${P?"HIT!":"no hit"}</span></span></div>
+        <div class="trace-data ${P?"trace-data--green":""}">
+          <span class="trace-dim">Generated from "${Ae}":</span>
+          <div class="trace-variations">${Qe}</div>
           <div style="margin-top:6px;">
-            <span class="trace-dim">Looking for:</span> <span class="trace-hl">"${shorter}"</span>
-            ${hasAbbrev ? '<span class="trace-green" style="margin-left:8px;">✓ Found in set!</span>' : '<span class="trace-dim" style="margin-left:8px;">— not in set</span>'}
+            <span class="trace-dim">Looking for:</span> <span class="trace-hl">"${g}"</span>
+            ${P?'<span class="trace-green" style="margin-left:8px;">\u2713 Found in set!</span>':'<span class="trace-dim" style="margin-left:8px;">\u2014 not in set</span>'}
           </div>
         </div>
       </div>
-    `});
-
-    // Step 6: Phonetic variations
-    delay += STEP;
-    const phoneticIsExact = Math.round(bestVarScore * 100) === 100;
-    const varHtml = variations1.length > 1 || variations2.length > 1
-      ? `<div class="trace-data ${phoneticIsExact ? 'trace-data--green' : 'trace-data--highlight'}">
-          <span class="trace-dim">Variations of "${stripped1}":</span>
+    `}),R+=oe;const Te=Math.round(Pe*100)===100,We=ae.length>1||qe.length>1?`<div class="trace-data ${Te?"trace-data--green":"trace-data--highlight"}">
+          <span class="trace-dim">Variations of "${N}":</span>
           <div class="trace-variations" id="trace-vars">
-            ${variations1.map((v, i) => `<span class="trace-var${bestVarPair && v === bestVarPair[0] ? ' trace-var--match' : ''}" style="animation-delay:${i * 80}ms">${v}</span>`).join('')}
+            ${ae.map((w,C)=>`<span class="trace-var${ue&&w===ue[0]?" trace-var--match":""}" style="animation-delay:${C*80}ms">${w}</span>`).join("")}
           </div>
-          <span class="trace-dim" style="margin-top:6px;display:block;">Variations of "${stripped2}":</span>
+          <span class="trace-dim" style="margin-top:6px;display:block;">Variations of "${I}":</span>
           <div class="trace-variations">
-            ${variations2.map((v, i) => `<span class="trace-var${bestVarPair && v === bestVarPair[1] ? ' trace-var--match' : ''}" style="animation-delay:${(i + variations1.length) * 80}ms">${v}</span>`).join('')}
+            ${qe.map((w,C)=>`<span class="trace-var${ue&&w===ue[1]?" trace-var--match":""}" style="animation-delay:${(C+ae.length)*80}ms">${w}</span>`).join("")}
           </div>
-          ${bestVarPair ? `<div style="margin-top:6px;"><span class="trace-dim">Best phonetic pair:</span> <span class="trace-hl">"${bestVarPair[0]}"</span> ↔ <span class="trace-hl">"${bestVarPair[1]}"</span> <span class="${phoneticIsExact ? 'trace-green' : 'trace-gold'}">${Math.round(bestVarScore * 100)}%</span></div>` : ''}
-          ${phoneticIsExact ? '<div style="margin-top:6px;"><span class="trace-green">✓ Phonetic variation is exact match — short-circuit!</span></div>' : ''}
-        </div>` : '';
-
-    trace.push({ delay, html: `
+          ${ue?`<div style="margin-top:6px;"><span class="trace-dim">Best phonetic pair:</span> <span class="trace-hl">"${ue[0]}"</span> \u2194 <span class="trace-hl">"${ue[1]}"</span> <span class="${Te?"trace-green":"trace-gold"}">${Math.round(Pe*100)}%</span></div>`:""}
+          ${Te?'<div style="margin-top:6px;"><span class="trace-green">\u2713 Phonetic variation is exact match \u2014 short-circuit!</span></div>':""}
+        </div>`:"";if(Q.push({delay:R,html:`
       <div class="trace-step">
-        <div class="trace-label"><span class="trace-icon ${phoneticIsExact ? 'trace-icon--hit' : 'trace-icon--done'}"></span><span class="trace-action">Generating phonetic variations (Indian name rules)${phoneticIsExact ? ' — <span class="trace-green">HIT!</span>' : ''}</span></div>
-        ${varHtml}
+        <div class="trace-label"><span class="trace-icon ${Te?"trace-icon--hit":"trace-icon--done"}"></span><span class="trace-action">Generating phonetic variations (Indian name rules)${Te?' \u2014 <span class="trace-green">HIT!</span>':""}</span></div>
+        ${We}
       </div>
-    `});
-
-    // Short-circuit if phonetic match is 100%
-    if (phoneticIsExact) {
-      finalResult.composite_score = 100;
-      finalResult.match = true;
-      finalResult.verdict = "MATCH";
-      finalResult.reason = "phonetic_exact";
-      runTrace(trace, traceBody, () => { clearInterval(timer); showResult(); });
-      return;
-    }
-
-    // Step 7-10: Algorithm scores with bars
-    const algos = [
-      { name: 'Jaro-Winkler', desc: 'prefix-weighted char similarity', score: Math.round(jw * 100), weight: '35%' },
-      { name: 'Damerau-Levenshtein', desc: 'edit distance (normalized)', score: Math.round(dl * 100), weight: '25%' },
-      { name: 'Dice Coefficient', desc: 'bigram overlap', score: Math.round(dice * 100), weight: '20%' },
-      { name: 'Token Sort', desc: 'order-independent comparison', score: Math.round(tokenSort * 100), weight: '20%' },
-    ];
-
-    algos.forEach(algo => {
-      delay += STEP;
-      const barColor = algo.score >= threshold ? 'trace-bar-fill--green' : (algo.score >= threshold - 10 ? '' : 'trace-bar-fill--gold');
-      trace.push({ delay, html: `
+    `}),Te){ie.composite_score=100,ie.match=!0,ie.verdict="MATCH",ie.reason="phonetic_exact",n(Q,K,()=>{clearInterval(Be),De()});return}[{name:"Jaro-Winkler",desc:"prefix-weighted char similarity",score:Math.round(Fe*100),weight:"35%"},{name:"Damerau-Levenshtein",desc:"edit distance (normalized)",score:Math.round(je*100),weight:"25%"},{name:"Dice Coefficient",desc:"bigram overlap",score:Math.round(Ge*100),weight:"20%"},{name:"Token Sort",desc:"order-independent comparison",score:Math.round(_e*100),weight:"20%"}].forEach(w=>{R+=oe;const C=w.score>=s?"trace-bar-fill--green":w.score>=s-10?"":"trace-bar-fill--gold";Q.push({delay:R,html:`
         <div class="trace-step">
-          <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">${algo.name} <span class="trace-dim">(${algo.desc})</span></span></div>
+          <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">${w.name} <span class="trace-dim">(${w.desc})</span></span></div>
           <div class="trace-data">
             <div class="trace-score-bar">
-              <div class="trace-bar-track"><div class="trace-bar-fill ${barColor}" style="width:${algo.score}%"></div></div>
-              <span class="trace-bar-val">${algo.score}%</span>
-              <span class="trace-dim">× ${algo.weight}</span>
+              <div class="trace-bar-track"><div class="trace-bar-fill ${C}" style="width:${w.score}%"></div></div>
+              <span class="trace-bar-val">${w.score}%</span>
+              <span class="trace-dim">\xD7 ${w.weight}</span>
             </div>
           </div>
         </div>
-      `});
-    });
-
-    // Step 11: Composite
-    delay += STEP;
-    const verdictColor = isMatch ? 'trace-green' : (band ? 'trace-gold' : 'trace-red');
-    const verdictText = isMatch ? '✓ MATCH' : (band ? '⚠ REVIEW BAND (fallback to API)' : '✗ REJECT');
-    trace.push({ delay, html: `
+      `})}),R+=oe;const Je=Ie?"trace-green":Le?"trace-gold":"trace-red",Ve=Ie?"\u2713 MATCH":Le?"\u26A0 REVIEW BAND (fallback to API)":"\u2717 REJECT";Q.push({delay:R,html:`
       <div class="trace-step">
         <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">Weighted composite score</span></div>
-        <div class="trace-data trace-data--${isMatch ? 'green' : (band ? 'gold' : 'red')}">
+        <div class="trace-data trace-data--${Ie?"green":Le?"gold":"red"}">
           <div class="trace-score-bar">
-            <div class="trace-bar-track"><div class="trace-bar-fill ${isMatch ? 'trace-bar-fill--green' : ''}" style="width:${composite}%"></div></div>
-            <span class="trace-bar-val" style="font-size:14px;">${composite}%</span>
-            <span class="trace-dim">threshold: ${threshold}%</span>
+            <div class="trace-bar-track"><div class="trace-bar-fill ${Ie?"trace-bar-fill--green":""}" style="width:${xe}%"></div></div>
+            <span class="trace-bar-val" style="font-size:14px;">${xe}%</span>
+            <span class="trace-dim">threshold: ${s}%</span>
           </div>
-          <div style="margin-top:8px;font-size:13px;"><span class="${verdictColor}">${verdictText}</span></div>
+          <div style="margin-top:8px;font-size:13px;"><span class="${Je}">${Ve}</span></div>
         </div>
       </div>
-    `});
-
-    // Run the trace
-    runTrace(trace, traceBody, () => { clearInterval(timer); showResult(); });
-  };
-
-  function runTrace(steps, container, onDone) {
-    steps.forEach((step, i) => {
-      setTimeout(() => {
-        container.insertAdjacentHTML('beforeend', step.html);
-        // Auto-scroll to bottom
-        container.scrollTop = container.scrollHeight;
-        // Trigger bar fill animation (bars start at 0 width via CSS)
-        const bars = container.querySelectorAll('.trace-bar-fill');
-        bars.forEach(b => { const w = b.style.width; b.style.width = '0'; requestAnimationFrame(() => b.style.width = w); });
-        // If last step, call onDone
-        if (i === steps.length - 1) setTimeout(onDone, 500);
-      }, step.delay);
-    });
-  }
-
-  // ── Algorithm implementations ────────────────────────────────────
-
-  function jaroWinkler(s1, s2) {
-    if (s1 === s2) return 1;
-    const len1 = s1.length, len2 = s2.length;
-    const maxDist = Math.floor(Math.max(len1, len2) / 2) - 1;
-    const match1 = new Array(len1).fill(false);
-    const match2 = new Array(len2).fill(false);
-    let matches = 0, transpositions = 0;
-
-    for (let i = 0; i < len1; i++) {
-      const start = Math.max(0, i - maxDist);
-      const end = Math.min(i + maxDist + 1, len2);
-      for (let j = start; j < end; j++) {
-        if (match2[j] || s1[i] !== s2[j]) continue;
-        match1[i] = match2[j] = true;
-        matches++;
-        break;
-      }
-    }
-    if (matches === 0) return 0;
-
-    let k = 0;
-    for (let i = 0; i < len1; i++) {
-      if (!match1[i]) continue;
-      while (!match2[k]) k++;
-      if (s1[i] !== s2[k]) transpositions++;
-      k++;
-    }
-
-    const jaro = (matches / len1 + matches / len2 + (matches - transpositions / 2) / matches) / 3;
-    let prefix = 0;
-    for (let i = 0; i < Math.min(4, Math.min(len1, len2)); i++) {
-      if (s1[i] === s2[i]) prefix++;
-      else break;
-    }
-    return jaro + prefix * 0.1 * (1 - jaro);
-  }
-
-  function damerauLevenshtein(s1, s2) {
-    const len1 = s1.length, len2 = s2.length;
-    const d = Array.from({length: len1 + 1}, () => new Array(len2 + 1).fill(0));
-    for (let i = 0; i <= len1; i++) d[i][0] = i;
-    for (let j = 0; j <= len2; j++) d[0][j] = j;
-
-    for (let i = 1; i <= len1; i++) {
-      for (let j = 1; j <= len2; j++) {
-        const cost = s1[i-1] === s2[j-1] ? 0 : 1;
-        d[i][j] = Math.min(
-          d[i-1][j] + 1,
-          d[i][j-1] + 1,
-          d[i-1][j-1] + cost
-        );
-        if (i > 1 && j > 1 && s1[i-1] === s2[j-2] && s1[i-2] === s2[j-1]) {
-          d[i][j] = Math.min(d[i][j], d[i-2][j-2] + cost);
-        }
-      }
-    }
-    return d[len1][len2];
-  }
-
-  function diceCoefficient(s1, s2) {
-    if (s1.length < 2 || s2.length < 2) return 0;
-    const bigrams1 = new Set();
-    const bigrams2 = new Set();
-    for (let i = 0; i < s1.length - 1; i++) bigrams1.add(s1.slice(i, i + 2));
-    for (let i = 0; i < s2.length - 1; i++) bigrams2.add(s2.slice(i, i + 2));
-    let intersection = 0;
-    bigrams1.forEach(b => { if (bigrams2.has(b)) intersection++; });
-    return (2 * intersection) / (bigrams1.size + bigrams2.size);
-  }
-
-  function tokenSortRatio(s1, s2) {
-    const sorted1 = s1.split(/\s+/).sort().join(' ');
-    const sorted2 = s2.split(/\s+/).sort().join(' ');
-    return jaroWinkler(sorted1, sorted2);
-  }
-
-  // ── HTTP Status Ticker ───────────────────────────────────────────
-  const TICKER_CODES = [
-    { code: '200 OK',                    cls: 's2xx' },
-    { code: '201 Created',               cls: 's2xx' },
-    { code: '204 No Content',            cls: 's2xx' },
-    { code: '206 Partial Content',       cls: 's2xx' },
-    { code: '301 Moved Permanently',     cls: 's3xx' },
-    { code: '304 Not Modified',          cls: 's3xx' },
-    { code: '400 Bad Request',           cls: 's4xx' },
-    { code: '401 Unauthorized',          cls: 's4xx' },
-    { code: '403 Forbidden',             cls: 's4xx' },
-    { code: '404 Not Found',             cls: 's4xx' },
-    { code: '409 Conflict',              cls: 's4xx' },
-    { code: '422 Unprocessable Entity',  cls: 's4xx' },
-    { code: '429 Too Many Requests',     cls: 's4xx' },
-    { code: '500 Internal Server Error', cls: 's5xx' },
-    { code: '502 Bad Gateway',           cls: 's5xx' },
-    { code: '503 Service Unavailable',   cls: 's5xx' },
-    { code: '504 Gateway Timeout',       cls: 's5xx' },
-  ];
-
-  const tickerTrack = document.getElementById('status-ticker-track');
-  if (tickerTrack) {
-    // Double the list for seamless infinite scroll
-    const items = [...TICKER_CODES, ...TICKER_CODES]
-      .map(({ code, cls }) =>
-        `<span class="status-ticker-item ${cls}">${code}</span>`)
-      .join('');
-    tickerTrack.innerHTML = items;
-  }
-
-  // ── x-response-time header ───────────────────────────────────────
-  const rtEl = document.getElementById('hero-response-time');
-  if (rtEl) {
-    const paint = performance.getEntriesByType('navigation')[0];
-    const ms = paint
-      ? Math.round(paint.domContentLoadedEventEnd - paint.startTime)
-      : Math.round(performance.now());
-    // Reveal after hero types in
-    setTimeout(() => { rtEl.textContent = ms + 'ms'; }, 3800);
-  }
-
-
-  // ── Page title follows scroll ─────────────────────────────────────
-  const sectionTitles = {
-    'overview':        'Overview',
-    'experience':      'GET /experience',
-    'skills':          'GET /skills',
-    'validator':       'POST /validate/pan-name',
-    'recommendations': 'GET /recommendations',
-    'education':       'GET /education',
-  };
-  const baseTitle = 'deepanshu-kumar.dev';
-
-  const titleObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const label = sectionTitles[entry.target.id];
-        document.title = label ? `${label} — ${baseTitle}` : baseTitle;
-      }
-    });
-  }, { threshold: 0.3 });
-
-  Object.keys(sectionTitles).forEach(id => {
-    const el = document.getElementById(id);
-    if (el) titleObserver.observe(el);
-  });
-
-
-  // ── Skills as latency ─────────────────────────────────────────────
-  document.querySelectorAll('.skill-tag[data-ms]').forEach(tag => {
-    const ms = parseInt(tag.dataset.ms);
-    // colour tier
-    tag.classList.remove('skill-tag--primary');
-    if (ms < 20)       tag.classList.add('skill-lat--fast');
-    else if (ms < 60)  tag.classList.add('skill-lat--mid');
-    else               tag.classList.add('skill-lat--slow');
-
-    // tooltip on hover
-    tag.setAttribute('title', `${ms}ms`);
-    tag.addEventListener('mouseenter', function() {
-      let tip = this.querySelector('.lat-tip');
-      if (!tip) {
-        tip = document.createElement('span');
-        tip.className = 'lat-tip';
-        this.appendChild(tip);
-      }
-      tip.textContent = ms + 'ms';
-    });
-    tag.addEventListener('mouseleave', function() {
-      this.querySelector('.lat-tip')?.remove();
-    });
-  });
-
-
-  // ── Command Palette ───────────────────────────────────────────────
-  const cmdBackdrop = document.getElementById('cmd-backdrop');
-  const cmdPalette  = document.getElementById('cmd-palette');
-  const cmdInput    = document.getElementById('cmd-input');
-  const cmdResults  = document.getElementById('cmd-results');
-
-  const CMD_ITEMS = [
-    { label: 'Overview',               sub: 'Introduction',              id: 'overview',        icon: '◉' },
-    { label: 'GET /experience',        sub: 'Work history',              id: 'experience',      icon: 'GET' },
-    { label: 'GET /skills/technical',  sub: 'Tech stack & tools',        id: 'skills',          icon: 'GET', tab: 'technical' },
-    { label: 'GET /skills/soft',       sub: 'Soft skills with proof',    id: 'skills',          icon: 'GET', tab: 'soft' },
-    { label: 'POST /validate/pan-name',sub: 'Live fuzzy name demo',      id: 'validator',       icon: 'POST' },
-    { label: 'GET /recommendations',   sub: 'Peer & manager recs',       id: 'recommendations', icon: 'GET' },
-    { label: 'GET /education',         sub: 'Academic credentials',      id: 'education',       icon: 'GET' },
-    { label: 'Download Resume',        sub: 'Deepanshu_Kumar_Resume.pdf',href: 'Deepanshu_Kumar_Resume.pdf', icon: '↓', download: true },
-    { label: 'Email',                  sub: 'Deepanshu.Kumar@Outlook.in',href: 'mailto:Deepanshu.Kumar@Outlook.in', icon: '✉' },
-    { label: 'GitHub',                 sub: 'Dev-Deepanshu-Kumar',       href: 'https://github.com/Dev-Deepanshu-Kumar', icon: '◈' },
-    { label: 'LinkedIn',               sub: 'deepanshu-kumar-dev',       href: 'https://linkedin.com/in/deepanshu-kumar-dev', icon: '⬡' },
-    { label: 'API: portfolio.json',    sub: 'curl this site',            href: '/api/portfolio.json', icon: '{}' },
-  ];
-
-  window.openPalette = function() {
-    cmdPalette.classList.add('open');
-    cmdBackdrop.classList.add('open');
-    cmdInput.value = '';
-    renderCmdResults('');
-    setTimeout(() => cmdInput.focus(), 50);
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closePalette() {
-    cmdPalette.classList.remove('open');
-    cmdBackdrop.classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  function renderCmdResults(query) {
-    const q = query.toLowerCase().trim();
-    const filtered = q
-      ? CMD_ITEMS.filter(i =>
-          i.label.toLowerCase().includes(q) ||
-          i.sub.toLowerCase().includes(q))
-      : CMD_ITEMS;
-
-    if (!filtered.length) {
-      cmdResults.innerHTML = '<div class="cmd-empty">No results</div>';
-      return;
-    }
-
-    cmdResults.innerHTML = filtered.map((item, idx) => {
-      const isGet  = item.icon === 'GET';
-      const isPost = item.icon === 'POST';
-      const iconCls = isGet ? 'cmd-icon cmd-icon--get' : isPost ? 'cmd-icon cmd-icon--post' : 'cmd-icon';
-      return `<div class="cmd-item" data-idx="${idx}" data-original-idx="${CMD_ITEMS.indexOf(item)}">
-        <span class="${iconCls}">${item.icon}</span>
-        <span class="cmd-item-label">${item.label}</span>
-        <span class="cmd-item-sub">${item.sub}</span>
-        <span class="cmd-enter">↵</span>
-      </div>`;
-    }).join('');
-
-    // activate first
-    cmdResults.querySelector('.cmd-item')?.classList.add('active');
-
-    // click handler
-    cmdResults.querySelectorAll('.cmd-item').forEach(el => {
-      el.addEventListener('click', () => executeCmdItem(CMD_ITEMS[parseInt(el.dataset.originalIdx)]));
-      el.addEventListener('mouseenter', () => {
-        cmdResults.querySelectorAll('.cmd-item').forEach(e => e.classList.remove('active'));
-        el.classList.add('active');
-      });
-    });
-  }
-
-  function executeCmdItem(item) {
-    closePalette();
-    if (item.href) {
-      if (item.download) {
-        const a = document.createElement('a');
-        a.href = item.href; a.download = ''; a.click();
-      } else {
-        window.open(item.href, item.href.startsWith('http') ? '_blank' : '_self');
-      }
-      return;
-    }
-    if (item.id) {
-      const el = document.getElementById(item.id);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        if (item.tab) setTimeout(() => switchSkillTab(item.tab, null), 400);
-      }
-    }
-  }
-
-  cmdInput.addEventListener('input', e => renderCmdResults(e.target.value));
-
-  cmdInput.addEventListener('keydown', e => {
-    const items = [...cmdResults.querySelectorAll('.cmd-item')];
-    const activeIdx = items.findIndex(i => i.classList.contains('active'));
-    if (e.key === 'ArrowDown') {
-      e.preventDefault();
-      const next = items[(activeIdx + 1) % items.length];
-      items.forEach(i => i.classList.remove('active'));
-      next?.classList.add('active');
-      next?.scrollIntoView({ block: 'nearest' });
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      const prev = items[(activeIdx - 1 + items.length) % items.length];
-      items.forEach(i => i.classList.remove('active'));
-      prev?.classList.add('active');
-      prev?.scrollIntoView({ block: 'nearest' });
-    } else if (e.key === 'Enter') {
-      const active = cmdResults.querySelector('.cmd-item.active');
-      if (active) executeCmdItem(CMD_ITEMS[parseInt(active.dataset.originalIdx)]);
-    } else if (e.key === 'Escape') {
-      closePalette();
-    }
-  });
-
-  cmdBackdrop.addEventListener('click', closePalette);
-
-  // trigger: / key or Ctrl+K
-  document.addEventListener('keydown', e => {
-    const tag = document.activeElement.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-    if (e.key === '/' || (e.ctrlKey && e.key === 'k')) {
-      e.preventDefault();
-      cmdPalette.classList.contains('open') ? closePalette() : openPalette();
-    }
-    if (e.key === 'Escape') closePalette();
-  });
-
-  // hint in topbar — press / to search
-  const topbarRight = document.querySelector('.topbar-right');
-  if (topbarRight) {
-    const hint = document.createElement('button');
-    hint.className = 'cmd-topbar-hint';
-    hint.innerHTML = '<span class="cmd-hint-slash">/</span> search';
-    hint.onclick = openPalette;
-    topbarRight.insertBefore(hint, topbarRight.firstChild);
-  }
-
-
-  // ── Lightbox ──────────────────────────────────────────────────────
-  const lightbox    = document.getElementById('lightbox');
-  const lightboxImg = document.getElementById('lightbox-img');
-  const lightboxClose = document.getElementById('lightbox-close');
-
-  function openLightbox(src, alt) {
-    lightboxImg.src = src;
-    lightboxImg.alt = alt || '';
-    lightbox.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeLightbox() {
-    lightbox.classList.remove('open');
-    document.body.style.overflow = '';
-    // clear src after transition so old image doesn't flash on reopen
-    setTimeout(() => { lightboxImg.src = ''; }, 260);
-  }
-
-  lightboxClose.addEventListener('click', closeLightbox);
-  lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
-
-  // delegate: any img with data-zoomable OR inside .rec-proof-img / .recog-screenshot-item
-  document.addEventListener('click', e => {
-    const img = e.target.closest('img.rec-proof-img, .recog-screenshot-item img');
-    if (img) openLightbox(img.src, img.alt);
-  });
-
-  // ── Open Siemens recognition from soft-skills ────────────────────
-  window.openExperienceRecognition = function(e) {
-    e.preventDefault();
-
-    // Find the Siemens json-object (first one in #experience)
-    const experienceSection = document.getElementById('experience');
-    const siemensBlock = experienceSection.querySelector('.json-object');
-
-    // Expand Siemens block if not already open
-    if (!siemensBlock.classList.contains('expanded')) {
-      siemensBlock.classList.add('expanded');
-    }
-
-    // Find the recognition nested field inside it
-    const recogField = siemensBlock.querySelector('.json-field--collapsible');
-
-    // Expand recognition if not already open
-    if (recogField && !recogField.classList.contains('expanded')) {
-      recogField.classList.add('expanded');
-    }
-
-    // Scroll to the recognition field after a short delay (let DOM expand)
-    setTimeout(() => {
-      if (recogField) {
-        recogField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 80);
-  };
-
-  // ── Recommendation LinkedIn proof toggle ─────────────────────────
-  window.toggleRecProof = function(btn) {
-    const collapse = btn.nextElementSibling;
-    const isOpen = collapse.classList.toggle('rec-proof-collapse--open');
-    btn.setAttribute('aria-expanded', isOpen);
-    btn.classList.toggle('rec-proof-btn--open', isOpen);
-    const arrow = btn.querySelector('.rec-proof-arrow');
-    if (arrow) arrow.textContent = isOpen ? '↓' : '→';
-  };
-
-  // ── Recognition proof toggle ──────────────────────────────────────
-  window.toggleProof = function(btn) {
-    const strip = document.getElementById('recog-proof-strip');
-    if (!strip) return;
-    const isOpen = strip.classList.toggle('recog-proof-strip--open');
-    btn.classList.toggle('recog-proof-btn--open', isOpen);
-    const arrow = btn.querySelector('.recog-proof-arrow');
-    if (arrow) arrow.textContent = isOpen ? '↓' : '→';
-  };
-
-  // ── Timeline bar — proportional widths from real dates ──────────
-  //
-  // To add a new org: add an entry to TIMELINE_PERIODS, add a
-  // .timeline-segment--<key> CSS rule for the colour, and add a
-  // <div class="timeline-segment timeline-segment--<key>" data-key="<key>">
-  // in the HTML.  Widths update automatically on next load.
-  //
-  const TIMELINE_PERIODS = [
-    { key: 'telebu',     start: new Date(2019, 11, 1), end: new Date(2020, 11, 31), label: 'Telebu',     color: '#a78bfa' },
-    { key: 'gap',        start: new Date(2021,  0, 1), end: new Date(2022,  2, 31), label: 'Career break', color: null },
-    { key: 'indialends', start: new Date(2022,  3, 1), end: new Date(2023, 11, 31), label: 'IndiaLends', color: 'var(--color-gold)' },
-    { key: 'siemens',    start: new Date(2024,  0, 1), end: null,                   label: 'Siemens',    color: 'var(--color-accent)' },
-  ];
-
-  function initTimeline() {
-    const bar    = document.getElementById('timeline-bar');
-    const gapZzz = document.getElementById('gap-zzz');
-    if (!bar) return;
-
-    const now    = new Date();
-    const total  = TIMELINE_PERIODS.reduce((sum, p) => {
-      const end = p.end || now;
-      return sum + (end - p.start);
-    }, 0);
-
-    let gapOffsetPct  = 0;
-    let gapWidthPct   = 0;
-    let accumulated   = 0;
-
-    TIMELINE_PERIODS.forEach(p => {
-      const seg = bar.querySelector(`[data-key="${p.key}"]`);
-      if (!seg) return;
-      const end      = p.end || now;
-      const duration = end - p.start;
-      const pct      = (duration / total) * 100;
-
-      seg.style.flex = `0 0 ${pct.toFixed(3)}%`;
-
-      const months = Math.round(duration / (1000 * 60 * 60 * 24 * 30.44));
-      const label  = p.end
-        ? `${p.label} · ${_fmtDate(p.start)} – ${_fmtDate(p.end)} · ${months}mo`
-        : `${p.label} · ${_fmtDate(p.start)} – Present · ${months}mo`;
-
-      if (p.key === 'gap') {
-        gapOffsetPct = (accumulated / total) * 100;
-        gapWidthPct  = pct;
-        seg.setAttribute('data-tooltip', `Career break · ${_fmtDate(p.start)} – ${_fmtDate(p.end)} — recalibrating`);
-        if (gapZzz) {
-          const tooltip = gapZzz.querySelector('.gap-tooltip');
-          if (tooltip) tooltip.textContent = `Career break · ${_fmtDate(p.start)} – ${_fmtDate(p.end)} — recalibrating`;
-        }
-      } else {
-        seg.setAttribute('title', label);
-      }
-
-      accumulated += duration;
-    });
-
-    // reposition zzz overlay to match gap segment exactly
-    if (gapZzz) {
-      gapZzz.style.left  = `${gapOffsetPct.toFixed(3)}%`;
-      gapZzz.style.width = `${gapWidthPct.toFixed(3)}%`;
-    }
-
-    // year markers
-    const yearsEl = document.getElementById('timeline-years');
-    if (yearsEl) {
-      const startYear = TIMELINE_PERIODS[0].start.getFullYear();
-      const endDate   = now;
-      const totalSpan = endDate - TIMELINE_PERIODS[0].start;
-      const endYear   = endDate.getFullYear();
-      let html = '';
-
-      for (let yr = startYear; yr <= endYear; yr++) {
-        const d   = new Date(yr, 0, 1);
-        const pct = ((d - TIMELINE_PERIODS[0].start) / totalSpan) * 100;
-        if (pct < 0 || pct > 100) continue;
-        const isNow = yr === endYear;
-        const left  = isNow ? '100%' : `${pct.toFixed(2)}%`;
-        const anchor = isNow ? 'translateX(-100%)' : 'translateX(-50%)';
-        html += `<span class="timeline-year${isNow ? ' timeline-year--now' : ''}"
-                       style="left:${left};transform:${anchor}">${isNow ? 'now' : yr}</span>`;
-      }
-      yearsEl.innerHTML = html;
-    }
-
-    // legend — most recent first, skip gap
-    const legend = document.getElementById('timeline-legend');
-    if (legend) {
-      const items = [...TIMELINE_PERIODS]
-        .filter(p => p.color)
-        .map(p => {
-          const suffix = !p.end ? ' (current)' : '';
-          return `<div class="timeline-legend-item">
-            <span class="timeline-legend-dot" style="background:${p.color}"></span>
-            ${p.label}${suffix}
-          </div>`;
-        });
-      legend.innerHTML = items.join('');
-    }
-  }
-
-  function _fmtDate(d) {
-    if (!d) return 'Present';
-    return d.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
-  }
-
-  initTimeline();
-
-  // ── Gap segment tooltip (tap on mobile, hover handled by CSS) ────
-  const gapSegment = document.querySelector('.timeline-segment--gap');
-  const gapZzz     = document.querySelector('.gap-zzz');
-  if (gapSegment && gapZzz) {
-    gapSegment.addEventListener('click', function(e) {
-      e.stopPropagation();
-      gapZzz.classList.toggle('tooltip-visible');
-    });
-    document.addEventListener('click', function() {
-      gapZzz.classList.remove('tooltip-visible');
-    });
-  }
-
-})();
+    `}),n(Q,K,()=>{clearInterval(Be),De()})};function n(e,t,s){e.forEach((a,y)=>{setTimeout(()=>{t.insertAdjacentHTML("beforeend",a.html),t.scrollTop=t.scrollHeight,t.querySelectorAll(".trace-bar-fill").forEach(S=>{const B=S.style.width;S.style.width="0",requestAnimationFrame(()=>S.style.width=B)}),y===e.length-1&&setTimeout(s,500)},a.delay)})}function l(e,t){if(e===t)return 1;const s=e.length,a=t.length,y=Math.floor(Math.max(s,a)/2)-1,c=new Array(s).fill(!1),S=new Array(a).fill(!1);let B=0,K=0;for(let $=0;$<s;$++){const le=Math.max(0,$-y),U=Math.min($+y+1,a);for(let H=le;H<U;H++)if(!(S[H]||e[$]!==t[H])){c[$]=S[H]=!0,B++;break}}if(B===0)return 0;let ee=0;for(let $=0;$<s;$++)if(c[$]){for(;!S[ee];)ee++;e[$]!==t[ee]&&K++,ee++}const z=(B/s+B/a+(B-K/2)/B)/3;let te=0;for(let $=0;$<Math.min(4,Math.min(s,a))&&e[$]===t[$];$++)te++;return z+te*.1*(1-z)}function u(e,t){const s=e.length,a=t.length,y=Array.from({length:s+1},()=>new Array(a+1).fill(0));for(let c=0;c<=s;c++)y[c][0]=c;for(let c=0;c<=a;c++)y[0][c]=c;for(let c=1;c<=s;c++)for(let S=1;S<=a;S++){const B=e[c-1]===t[S-1]?0:1;y[c][S]=Math.min(y[c-1][S]+1,y[c][S-1]+1,y[c-1][S-1]+B),c>1&&S>1&&e[c-1]===t[S-2]&&e[c-2]===t[S-1]&&(y[c][S]=Math.min(y[c][S],y[c-2][S-2]+B))}return y[s][a]}function r(e,t){if(e.length<2||t.length<2)return 0;const s=new Set,a=new Set;for(let c=0;c<e.length-1;c++)s.add(e.slice(c,c+2));for(let c=0;c<t.length-1;c++)a.add(t.slice(c,c+2));let y=0;return s.forEach(c=>{a.has(c)&&y++}),2*y/(s.size+a.size)}function h(e,t){const s=e.split(/\s+/).sort().join(" "),a=t.split(/\s+/).sort().join(" ");return l(s,a)}const f=[{code:"200 OK",cls:"s2xx"},{code:"201 Created",cls:"s2xx"},{code:"204 No Content",cls:"s2xx"},{code:"206 Partial Content",cls:"s2xx"},{code:"301 Moved Permanently",cls:"s3xx"},{code:"304 Not Modified",cls:"s3xx"},{code:"400 Bad Request",cls:"s4xx"},{code:"401 Unauthorized",cls:"s4xx"},{code:"403 Forbidden",cls:"s4xx"},{code:"404 Not Found",cls:"s4xx"},{code:"409 Conflict",cls:"s4xx"},{code:"422 Unprocessable Entity",cls:"s4xx"},{code:"429 Too Many Requests",cls:"s4xx"},{code:"500 Internal Server Error",cls:"s5xx"},{code:"502 Bad Gateway",cls:"s5xx"},{code:"503 Service Unavailable",cls:"s5xx"},{code:"504 Gateway Timeout",cls:"s5xx"}],x=document.getElementById("status-ticker-track");if(x){const e=[...f,...f].map(({code:t,cls:s})=>`<span class="status-ticker-item ${s}">${t}</span>`).join("");x.innerHTML=e}const v=document.getElementById("hero-response-time");if(v){const e=performance.getEntriesByType("navigation")[0],t=Math.round(e?e.domContentLoadedEventEnd-e.startTime:performance.now());setTimeout(()=>{v.textContent=t+"ms"},3800)}const j={overview:"Overview",experience:"GET /experience",skills:"GET /skills",validator:"POST /validate/pan-name",recommendations:"GET /recommendations",education:"GET /education"},O="deepanshu-kumar.dev",k=new IntersectionObserver(e=>{e.forEach(t=>{if(t.isIntersecting){const s=j[t.target.id];document.title=s?`${s} \u2014 ${O}`:O}})},{threshold:.3});Object.keys(j).forEach(e=>{const t=document.getElementById(e);t&&k.observe(t)}),document.querySelectorAll(".skill-tag[data-ms]").forEach(e=>{const t=parseInt(e.dataset.ms);e.classList.remove("skill-tag--primary"),t<20?e.classList.add("skill-lat--fast"):t<60?e.classList.add("skill-lat--mid"):e.classList.add("skill-lat--slow"),e.setAttribute("title",`${t}ms`),e.addEventListener("mouseenter",function(){let s=this.querySelector(".lat-tip");s||(s=document.createElement("span"),s.className="lat-tip",this.appendChild(s)),s.textContent=t+"ms"}),e.addEventListener("mouseleave",function(){this.querySelector(".lat-tip")?.remove()})});const re=document.getElementById("cmd-backdrop"),ge=document.getElementById("cmd-palette"),ve=document.getElementById("cmd-input"),V=document.getElementById("cmd-results"),X=[{label:"Overview",sub:"Introduction",id:"overview",icon:"\u25C9"},{label:"GET /experience",sub:"Work history",id:"experience",icon:"GET"},{label:"GET /skills/technical",sub:"Tech stack & tools",id:"skills",icon:"GET",tab:"technical"},{label:"GET /skills/soft",sub:"Soft skills with proof",id:"skills",icon:"GET",tab:"soft"},{label:"POST /validate/pan-name",sub:"Live fuzzy name demo",id:"validator",icon:"POST"},{label:"GET /recommendations",sub:"Peer & manager recs",id:"recommendations",icon:"GET"},{label:"GET /education",sub:"Academic credentials",id:"education",icon:"GET"},{label:"Download Resume",sub:"Deepanshu_Kumar_Resume.pdf",href:"Deepanshu_Kumar_Resume.pdf",icon:"\u2193",download:!0},{label:"Email",sub:"Deepanshu.Kumar@Outlook.in",href:"mailto:Deepanshu.Kumar@Outlook.in",icon:"\u2709"},{label:"GitHub",sub:"Dev-Deepanshu-Kumar",href:"https://github.com/Dev-Deepanshu-Kumar",icon:"\u25C8"},{label:"LinkedIn",sub:"deepanshu-kumar-dev",href:"https://linkedin.com/in/deepanshu-kumar-dev",icon:"\u2B21"},{label:"API: portfolio.json",sub:"curl this site",href:"/api/portfolio.json",icon:"{}"}];window.openPalette=function(){ge.classList.add("open"),re.classList.add("open"),ve.value="",G(""),setTimeout(()=>ve.focus(),50),document.body.style.overflow="hidden"};function fe(){ge.classList.remove("open"),re.classList.remove("open"),document.body.style.overflow=""}function G(e){const t=e.toLowerCase().trim(),s=t?X.filter(a=>a.label.toLowerCase().includes(t)||a.sub.toLowerCase().includes(t)):X;if(!s.length){V.innerHTML='<div class="cmd-empty">No results</div>';return}V.innerHTML=s.map((a,y)=>{const c=a.icon==="GET",S=a.icon==="POST",B=c?"cmd-icon cmd-icon--get":S?"cmd-icon cmd-icon--post":"cmd-icon";return`<div class="cmd-item" data-idx="${y}" data-original-idx="${X.indexOf(a)}">
+        <span class="${B}">${a.icon}</span>
+        <span class="cmd-item-label">${a.label}</span>
+        <span class="cmd-item-sub">${a.sub}</span>
+        <span class="cmd-enter">\u21B5</span>
+      </div>`}).join(""),V.querySelector(".cmd-item")?.classList.add("active"),V.querySelectorAll(".cmd-item").forEach(a=>{a.addEventListener("click",()=>_(X[parseInt(a.dataset.originalIdx)])),a.addEventListener("mouseenter",()=>{V.querySelectorAll(".cmd-item").forEach(y=>y.classList.remove("active")),a.classList.add("active")})})}function _(e){if(fe(),e.href){if(e.download){const t=document.createElement("a");t.href=e.href,t.download="",t.click()}else window.open(e.href,e.href.startsWith("http")?"_blank":"_self");return}if(e.id){const t=document.getElementById(e.id);t&&(t.scrollIntoView({behavior:"smooth",block:"start"}),e.tab&&setTimeout(()=>switchSkillTab(e.tab,null),400))}}ve.addEventListener("input",e=>G(e.target.value)),ve.addEventListener("keydown",e=>{const t=[...V.querySelectorAll(".cmd-item")],s=t.findIndex(a=>a.classList.contains("active"));if(e.key==="ArrowDown"){e.preventDefault();const a=t[(s+1)%t.length];t.forEach(y=>y.classList.remove("active")),a?.classList.add("active"),a?.scrollIntoView({block:"nearest"})}else if(e.key==="ArrowUp"){e.preventDefault();const a=t[(s-1+t.length)%t.length];t.forEach(y=>y.classList.remove("active")),a?.classList.add("active"),a?.scrollIntoView({block:"nearest"})}else if(e.key==="Enter"){const a=V.querySelector(".cmd-item.active");a&&_(X[parseInt(a.dataset.originalIdx)])}else e.key==="Escape"&&fe()}),re.addEventListener("click",fe),document.addEventListener("keydown",e=>{const t=document.activeElement.tagName;t==="INPUT"||t==="TEXTAREA"||((e.key==="/"||e.ctrlKey&&e.key==="k")&&(e.preventDefault(),ge.classList.contains("open")?fe():openPalette()),e.key==="Escape"&&fe())});const we=document.querySelector(".topbar-right");if(we){const e=document.createElement("button");e.className="cmd-topbar-hint",e.innerHTML='<span class="cmd-hint-slash">/</span> search',e.onclick=openPalette,we.insertBefore(e,we.firstChild)}const ye=document.getElementById("lightbox"),Se=document.getElementById("lightbox-img"),Ne=document.getElementById("lightbox-close");function Ce(e,t){Se.src=e,Se.alt=t||"",ye.classList.add("open"),document.body.style.overflow="hidden"}function Ee(){ye.classList.remove("open"),document.body.style.overflow="",setTimeout(()=>{Se.src=""},260)}Ne.addEventListener("click",Ee),ye.addEventListener("click",e=>{e.target===ye&&Ee()}),document.addEventListener("keydown",e=>{e.key==="Escape"&&Ee()}),document.addEventListener("click",e=>{const t=e.target.closest("img.rec-proof-img, .recog-screenshot-item img");t&&Ce(t.src,t.alt)}),window.openExperienceRecognition=function(e){e.preventDefault();const s=document.getElementById("experience").querySelector(".json-object");s.classList.contains("expanded")||s.classList.add("expanded");const a=s.querySelector(".json-field--collapsible");a&&!a.classList.contains("expanded")&&a.classList.add("expanded"),setTimeout(()=>{a&&a.scrollIntoView({behavior:"smooth",block:"center"})},80)},window.toggleRecProof=function(e){const s=e.nextElementSibling.classList.toggle("rec-proof-collapse--open");e.setAttribute("aria-expanded",s),e.classList.toggle("rec-proof-btn--open",s);const a=e.querySelector(".rec-proof-arrow");a&&(a.textContent=s?"\u2193":"\u2192")},window.toggleProof=function(e){const t=document.getElementById("recog-proof-strip");if(!t)return;const s=t.classList.toggle("recog-proof-strip--open");e.classList.toggle("recog-proof-btn--open",s);const a=e.querySelector(".recog-proof-arrow");a&&(a.textContent=s?"\u2193":"\u2192")}})(),(function(){"use strict";const T={"C#":{synopsis:"Primary language \xB7 5+ years daily",usage:"All backend services, APIs, shared libraries, Azure Functions",where:"Siemens, IndiaLends, Telebu",see:"ASP.NET Core, .NET Core, LINQ"},SQL:{synopsis:"Query language for relational databases",usage:"Stored procedures, query optimization, migrations, reporting",where:"All companies \u2014 SQL Server primary",see:"T-SQL, Dapper, EF Core"},JavaScript:{synopsis:"Frontend & scripting",usage:"jQuery UI components, Azure Function triggers, this portfolio",where:"IndiaLends (frontend), Siemens (DevExpress)",see:"jQuery, Vue.js"},"ASP.NET Core":{synopsis:"Web framework for .NET",usage:"REST APIs, Minimal APIs, MVC endpoints, middleware pipelines",where:"Siemens (dashboard satellite, P&S microservice)",see:"Minimal APIs, REST, OIDC"},".NET Core":{synopsis:"Cross-platform runtime",usage:"All new services since 2022, shared libraries, container targets",where:"Siemens, IndiaLends",see:"ASP.NET Core, Docker"},"Minimal APIs":{synopsis:".NET 8 lightweight API pattern",usage:"Dashboard satellite service, P&S microservice endpoints",where:"Siemens \u2014 new services",see:"ASP.NET Core, REST"},REST:{synopsis:"API design pattern",usage:"All service interfaces \u2014 resource-oriented, versioned, documented",where:"All companies",see:"Swagger/OpenAPI, JSON"},"CQRS / MediatR":{synopsis:"Command/Query separation + mediator",usage:"P&S microservice \u2014 separate read/write models",where:"Siemens",see:"DDD, Clean Architecture"},DDD:{synopsis:"Domain-Driven Design",usage:"Aggregate design, bounded contexts, ubiquitous language in P&S service",where:"Siemens (P&S microservice)",see:"Clean Architecture, CQRS"},"Clean Architecture":{synopsis:"Layered dependency inversion",usage:"Service structure: Domain \u2192 Application \u2192 Infrastructure \u2192 API",where:"Siemens \u2014 all new services",see:"DDD, CQRS / MediatR"},Microservices:{synopsis:"Independently deployable services",usage:"Dashboard satellite (Strangler Fig), P&S service, credential service",where:"Siemens \u2014 platform modernisation",see:"Docker, REST, DDD"},BDD:{synopsis:"Behaviour-Driven Development",usage:"SpecFlow/ReqnRoll scenarios, Given-When-Then test structure",where:"Siemens \u2014 all new services",see:"NUnit, SpecFlow, Moq"},"Azure Functions":{synopsis:"Serverless compute",usage:"HTTP triggers (webhooks), Queue/Blob/Timer triggers for async workflows",where:"IndiaLends \u2014 document processing, scheduled reports",see:"Service Bus, Blob Storage"},"Entity Framework":{synopsis:"ORM for .NET (EF6 legacy)",usage:"Existing monolith data access layer \u2014 170+ project codebase",where:"Siemens (legacy platform)",see:"EF Core, Dapper, LINQ"},"EF Core":{synopsis:"Modern ORM for .NET Core",usage:"New service data layers, migrations, code-first models",where:"Siemens (new services)",see:"Dapper, LINQ, PostgreSQL"},Dapper:{synopsis:"Micro-ORM \u2014 raw SQL performance",usage:"Replaced EF for dashboard \u2014 3x faster queries via stored procs",where:"Siemens (dashboard optimization)",see:"T-SQL, SQL Server"},LINQ:{synopsis:"Language-integrated query",usage:"Collection transformations, EF queries, data pipeline operations",where:"All companies",see:"EF Core, C#"},"T-SQL":{synopsis:"SQL Server dialect",usage:"Stored procedures, views, performance tuning, index optimization",where:"Siemens, IndiaLends",see:"SQL Server, Dapper"},"SQL Server":{synopsis:"Primary relational database",usage:"Multi-tenant schemas, stored procs, maintenance jobs, Always On AG",where:"Siemens, IndiaLends",see:"T-SQL, Dapper, EF Core"},PostgreSQL:{synopsis:"Open-source relational DB",usage:"New microservice data stores, container-friendly deployments",where:"Siemens (new services)",see:"EF Core, Docker"},Redis:{synopsis:"In-memory cache / data store",usage:"Session caching, credential caching (shared library), distributed lock",where:"Siemens (shared NuGet library)",see:"AWS Secrets Manager, Resiliency"},"Azure App Service":{synopsis:"PaaS web hosting",usage:"Production deployment target for monolith and satellites",where:"Siemens, IndiaLends",see:"Docker, Azure DevOps"},"Service Bus":{synopsis:"Enterprise message broker",usage:"Async event-driven workflows, decoupled service communication",where:"IndiaLends (financial workflows)",see:"Azure Functions, Queue triggers"},"Blob Storage":{synopsis:"Azure object storage",usage:"Document storage, report generation output, file upload handling",where:"IndiaLends",see:"Azure Functions"},"AWS Secrets Manager":{synopsis:"Cloud secret management",usage:"Secure DB credential resolution, region-aware rotation in shared library",where:"Siemens (container migration)",see:"Redis, Resiliency Patterns"},Docker:{synopsis:"Container runtime",usage:"Local dev environments, Linux container targets for platform migration",where:"Siemens (Windows\u2192Linux migration)",see:"Microservices, .NET Core"},"OIDC / OAuth2":{synopsis:"Auth protocol standards",usage:"Enterprise SSO integration, token validation middleware",where:"Siemens (Auth0 ecosystem)",see:"JWT, Auth0, Cookie Auth"},JWT:{synopsis:"JSON Web Tokens",usage:"API authentication, claims-based authorization, token refresh flows",where:"Siemens, IndiaLends",see:"OIDC, Auth0"},Auth0:{synopsis:"Identity platform",usage:"Centralised auth service, tenant isolation, session management",where:"Siemens",see:"OIDC, JWT"},"VAPT Remediation":{synopsis:"Vulnerability & Penetration Testing fixes",usage:"Remediated findings from security assessments \u2014 XSS, CSRF, injection",where:"IndiaLends",see:"Auth, Security"},"Azure DevOps":{synopsis:"CI/CD + project management",usage:"Build pipelines, release gates, Azure Repos, work items",where:"IndiaLends, Siemens (boards)",see:"Jenkins, TeamCity"},Jenkins:{synopsis:"CI/CD automation server",usage:"Production release pipelines, automated testing gates",where:"Siemens",see:"TeamCity, SonarQube"},TeamCity:{synopsis:"JetBrains CI/CD",usage:"Build configurations, NuGet package publishing to MyGet",where:"Siemens",see:"Jenkins, MyGet"},SonarQube:{synopsis:"Static code analysis",usage:"Code quality gates \u2014 coverage, duplication, complexity, vulnerabilities",where:"Siemens (CI pipeline)",see:"Snyk, Jenkins"},Snyk:{synopsis:"Dependency vulnerability scanning",usage:"NuGet package security, container image scanning in CI",where:"Siemens",see:"SonarQube, Docker"},Grafana:{synopsis:"Observability dashboards",usage:"Production monitoring \u2014 API latency, error rates, resource usage",where:"Siemens (production)",see:"Datadog"},Datadog:{synopsis:"APM & monitoring platform",usage:"Distributed tracing, log aggregation, alerting on production issues",where:"Siemens",see:"Grafana"},NUnit:{synopsis:"Unit testing framework",usage:"All unit + integration tests, parameterized test cases",where:"Siemens",see:"Moq, SpecFlow"},SpecFlow:{synopsis:"BDD framework for .NET",usage:"Given-When-Then feature files, stakeholder-readable test specs",where:"Siemens",see:"ReqnRoll, NUnit"},ReqnRoll:{synopsis:"SpecFlow successor (OSS)",usage:"Migration from SpecFlow, new BDD scenarios post-2024",where:"Siemens (new services)",see:"SpecFlow, NUnit"},Moq:{synopsis:"Mocking framework",usage:"Dependency isolation in unit tests, verify interactions",where:"Siemens",see:"NUnit, BDD"}};document.querySelectorAll(".skill-tag").forEach(D=>{D.style.cursor="pointer",D.addEventListener("click",()=>{document.querySelectorAll(".skill-tag.selected").forEach(o=>o.classList.remove("selected")),D.classList.add("selected"),bumpRequest("GET");const b=[...D.childNodes].filter(o=>o.nodeType===Node.TEXT_NODE).map(o=>o.textContent).join("").trim(),E=T[b],A=document.getElementById("skill-terminal"),m=document.getElementById("skill-terminal-title"),d=document.getElementById("skill-terminal-body");if(!E){m.textContent=`$ man ${b.toLowerCase().replace(/[^a-z0-9]/g,"-")}`,d.innerHTML=`<span class="man-dim">No manual entry for ${b}</span>`,A.classList.add("active");return}m.textContent=`$ man ${b.toLowerCase().replace(/[^a-z0-9]/g,"-")}`,d.innerHTML=`
+        <div class="man-section">
+          <div class="man-heading">NAME</div>
+          <div class="man-content">${b}</div>
+        </div>
+        <div class="man-section">
+          <div class="man-heading">SYNOPSIS</div>
+          <div class="man-content">${E.synopsis}</div>
+        </div>
+        <div class="man-section">
+          <div class="man-heading">USAGE</div>
+          <div class="man-content man-content--gold">${E.usage}</div>
+        </div>
+        <div class="man-section">
+          <div class="man-heading">WHERE</div>
+          <div class="man-content man-content--green">${E.where}</div>
+        </div>
+        <div class="man-section">
+          <div class="man-heading">SEE ALSO</div>
+          <div class="man-content man-ref">${E.see}</div>
+        </div>
+      `,A.classList.add("active"),A.scrollIntoView({behavior:"smooth",block:"nearest"})})})})(),(function(){"use strict";window.runValidator=function(){const m=document.getElementById("vld-name1").value.trim(),d=document.getElementById("vld-name2").value.trim(),o=parseInt(document.getElementById("vld-threshold").value)||72,p=document.getElementById("vld-animate").checked,i=document.getElementById("vld-result"),n=document.getElementById("vld-status"),l=document.getElementById("vld-response-body"),u=document.getElementById("pipeline-trace"),r=document.getElementById("trace-body"),h=document.getElementById("trace-elapsed"),f=document.getElementById("vld-btn");if(bumpRequest("POST"),!m||!d){i.style.display="block",u.style.display="none",n.textContent="400 Bad Request",n.style.color="#f87171",l.textContent=JSON.stringify({error:"Both fields required",status:400},null,2);return}const x=m.toUpperCase(),v=d.toUpperCase(),j=/^(DR|MR|MRS|MS|SHRI|SMT|PROF)\.?\s+/i,O=x.replace(j,""),k=v.replace(j,""),re=x!==O||v!==k,ge={MD:"MOHAMMAD",MOHD:"MOHAMMAD",MHD:"MOHAMMAD",PT:"PANDIT",PD:"PANDIT",KR:"KUMAR",KMR:"KUMAR",CH:"CHANDRA",CHDR:"CHANDRA",SK:"SHEIKH",SH:"SHEIKH",SM:"SAMAN",SRI:"SHRI",RAM:"RAMA",DEV:"DEVI",JR:"JUNIOR",SR:"SENIOR"};function ve(g){return g.split(/\s+/).map(P=>ge[P]||P).join(" ")}const V=ve(O),X=ve(k),fe=V!==O||X!==k,G=V,_=X,we=G===_,ye=G.split(/\s+/).filter(Boolean),Se=_.split(/\s+/).filter(Boolean),Ne=!we&&ye.slice().reverse().join(" ")===Se.join(" ");function*Ce(g,L){if(!L){yield[];return}for(let F=0;F<g.length;F++)for(const P of Ce(g.filter((se,ne)=>ne!==F),L-1))yield[g[F],...P]}function Ee(g){const L=g.split(" "),F=new Set;for(let P=0;P<=L.length;P++)for(const se of Ce(L,P))F.add(se.join(""));return F}function e(g){const L=g.split(" "),F=new Set;for(let P=1;P<=L.length;P++)for(let se=0;se<=L.length-P;se++){const ne=[...L];for(let ae=se;ae<se+P;ae++)ne[ae]=L[ae][0]||"";for(const ae of Ee(ne.join(" ")))F.add(ae)}return F}const t=G.length>=_.length?G:_,s=(G.length>=_.length?_:G).replace(/ /g,""),a=Ee(t),y=e(t),c=a.has(s)||y.has(s),S=[...new Set([...a,...y])].filter(g=>g.length>0).slice(0,12);function B(g){const L=[g];return[[/PH/g,"F"],[/EE/g,"I"],[/OO/g,"U"],[/TH/g,"T"],[/DH/g,"D"],[/SH/g,"S"],[/GH/g,"G"],[/KH/g,"K"],[/BH/g,"B"],[/AA/g,"A"],[/EE/g,"I"],[/Y$/g,"I"],[/W/g,"V"],[/Z/g,"J"]].forEach(([P,se])=>{const ne=g.replace(P,se);ne!==g&&!L.includes(ne)&&L.push(ne)}),L}const K=B(G),ee=B(_);let z=null,te=0;K.forEach(g=>{ee.forEach(L=>{const F=D(g,L);F>te&&(te=F,z=[g,L])})});const $=D(G,_),le=1-b(G,_)/Math.max(G.length,_.length),U=E(G,_),H=A(G,_),be=Math.round(($*.35+le*.25+U*.2+H*.2)*100),de=be>=o,pe=Math.abs(be-o)<=5,q={match:de,composite_score:be,threshold:o,verdict:de?"MATCH":pe?"REVIEW_BAND":"REJECT",fallback_required:pe,algorithms:{jaro_winkler:{score:Math.round($*100),weight:.35},damerau_levenshtein:{score:Math.round(le*100),weight:.25},dice_coefficient:{score:Math.round(U*100),weight:.2},token_sort:{score:Math.round(H*100),weight:.2}},input:{name_on_pan:G,name_provided:_}};function Z(){n.textContent="200 OK",n.style.color="var(--method-get)",i.style.display="block",l.textContent=JSON.stringify(q,null,2),f.disabled=!1,f.textContent="Send Request",setTimeout(()=>{i.scrollIntoView({behavior:"smooth",block:"nearest"})},100)}if(!p){u.style.display="none",Z();return}f.disabled=!0,f.textContent="Processing...",i.style.display="none",u.style.display="block",r.innerHTML="";let Me=0;const N=setInterval(()=>{Me+=50,h&&(h.textContent=Me+"ms")},50),I=[];let M=0;const Y=350;if(M+=Y,I.push({delay:M,html:`
+      <div class="trace-step">
+        <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">Normalize \u2014 uppercase, trim whitespace</span></div>
+        <div class="trace-data trace-data--highlight">
+          <span class="trace-dim">pan \u2192</span> <span class="trace-val">"${x}"</span><br>
+          <span class="trace-dim">provided \u2192</span> <span class="trace-val">"${v}"</span>
+        </div>
+      </div>
+    `}),re&&(M+=Y,I.push({delay:M,html:`
+        <div class="trace-step">
+          <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">Strip titles \u2014 Dr., Mr., Shri, Smt.</span></div>
+          <div class="trace-data trace-data--highlight">
+            <span class="trace-dim">cleaned \u2192</span> <span class="trace-val">"${O}"</span> vs <span class="trace-val">"${k}"</span>
+          </div>
+        </div>
+      `})),fe?(M+=Y,I.push({delay:M,html:`
+        <div class="trace-step">
+          <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">Expand prefixes/suffixes \u2014 Md, Kr, Pt, Ch, Sk</span></div>
+          <div class="trace-data trace-data--highlight">
+            ${O!==V?`<span class="trace-dim">"${O}" \u2192</span> <span class="trace-val">"${V}"</span><br>`:""}
+            ${k!==X?`<span class="trace-dim">"${k}" \u2192</span> <span class="trace-val">"${X}"</span>`:""}
+            
+          </div>
+        </div>
+      `})):(M+=Y,I.push({delay:M,html:`
+        <div class="trace-step">
+          <div class="trace-label"><span class="trace-icon trace-icon--skip"></span><span class="trace-action">Expand prefixes/suffixes \u2014 <span class="trace-dim">none found</span></span></div>
+        </div>
+      `})),M+=Y,we){I.push({delay:M,html:`
+        <div class="trace-step">
+          <div class="trace-label"><span class="trace-icon trace-icon--hit"></span><span class="trace-action">Fast-path: Exact match \u2014 <span class="trace-green">HIT!</span></span></div>
+          <div class="trace-data trace-data--green">
+            <span class="trace-green">\u2713 Names are identical. Short-circuit \u2192 100% match</span>
+          </div>
+        </div>
+      `}),T(I,r,()=>{clearInterval(N),q.composite_score=100,q.match=!0,q.verdict="MATCH",Z()});return}else I.push({delay:M,html:`
+        <div class="trace-step">
+          <div class="trace-label"><span class="trace-icon trace-icon--skip"></span><span class="trace-action">Fast-path: Exact match \u2014 <span class="trace-dim">no hit</span></span></div>
+        </div>
+      `});if(M+=Y,Ne){I.push({delay:M,html:`
+        <div class="trace-step">
+          <div class="trace-label"><span class="trace-icon trace-icon--hit"></span><span class="trace-action">Fast-path: Reversed word order \u2014 <span class="trace-green">HIT!</span></span></div>
+          <div class="trace-data trace-data--green">
+            <span class="trace-dim">"${ye.join(" ")}"</span> = <span class="trace-dim">"${Se.join(" ")}"</span> reversed<br>
+            <span class="trace-green">\u2713 Match confirmed via word reorder</span>
+          </div>
+        </div>
+      `}),T(I,r,()=>{clearInterval(N),q.composite_score=98,q.match=!0,q.verdict="MATCH",Z()});return}else I.push({delay:M,html:`
+        <div class="trace-step">
+          <div class="trace-label"><span class="trace-icon trace-icon--skip"></span><span class="trace-action">Fast-path: Reversed word order \u2014 <span class="trace-dim">no hit</span></span></div>
+        </div>
+      `});M+=Y;const $e=S.map((g,L)=>`<span class="trace-var${g===s?" trace-var--match":""}" style="animation-delay:${L*60}ms">${g}</span>`).join("");I.push({delay:M,html:`
+      <div class="trace-step">
+        <div class="trace-label"><span class="trace-icon ${c?"trace-icon--hit":"trace-icon--skip"}"></span><span class="trace-action">Fast-path: Abbreviation (recursive permutations) \u2014 <span class="${c?"trace-green":"trace-dim"}">${c?"HIT!":"no hit"}</span></span></div>
+        <div class="trace-data ${c?"trace-data--green":""}">
+          <span class="trace-dim">Generated from "${t}":</span>
+          <div class="trace-variations">${$e}</div>
+          <div style="margin-top:6px;">
+            <span class="trace-dim">Looking for:</span> <span class="trace-hl">"${s}"</span>
+            ${c?'<span class="trace-green" style="margin-left:8px;">\u2713 Found in set!</span>':'<span class="trace-dim" style="margin-left:8px;">\u2014 not in set</span>'}
+          </div>
+        </div>
+      </div>
+    `}),M+=Y;const me=Math.round(te*100)===100,Re=K.length>1||ee.length>1?`<div class="trace-data ${me?"trace-data--green":"trace-data--highlight"}">
+          <span class="trace-dim">Variations of "${G}":</span>
+          <div class="trace-variations" id="trace-vars">
+            ${K.map((g,L)=>`<span class="trace-var${z&&g===z[0]?" trace-var--match":""}" style="animation-delay:${L*80}ms">${g}</span>`).join("")}
+          </div>
+          <span class="trace-dim" style="margin-top:6px;display:block;">Variations of "${_}":</span>
+          <div class="trace-variations">
+            ${ee.map((g,L)=>`<span class="trace-var${z&&g===z[1]?" trace-var--match":""}" style="animation-delay:${(L+K.length)*80}ms">${g}</span>`).join("")}
+          </div>
+          ${z?`<div style="margin-top:6px;"><span class="trace-dim">Best phonetic pair:</span> <span class="trace-hl">"${z[0]}"</span> \u2194 <span class="trace-hl">"${z[1]}"</span> <span class="${me?"trace-green":"trace-gold"}">${Math.round(te*100)}%</span></div>`:""}
+          ${me?'<div style="margin-top:6px;"><span class="trace-green">\u2713 Phonetic variation is exact match \u2014 short-circuit!</span></div>':""}
+        </div>`:"";if(I.push({delay:M,html:`
+      <div class="trace-step">
+        <div class="trace-label"><span class="trace-icon ${me?"trace-icon--hit":"trace-icon--done"}"></span><span class="trace-action">Generating phonetic variations (Indian name rules)${me?' \u2014 <span class="trace-green">HIT!</span>':""}</span></div>
+        ${Re}
+      </div>
+    `}),me){q.composite_score=100,q.match=!0,q.verdict="MATCH",q.reason="phonetic_exact",T(I,r,()=>{clearInterval(N),Z()});return}[{name:"Jaro-Winkler",desc:"prefix-weighted char similarity",score:Math.round($*100),weight:"35%"},{name:"Damerau-Levenshtein",desc:"edit distance (normalized)",score:Math.round(le*100),weight:"25%"},{name:"Dice Coefficient",desc:"bigram overlap",score:Math.round(U*100),weight:"20%"},{name:"Token Sort",desc:"order-independent comparison",score:Math.round(H*100),weight:"20%"}].forEach(g=>{M+=Y;const L=g.score>=o?"trace-bar-fill--green":g.score>=o-10?"":"trace-bar-fill--gold";I.push({delay:M,html:`
+        <div class="trace-step">
+          <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">${g.name} <span class="trace-dim">(${g.desc})</span></span></div>
+          <div class="trace-data">
+            <div class="trace-score-bar">
+              <div class="trace-bar-track"><div class="trace-bar-fill ${L}" style="width:${g.score}%"></div></div>
+              <span class="trace-bar-val">${g.score}%</span>
+              <span class="trace-dim">\xD7 ${g.weight}</span>
+            </div>
+          </div>
+        </div>
+      `})}),M+=Y;const He=de?"trace-green":pe?"trace-gold":"trace-red",Ae=de?"\u2713 MATCH":pe?"\u26A0 REVIEW BAND (fallback to API)":"\u2717 REJECT";I.push({delay:M,html:`
+      <div class="trace-step">
+        <div class="trace-label"><span class="trace-icon trace-icon--done"></span><span class="trace-action">Weighted composite score</span></div>
+        <div class="trace-data trace-data--${de?"green":pe?"gold":"red"}">
+          <div class="trace-score-bar">
+            <div class="trace-bar-track"><div class="trace-bar-fill ${de?"trace-bar-fill--green":""}" style="width:${be}%"></div></div>
+            <span class="trace-bar-val" style="font-size:14px;">${be}%</span>
+            <span class="trace-dim">threshold: ${o}%</span>
+          </div>
+          <div style="margin-top:8px;font-size:13px;"><span class="${He}">${Ae}</span></div>
+        </div>
+      </div>
+    `}),T(I,r,()=>{clearInterval(N),Z()})};function T(m,d,o){m.forEach((p,i)=>{setTimeout(()=>{d.insertAdjacentHTML("beforeend",p.html),d.scrollTop=d.scrollHeight,d.querySelectorAll(".trace-bar-fill").forEach(l=>{const u=l.style.width;l.style.width="0",requestAnimationFrame(()=>l.style.width=u)}),i===m.length-1&&setTimeout(o,500)},p.delay)})}function D(m,d){if(m===d)return 1;const o=m.length,p=d.length,i=Math.floor(Math.max(o,p)/2)-1,n=new Array(o).fill(!1),l=new Array(p).fill(!1);let u=0,r=0;for(let v=0;v<o;v++){const j=Math.max(0,v-i),O=Math.min(v+i+1,p);for(let k=j;k<O;k++)if(!(l[k]||m[v]!==d[k])){n[v]=l[k]=!0,u++;break}}if(u===0)return 0;let h=0;for(let v=0;v<o;v++)if(n[v]){for(;!l[h];)h++;m[v]!==d[h]&&r++,h++}const f=(u/o+u/p+(u-r/2)/u)/3;let x=0;for(let v=0;v<Math.min(4,Math.min(o,p))&&m[v]===d[v];v++)x++;return f+x*.1*(1-f)}function b(m,d){const o=m.length,p=d.length,i=Array.from({length:o+1},()=>new Array(p+1).fill(0));for(let n=0;n<=o;n++)i[n][0]=n;for(let n=0;n<=p;n++)i[0][n]=n;for(let n=1;n<=o;n++)for(let l=1;l<=p;l++){const u=m[n-1]===d[l-1]?0:1;i[n][l]=Math.min(i[n-1][l]+1,i[n][l-1]+1,i[n-1][l-1]+u),n>1&&l>1&&m[n-1]===d[l-2]&&m[n-2]===d[l-1]&&(i[n][l]=Math.min(i[n][l],i[n-2][l-2]+u))}return i[o][p]}function E(m,d){if(m.length<2||d.length<2)return 0;const o=new Set,p=new Set;for(let n=0;n<m.length-1;n++)o.add(m.slice(n,n+2));for(let n=0;n<d.length-1;n++)p.add(d.slice(n,n+2));let i=0;return o.forEach(n=>{p.has(n)&&i++}),2*i/(o.size+p.size)}function A(m,d){const o=m.split(/\s+/).sort().join(" "),p=d.split(/\s+/).sort().join(" ");return D(o,p)}})();const TIMELINE_PERIODS=[{key:"telebu",start:new Date(2019,11,1),end:new Date(2020,11,31),label:"Telebu",color:"#a78bfa"},{key:"gap",start:new Date(2021,0,1),end:new Date(2022,2,31),label:"Career break",color:null},{key:"indialends",start:new Date(2022,3,1),end:new Date(2023,11,31),label:"IndiaLends",color:"var(--color-gold)"},{key:"siemens",start:new Date(2024,0,1),end:null,label:"Siemens",color:"var(--color-accent)"}];function _fmtDate(T){return T?T.toLocaleDateString("en-IN",{month:"short",year:"numeric"}):"Present"}function initTimeline(){const T=document.getElementById("timeline-bar"),D=document.getElementById("gap-zzz");if(!T)return;const b=new Date,E=TIMELINE_PERIODS.reduce((i,n)=>i+((n.end||b)-n.start),0);let A=0,m=0,d=0;TIMELINE_PERIODS.forEach(i=>{const n=T.querySelector(`[data-key="${i.key}"]`);if(!n)return;const u=(i.end||b)-i.start,r=u/E*100;n.style.flex=`0 0 ${r.toFixed(3)}%`;const h=Math.round(u/(1e3*60*60*24*30.44)),f=i.end?`${i.label} \xB7 ${_fmtDate(i.start)} \u2013 ${_fmtDate(i.end)} \xB7 ${h}mo`:`${i.label} \xB7 ${_fmtDate(i.start)} \u2013 Present \xB7 ${h}mo`;if(i.key==="gap"){if(A=d/E*100,m=r,n.setAttribute("data-tooltip",`Career break \xB7 ${_fmtDate(i.start)} \u2013 ${_fmtDate(i.end)} \u2014 recalibrating`),D){const x=D.querySelector(".gap-tooltip");x&&(x.textContent=`Career break \xB7 ${_fmtDate(i.start)} \u2013 ${_fmtDate(i.end)} \u2014 recalibrating`)}}else n.setAttribute("title",f);d+=u}),D&&(D.style.left=`${A.toFixed(3)}%`,D.style.width=`${m.toFixed(3)}%`);const o=document.getElementById("timeline-years");if(o){const i=TIMELINE_PERIODS[0].start.getFullYear(),n=b,l=n-TIMELINE_PERIODS[0].start,u=n.getFullYear();let r="";for(let h=i;h<=u;h++){const x=(new Date(h,0,1)-TIMELINE_PERIODS[0].start)/l*100;if(x<0||x>100)continue;const v=h===u,j=v?"100%":`${x.toFixed(2)}%`;r+=`<span class="timeline-year${v?" timeline-year--now":""}"
+                     style="left:${j};transform:${v?"translateX(-100%)":"translateX(-50%)"}">${v?"now":h}</span>`}o.innerHTML=r}const p=document.getElementById("timeline-legend");p&&(p.innerHTML=[...TIMELINE_PERIODS].filter(i=>i.color).map(i=>{const n=i.end?"":" (current)";return`<div class="timeline-legend-item">
+          <span class="timeline-legend-dot" style="background:${i.color}"></span>
+          ${i.label}${n}
+        </div>`}).join(""))}initTimeline(),(function(){const T=document.querySelector(".timeline-segment--gap"),D=document.querySelector(".gap-zzz");T&&D&&(T.addEventListener("click",function(b){b.stopPropagation(),D.classList.toggle("tooltip-visible")}),document.addEventListener("click",function(){D.classList.remove("tooltip-visible")}))})();
