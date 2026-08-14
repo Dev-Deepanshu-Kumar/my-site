@@ -5,7 +5,7 @@
 const esbuild = require('esbuild');
 const path = require('path');
 
-const watch = process.argv.includes('--watch');
+const watch = process.argv.includes('--watch'); 
 
 // CSS entry — import order matters: base → layout → sections → components → animations
 const cssEntry = 'src/css/entry.css';
