@@ -8,7 +8,7 @@
  *   CAREER_START              — your engineering start date
  *   GAP_DAYS                  — days to subtract (career break)
  *   EXCLUDE_FROM_COUNT        — section IDs that don't count toward explored total
- *                               (overview is excluded — always visible on load)
+ *                              (overview is excluded — always visible on load)
  */
 (function() {
   'use strict';
@@ -116,4 +116,6 @@
       });
     }, { threshold: 0.1, rootMargin: '0px 0px -10% 0px' });
     lastObserver.observe(lastSection);
-  })();
+  }
+
+})();
