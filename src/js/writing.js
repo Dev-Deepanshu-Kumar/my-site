@@ -9,7 +9,7 @@
  *   per_page param in fetch URL — controls how many articles show
  */
 (function() {
-  'use strict';
+  'use strict';  
 
   // ── Dev.to Writing Widget ─────────────────────────────────────────
   // Set to false to hide both sidebar and mobile writing widgets instantly
