@@ -104,4 +104,16 @@
   }, { threshold: 0.5 });
   sections.forEach(s => reqScrollObserver.observe(s));
 
-})();
+  // Special-case the last section: observe it with a looser threshold and bottom rootMargin
+  const lastSection = sections[sections.length - 1];
+  if (lastSection) {
+    const lastObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !entry.target.dataset.reqCounted) {
+          entry.target.dataset.reqCounted = 'true';
+          window.bumpRequest('GET');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -10% 0px' });
+    lastObserver.observe(lastSection);
+  })();
