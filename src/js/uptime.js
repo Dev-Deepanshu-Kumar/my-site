@@ -52,7 +52,7 @@
 
   // ── Rate Limit Progress ───────────────────────────────────────────
   const visitedSections    = new Set();
-  const EXCLUDE_FROM_COUNT = new Set(['overview']);
+  const EXCLUDE_FROM_COUNT = new Set([]); //new Set(['overview']);
   const totalEndpoints     = [...sections].filter(s => !EXCLUDE_FROM_COUNT.has(s.id)).length;
 
   const rateLimitObserver = new IntersectionObserver((entries) => {
