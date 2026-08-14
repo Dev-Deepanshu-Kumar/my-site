@@ -8,7 +8,7 @@
  *   CAREER_START              — your engineering start date
  *   GAP_DAYS                  — days to subtract (career break)
  *   EXCLUDE_FROM_COUNT        — section IDs that don't count toward explored total
- *                              (overview is excluded — always visible on load)
+ *                               (overview is excluded — always visible on load)
  */
 (function() {
   'use strict';
@@ -94,28 +94,38 @@
     if (mwReq) mwReq.textContent = total;
   };
 
+  // Robust observer: handle short / near-footer sections which may never reach a high threshold
   const reqScrollObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      if (entry.isIntersecting && !entry.target.dataset.reqCounted) {
+      if (entry.target.dataset.reqCounted) return;
+
+      const ratio = entry.intersectionRatio || 0;
+      // Treat as visible if at least 25% of the section is in view
+      const enoughVisible = ratio >= 0.25;
+      // Also treat as visible if the element's bottom is at/within viewport (handles short/near-footer sections)
+      const rect = entry.boundingClientRect || { bottom: Infinity };
+      const nearBottom = rect.bottom <= (window.innerHeight + 10);
+
+      if (entry.isIntersecting && (enoughVisible || nearBottom)) {
         entry.target.dataset.reqCounted = 'true';
         window.bumpRequest('GET');
       }
     });
-  }, { threshold: 0.5 });
+  }, { threshold: [0, 0.25, 0.5], rootMargin: '0px 0px -10% 0px' });
   sections.forEach(s => reqScrollObserver.observe(s));
 
-  // Special-case the last section: observe it with a looser threshold and bottom rootMargin
-  const lastSection = sections[sections.length - 1];
-  if (lastSection) {
-    const lastObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting && !entry.target.dataset.reqCounted) {
-          entry.target.dataset.reqCounted = 'true';
-          window.bumpRequest('GET');
-        }
-      });
-    }, { threshold: 0.1, rootMargin: '0px 0px -10% 0px' });
-    lastObserver.observe(lastSection);
+  // Fallback: on scroll/resize, count any leftover sections whose bottom has entered the viewport
+  function countNearBottomSections() {
+    sections.forEach(s => {
+      if (s.dataset.reqCounted) return;
+      const rect = s.getBoundingClientRect();
+      if (rect.bottom <= window.innerHeight + 5) {
+        s.dataset.reqCounted = 'true';
+        window.bumpRequest('GET');
+      }
+    });
   }
+  window.addEventListener('scroll', countNearBottomSections, { passive: true });
+  window.addEventListener('resize', countNearBottomSections);
 
 })();
