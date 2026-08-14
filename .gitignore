@@ -1,3 +1,5 @@
 node_modules/
 src/_bundle.css
 src/_bundle.js
+js/main.js
+css/style.css
